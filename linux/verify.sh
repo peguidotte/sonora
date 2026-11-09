@@ -5,9 +5,8 @@ export LC_ALL=C
 umask 077
 script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 network_script=$script_dir/network.sh
-monitor_script=$script_dir/monitor.sh
+monitor_script=/usr/local/bin/sonora-monitor
 [[ -f $network_script ]] || network_script=/usr/local/sbin/sonora-network
-[[ -f $monitor_script ]] || monitor_script=/usr/local/bin/sonora-monitor
 [[ $EUID == 0 ]] || { echo 'Executar como root.' >&2; exit 2; }
 infra_only=false
 fault=false
@@ -49,13 +48,17 @@ DO \$\$ BEGIN
 END \$\$;"
 check private_files python3 - <<'PY'
 from pathlib import Path
-import stat
+import grp, stat, subprocess
 for name in ('admin', 'api.env', 'soa.env', 'migrator.env'):
     p = Path('/etc/sonora') / name
     assert p.stat().st_uid == 0 and not stat.S_IMODE(p.stat().st_mode) & 0o077, 'Unsafe configuration permissions'
 for name in ('api', 'soa'):
     p = Path(f'/etc/sonora/{name}-keys.json')
-    assert p.stat().st_uid == 0 and stat.S_IMODE(p.stat().st_mode) == 0o640, 'Unsafe key-file permissions'
+    assert (p.stat().st_uid == 0 and stat.S_IMODE(p.stat().st_mode) == 0o640
+            and p.stat().st_gid == grp.getgrnam('sonora-' + name).gr_gid), 'Unsafe key-file permissions'
+    assert subprocess.run(['runuser','-u','sonora-' + name,'--','test','-r',str(p)]).returncode == 0
+    for other in ('admin/read.key', 'migrator.env', ('soa' if name=='api' else 'api') + '-keys.json'):
+        assert subprocess.run(['runuser','-u','sonora-' + name,'--','test','-r','/etc/sonora/' + other]).returncode != 0
 print('Configuration metadata checked; no secret contents emitted.')
 PY
 check internal_listeners python3 - <<'PY'
@@ -90,6 +93,8 @@ if $fault; then
 fi
 
 if $load; then
+  # O usuário do serviço lê apenas o runtime instalado (bootstrap é root-only).
+  check monitor_runtime_readable runuser -u sonora-monitor -- test -r "$monitor_script"
   # Unidades de laboratório isoladas: não alterar limites/configuração do monitor de produção.
   monitor_unit="sonora-lab-monitor-$$"
   load_unit="sonora-lab-load-$$"
