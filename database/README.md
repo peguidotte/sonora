@@ -22,7 +22,7 @@ Com PostgreSQL e Java 21 locais, exportar `PGHOST`, `PGPORT`, `PGDATABASE`, `PGU
 
 ## Evolução e testes
 
-`V1__create_namespaces.sql` prepara somente os schemas e permissões padrão. **Tabelas, views e seed do domínio ainda serão desenvolvidos pelo Felipe**, conforme [database.json](../contracts/database.json). Histórico Flyway fica em `sonora_meta`, fora da interface de leitura. Runtime Java usa `sonora_ingest`; C# usa `sonora_query`; nenhum aplica migrations. As views devem cumprir o contrato e expor somente campos permitidos.
+`V1__create_namespaces.sql` prepara somente os schemas e permissões padrão. **Tabelas, views e seed do domínio ainda serão desenvolvidos pelo Felipe**, conforme [database.json](../contracts/database.json). Histórico Flyway fica em `sonora_meta`, fora da interface de leitura. Qualificar objetos de domínio como `sonora.nome` e views como `sonora_read.nome`; não usar o schema padrão `sonora_meta` para tabelas da aplicação. Runtime Java usa `sonora_ingest`; C# usa `sonora_query`; nenhum aplica migrations. As views devem cumprir o contrato e expor somente campos permitidos.
 
 Criar novas versões `V2__...sql`, `V3__...sql`; preservar migrations já aplicadas e coordenar numeração/revisão. Mudanças devem preservar serviços que ainda estejam rodando. Seed sintético de demonstração deve ser explícito e separado das migrations de produção em `seeds/dev/` quando implementado; não importar fixtures de ML como resultado real nem carregar seed automaticamente na Azure.
 
