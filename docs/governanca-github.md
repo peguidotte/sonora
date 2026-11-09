@@ -13,7 +13,15 @@ Monorepo privado criado na conta @peguidotte por solicitação de Pedro. Nome co
 
 ## Proteção técnica
 
-Estado inicial: será conferido via API após o primeiro push. Política documentada não equivale a proteção ativa. Em repositório privado, branch protection depende do plano GitHub; se a API recusar por plano, registrar a resposta e manter disciplina de PR sem alegar bloqueio técnico.
+**Verificado em 08/11/2026: proteção de main não está ativa.** A API recusou a configuração com HTTP 403: “Upgrade to GitHub Pro or make this repository public to enable this feature”. O repositório foi mantido privado e nenhum plano foi alterado. Assim, a política de PR/revisão depende da disciplina do grupo enquanto o recurso não estiver disponível; não há bloqueio técnico de push direto/merge sem aprovação nesta conta.
+
+Configurações aplicadas: main como branch padrão, squash merge habilitado, merge commit/rebase merge desabilitados e exclusão de branch após merge. A proteção solicitada exigia check de contratos, uma aprovação e bloqueio de force-push/exclusão; a recusa não aplicou esses bloqueios.
+
+## Estado da CI remota
+
+Em 08/11, os primeiros runs de push e workflow_dispatch terminaram em startup_failure antes de criar qualquer job. A API não retornou anotações/causa específica. As mesmas validações passaram localmente; actionlint 1.7.12, obtido do release oficial e conferido por SHA-256, não apontou erro nos dois workflows. Isso não demonstra sucesso da execução no GitHub.
+
+A inspeção da mensagem visual ficou indisponível porque navegação local está desativada nas configurações do aplicativo. Pendente conferir o erro na aba Actions e eventuais restrições da conta/execução. Não afirmar que a CI remota está verde nem atribuir a falha a faturamento sem evidência. Referências dos runs iniciais: 42538039118 e 42538127838 (repo temporário criado nesta sessão).
 
 Referência: [GitHub — protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
 
