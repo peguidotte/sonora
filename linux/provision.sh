@@ -211,6 +211,7 @@ MaxRetentionSec=14day
 EOF
 cat > /etc/logrotate.d/sonora <<'EOF'
 /var/log/sonora-*.log {
+    su root root
     weekly
     maxsize 5M
     rotate 4
@@ -222,4 +223,5 @@ cat > /etc/logrotate.d/sonora <<'EOF'
 EOF
 systemctl restart systemd-journald
 journalctl --flush
+logrotate --debug /etc/logrotate.d/sonora > /var/log/sonora-logrotate-validation.log 2>&1
 echo "$(date -Is) COMPLETE provision; aplicações aguardam artefatos reais e migrations SOA."

@@ -36,6 +36,9 @@ for unit in postgresql caddy sonora-monitor; do
   check "${unit}_boot" systemctl is-enabled --quiet "$unit"
 done
 check database pg_isready -h 127.0.0.1 -p 5432 -d sonora
+check journal_persistent test -d /var/log/journal
+check_log_rotation() { logrotate --debug /etc/logrotate.d/sonora > /var/log/sonora-logrotate-validation.log 2>&1; }
+check log_rotation check_log_rotation
 check proxy_config caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 check database_permissions runuser -u postgres -- psql -X -v ON_ERROR_STOP=1 -At sonora -c "
 DO \$\$ BEGIN
