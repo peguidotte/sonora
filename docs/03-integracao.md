@@ -1,4 +1,4 @@
-# Contratos de integração — API de ruído v0.2.0
+# Contratos de integração — API de ruído v0.3.0
 
 **Proposta de implementação em 08/11/2026.** Este é o acordo inicial entre responsáveis; não existe API implementada. Mudanças devem ser registradas aqui antes de alterar consumidores. Os responsáveis podem ajustar o contrato em conjunto; não alterar campos silenciosamente.
 
@@ -33,9 +33,9 @@ Origem enum: `simulated` ou `public_dataset`. Método enum inicial: `wokwi_linea
 | Entidade | Campos mínimos |
 | --- | --- |
 | Source | id, name, sourceUrl, snapshotDate, license, origin, limitations |
-| Point | id, name, city, latitude, longitude, isDemo |
-| Device | id, pointId, name, enabled, lastReceivedAt, secretHash |
-| Observation | id, sourceId, pointId, deviceId opcional, sessionId, externalId, observedAt, durationSeconds, laeqDbA, method, calibrationStatus, receivedAt |
+| Location | id, name, city, latitude, longitude, isDemo |
+| Device | id, locationId, name, enabled, lastReceivedAt, secretHash |
+| Observation | id, sourceId, locationId, deviceId opcional, sessionId, externalId, observedAt, durationSeconds, laeqDbA, method, calibrationStatus, receivedAt |
 | MlSummary | id, modelVersion, city, dataPeriod, sampleCount, groups, metrics, limitations, createdAt |
 | ImportBatch — banco SOA | id, sourceId, fileSha256, status, acceptedCount, duplicateCount, rejectedCount, deliveryStatus, createdAt |
 
@@ -47,21 +47,21 @@ Leituras públicas devem corresponder ao entorno do ponto cadastrado: importador
 | --- | --- |
 | GET /health/live | 200 se processo ativo, sem segredos |
 | GET /health/ready | 200 se banco acessível; 503 caso contrário |
-| GET /api/v1/pontos | Lista paginada: items, page, pageSize, total; pageSize até 100 |
-| GET /api/v1/pontos/{id} | Nome, coordenadas, cidade, isDemo; 404 inexistente |
-| GET /api/v1/pontos/{id}/perfil | Janela from/to, origin obrigatória, agregação por hora/dia; cobertura e fonte |
-| GET /api/v1/pontos/{id}/observacoes | Registros paginados, mesmos filtros temporais e de origem |
-| POST /api/v1/observacoes | Ingestão de dispositivo, uma observação simulada, com X-Ingest-Key |
-| POST /api/v1/importacoes/observacoes | Lote administrativo de até 100 observações reais, com X-Admin-Key |
-| GET /api/v1/dispositivos | Estado de dispositivos de demonstração, sem hashes/chaves |
-| GET /api/v1/analises/resumo | Resumo ML ou 204 enquanto não importado |
-| GET /painel | Página simples: pontos, leituras, origem e disponibilidade; Swagger não substitui esta visão |
+| GET /api/v1/locations | Lista paginada: items, page, pageSize, total; pageSize até 100 |
+| GET /api/v1/locations/{locationId} | Nome, coordenadas, cidade, isDemo; 404 inexistente |
+| GET /api/v1/locations/{locationId}/noise-profile | Janela from/to, origin obrigatória, agregação por hora/dia; cobertura e fonte |
+| GET /api/v1/locations/{locationId}/observations | Registros paginados, mesmos filtros temporais e de origem |
+| POST /api/v1/observations | Ingestão de dispositivo, uma observação simulada, com X-Api-Key e observations:write |
+| POST /api/v1/imports/observations | Lote administrativo de até 100 observações reais, com X-Api-Key e imports:write |
+| GET /api/v1/devices | Estado de dispositivos de demonstração, sem hashes/chaves |
+| GET /api/v1/analytics/summary | Resumo ML ou 204 enquanto não importado |
+| GET /dashboard | Página simples: pontos, leituras, origem e disponibilidade; Swagger não substitui esta visão |
 
-Filtro geográfico proposto de GET /pontos: latitude/longitude em par e radiusMeters (padrão 500; 1–1000), calculando distância entre pontos cadastrados e coordenada consultada. É busca de pontos próximos; o raio não certifica cobertura acústica da área. Sem coordenadas, listar catálogo. Endereço textual/geocoding fica fora do MVP.
+Filtro geográfico proposto de GET /locations: latitude/longitude em par e radiusMeters (padrão 500; 1–1000), calculando distância entre pontos cadastrados e coordenada consultada. É busca de pontos próximos; o raio não certifica cobertura acústica da área. Sem coordenadas, listar catálogo. Endereço textual/geocoding fica fora do MVP.
 
-Janela de consulta: from inclusivo, to exclusivo; ambos obrigatórios e from < to; até 31 dias por requisição. Origin obrigatória nas consultas de observações/perfil. Perfil sem dados responde 200 com `status: no_data`, métricas nulas e lista vazia; ponto inexistente responde 404. Não devolver zero dB para representar ausência.
+Janela de consulta: from inclusivo, to exclusivo; ambos obrigatórios e from < to; até 31 dias por requisição. Origin obrigatória nas consultas de observações/noise-profile. Perfil sem dados responde 200 com `status: no_data`, métricas nulas e lista vazia; ponto inexistente responde 404. Não devolver zero dB para representar ausência.
 
-Consultas de demonstração são públicas, somente leitura, sem PII. Autenticação de assinantes, cobrança e quotas comerciais são futuras. Gravações usam chaves distintas, fora do Git; ingestão vinculada ao dispositivo. Chave administrativa só no backend/operador, nunca no app ou sketch público. O Wokwi público usa credencial descartável restrita a dados simulados, revogada após a demonstração.
+API de dados privada: todas as rotas /api/v1 exigem X-Api-Key e a permissão definida no OpenAPI. Chaves de cliente, dispositivo, importador e operador têm escopos distintos. GET /health/live só revela estado mínimo; /dashboard pode servir HTML vazio, com consultas privadas posteriores. Readiness/documentação operacional exigem operations:read. Chaves fora do Git, URLs e logs; credenciais comerciais reais nunca são embutidas em app/sketch. No Wokwi, usar credencial descartável vinculada ao dispositivo e revogar após a demonstração. Regras completas em [acesso privado](api-security.md). Cobrança e quotas comerciais continuam futuras.
 
 ## Exemplo de ingestão simulada
 
@@ -105,9 +105,9 @@ Estado operacional: dispositivo fica stale após 60 s sem recebimento, valor con
 
 ## Integração SOA e ML
 
-SOA: POST /api/v1/lotes cria importação de arquivo local previamente cadastrado; GET /api/v1/lotes e GET /api/v1/lotes/{id} consultam estado/contagens. Sem download de URL arbitrária nem caminho livre enviado pelo usuário. SQLite com migrations persiste lotes/erros sanitizados. Envio à API principal usa POST /importacoes/observacoes; tentativas repetidas mantêm externalId. Não criar filas distribuídas.
+SOA: POST /api/v1/batches cria importação de arquivo local previamente cadastrado; GET /api/v1/batches e GET /api/v1/batches/{batchId} consultam estado/contagens. Sem download de URL arbitrária nem caminho livre enviado pelo usuário. SQLite com migrations persiste lotes/erros sanitizados. Envio à API principal usa POST /imports/observations; tentativas repetidas mantêm externalId. Não criar filas distribuídas.
 
-ML entrega `ml/output/resumo.json` com schemaVersion=1, city, modelVersion, sourceUrl, datasetSha256, dataPeriod (início/fim), sampleCount, groups (id, count, description), metrics (nome, treino, teste), limitations. Backend importa por comando administrativo documentado, validando schema antes da gravação. Não executar pickle de terceiros. GET /analises/resumo expõe o resumo, sem necessidade de serviço Python online.
+ML entrega `ml/output/summary.json` com schemaVersion=1, city, modelVersion, sourceUrl, datasetSha256, dataPeriod (início/fim), sampleCount, groups (id, count, description), metrics (nome, treino, teste), limitations. Backend importa por comando administrativo documentado, validando schema antes da gravação. Não executar pickle de terceiros. GET /analytics/summary expõe o resumo, sem necessidade de serviço Python online.
 
 A análise da cidade não atribui automaticamente um grupo a cada endereço. Só ligar uma análise a um ponto se houver correspondência de observação/local/período comprovada; isso é extensão do MVP.
 
@@ -127,10 +127,12 @@ Caminhos propostos: /opt/gs-ruido/app (artefatos), /var/lib/gs-ruido/ruido.db (d
 6. Resumo ML validado aparece com versão e limitações.
 7. Erros/logs não expõem chaves, payloads sensíveis ou stack trace.
 
-Schemas e exemplos serão conferidos contra o OpenAPI real antes da integração. Os contratos v0.2.0 em contracts/openapi/ e o schema ML são verificáveis. Continuam sendo especificação; os exemplos não são evidência da implementação.
+Schemas e exemplos serão conferidos contra o OpenAPI real antes da integração. Os contratos v0.3.0 em contracts/openapi/ e o schema ML são verificáveis. Continuam sendo especificação; os exemplos não são evidência da implementação.
 
 ## Monorepo, contratos e deploy
 
-Componentes na mesma main, com entregas/persistências independentes; monorepo não significa um backend para duas rubricas. OpenAPI: contracts/openapi/csharp.openapi.json e soa.openapi.json. Erro estrutural é code/message/traceId opcional. Autenticação de operações SOA usa X-Operator-Key, distinta da chave administrativa do C#; não devolver esse segredo em resposta.
+Componentes na mesma main, com entregas/persistências independentes; monorepo não significa um backend para duas rubricas. OpenAPI: contracts/openapi/csharp.openapi.json e soa.openapi.json. Erro estrutural é code/message/traceId opcional. Autenticação usa X-Api-Key nos dois serviços; operador SOA tem imports:manage, enquanto a chamada SOA -> C# exige outra credencial com imports:write. Não reutilizar a mesma chave entre serviços nem devolver segredos em resposta.
 
 Destino planejado: Azure, C# e SOA hospedados como serviços independentes numa VM; base externa SOA pode usar prefixo /soa removido no proxy. Modo local preservado. [Plano de deploy](../deploy/azure/README.md) e [regras RN01–RN20](regras-de-negocio.md).
+
+Rotas, nomes de campos, enums, tipos de contrato e erros técnicos usam inglês; documentação explicativa permanece PT-BR. Location substitui Point, locationId substitui pointId e ml/output/summary.json substitui o nome anterior. Sem aliases das rotas antigas no MVP. [Visão rápida das APIs](api-overview.md).

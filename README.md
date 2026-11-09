@@ -66,11 +66,11 @@ python tools/mock_server.py --service csharp --port 4010
 python tools/mock_server.py --service soa --port 4011
 ```
 
-Mock C#: http://127.0.0.1:4010/painel e /openapi.json. Mock SOA: http://127.0.0.1:4011/openapi.json. São exemplos estáticos, sem persistência ou autenticação real; [limites e exemplos](contracts/README.md). O responsável implementa banco/seed e funcionamento real da própria matéria.
+Mock C#: http://127.0.0.1:4010/dashboard (HTML vazio) e /openapi.json com chave de operador. Mock SOA: http://127.0.0.1:4011/openapi.json com chave SOA. Dados privados usam X-Api-Key de fixture. São exemplos estáticos, sem persistência ou autenticação de produção; [chaves, limites e exemplos](contracts/README.md). O responsável implementa banco/seed e funcionamento real da própria matéria.
 
 ## Integração e deploy
 
-C# recebe IoT simulado e lotes reais do SOA, serve Mobile/painel e importa resumo ML. Fonte real, histórico e simulação ficam separados; ausência não é 0 dB. Nenhum áudio é armazenado.
+C# recebe IoT simulado e lotes reais do SOA, serve Mobile/dashboard e importa resumo ML. Fonte real, histórico e simulação ficam separados; ausência não é 0 dB. Nenhum áudio é armazenado.
 
 Destino provável indicado pelo grupo: **Azure**, inicialmente VM Linux com serviços C#/SOA independentes, HTTPS e dados persistentes. Aplicações e provisionamento ainda serão implementados. Assinatura, região, recursos/créditos e acesso precisam ser definidos; nenhum recurso Azure foi criado nesta etapa.
 
@@ -85,3 +85,7 @@ Branches por entrega -> pull request -> revisão de Pedro e responsáveis afetad
 Prazo conservador do PDF: **19/11/2026 às 23h55**. Integração alvo até 16/11; revisão/vídeos em 17–18/11. Metas internas não alteram as datas oficiais.
 
 Materiais privados do Teams, conversas locais, bancos/segredos e dados brutos não são versionados. Registrar usos de IA em [docs/uso-de-ia.md](docs/uso-de-ia.md). Não há entrevistas, implantação física, venda, resultado científico ou entrega acadêmica presumidos.
+
+## Contratos privados v0.3.0
+
+Rotas, JSON e erros em inglês. Todas as rotas de dados exigem X-Api-Key com permissão explícita; somente liveness e HTML vazio de interface são anônimos. [Visão rápida das APIs](docs/api-overview.md) e [autenticação/escopos](docs/api-security.md). Para testar os mocks, usar somente as chaves públicas em contracts/fixtures/mock-credentials.json; elas nunca devem ser aceitas no deploy.

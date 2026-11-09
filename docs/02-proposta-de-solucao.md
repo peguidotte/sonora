@@ -44,7 +44,7 @@ C# é a única aplicação que escreve no banco principal. SOA tem banco própri
 3. Salva favorito e consegue reabrir o resumo em cache sem rede, com data da consulta.
 4. Operador altera o potenciômetro no Wokwi e acompanha leitura simulada na API e no painel.
 5. SOA importa pequeno lote real e comprova validação, deduplicação e rastreabilidade.
-6. Resumo de ML real aparece na API/painel em seção separada, com cidade, versão e limitações.
+6. Resumo de ML real aparece na API/dashboard em seção separada, com cidade, versão e limitações.
 7. Linux inicia a aplicação e o monitor; uma falha controlada demonstra recuperação.
 
 ## Dados já inspecionados

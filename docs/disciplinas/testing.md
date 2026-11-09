@@ -31,7 +31,7 @@ Cada seção abaixo contém os campos pedidos. Objetivo: verificar o comportamen
 
 - **Objetivo:** verificar 200 paginado; apenas pontos no raio; sem afirmar cobertura de toda a área.
 - **Preparação:** Pontos A e B cadastrados; API disponível.
-- **Entrada:** GET /pontos com coordenadas próximas e raio permitido.
+- **Entrada:** GET /locations com coordenadas próximas e raio permitido.
 - **Passos:** Consultar lista; conferir itens e distâncias.
 - **Saída esperada:** 200 paginado; apenas pontos no raio; sem afirmar cobertura de toda a área.
 
@@ -143,16 +143,16 @@ Cada seção abaixo contém os campos pedidos. Objetivo: verificar o comportamen
 
 - **Objetivo:** verificar 200 com cidade, período, grupos, métricas e limitações do experimento; não rotula todos os imóveis.
 - **Preparação:** Resumo real do experimento importado e validado.
-- **Entrada:** GET /analises/resumo.
-- **Passos:** Consultar endpoint/painel; conferir versão e contexto.
+- **Entrada:** GET /analytics/summary.
+- **Passos:** Consultar endpoint/dashboard; conferir versão e contexto.
 - **Saída esperada:** 200 com cidade, período, grupos, métricas e limitações do experimento; não rotula todos os imóveis.
 
 ### TC16 — F08 (−)
 
 - **Objetivo:** verificar 204; interface informa análise não disponível; nenhum resultado inventado.
 - **Preparação:** Banco sem resumo ML importado.
-- **Entrada:** GET /analises/resumo.
-- **Passos:** Consultar endpoint/painel.
+- **Entrada:** GET /analytics/summary.
+- **Passos:** Consultar endpoint/dashboard.
 - **Saída esperada:** 204; interface informa análise não disponível; nenhum resultado inventado.
 
 ## Organização e aceite da entrega
@@ -180,4 +180,8 @@ Projeto Azure, identidade do professor e confirmação de atualizações da tare
 
 ## Organização no monorepo
 
-Pasta `testing/`; branch `felipe/testing`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.2.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Pasta `testing/`; branch `felipe/testing`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+
+## Atualização v0.3.0 — API privada
+
+Preparações de consultas positivas agora incluem X-Api-Key com acoustics:read; consultas de dispositivos/readiness usam operations:read. Casos SOA usam imports:manage no SOA e imports:write no receptor C#. Adequar URLs ao inglês. Adicionar casos de GET sem chave -> 401, chave inválida -> 401, cliente tentando POST -> 403, dispositivo alheio -> 403 e chave revogada -> 401. Em Mobile, chave de leitura somente em memória, fora do cache SQLite. Fixtures públicas do mock não provam proteção em produção.

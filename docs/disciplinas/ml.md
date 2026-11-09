@@ -54,7 +54,7 @@ Mostrar tabela das 12 configurações, média/variação de CV, gráfico PCA, ta
 
 ## Integração e entrega
 
-Exportar ml/output/resumo.json conforme [contrato](../03-integracao.md): versão, cidade, fonte/hash, período, sessões válidas, grupos, métricas e limitações. Nenhuma inferência Python online é necessária. O painel mostra resumo da cidade, em seção separada; não aplicar rótulo de uma sessão a todo o entorno.
+Exportar ml/output/summary.json conforme [contrato](../03-integracao.md): versão, cidade, fonte/hash, período, sessões válidas, grupos, métricas e limitações. Nenhuma inferência Python online é necessária. O painel mostra resumo da cidade, em seção separada; não aplicar rótulo de uma sessão a todo o entorno.
 
 **Meta 09/11:** diagnóstico e amostra tabular limpa. **Meta 11/11:** divisão e pipeline reproduzíveis. **Meta 14/11:** busca/avaliação e resumo. **Meta 17/11:** relatório, notebook executado e vídeo.
 
@@ -66,4 +66,4 @@ Licença/atribuição no artefato redistribuído, filtros e quantidade final de 
 
 ## Organização no monorepo
 
-Pasta `ml/`; branch `gabriel/ia`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.2.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Pasta `ml/`; branch `gabriel/ia`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.

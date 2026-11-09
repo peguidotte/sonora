@@ -23,10 +23,13 @@
 
 - Leonardo (RM555573): api/ e iot/; Felipe (RM556931): soa/ e testing/; Herbert (RM555701): cybersecurity/ e mobile/; Gabriel (RM556476): ml/; Pedro (RM556630): linux/, integração e auditoria. Ver docs/equipe.md.
 - Usuário autorizou repositório GitHub privado, monorepo, branches por entrega, integração via PR/main e planejamento de deploys provavelmente na Azure. Não transformar isso em autorização para implementar todas as matérias dos colegas ou enviar mensagens.
-- Contratos verificáveis v0.2.0 em contracts/; regras em docs/regras-de-negocio.md. Mudanças de interface exigem atualizar consumidores/fixtures e validar contratos.
+- Contratos verificáveis v0.3.0 em contracts/; regras em docs/regras-de-negocio.md. Mudanças de interface exigem atualizar consumidores/fixtures e validar contratos.
 - Todos os componentes devem ter modo standalone e integrado conforme docs/modos-de-execucao.md. Mock não é prova de implementação real; ML usa dados reais.
 - Pedro usará o assistente para auditar entregas contra solução, rubrica, código e evidências. Seguir docs/auditoria.md; identificar commit e comandos realmente executados. Não inventar resultado/nota.
 - Não fazer push direto na main após bootstrap; usar branches e PRs. Conferir se proteções realmente estão ativas; políticas documentadas não são proteção técnica.
 - Fontes privadas, prompts locais, output/ e dataset bruto ficam fora do Git. Registro publicável de IA em docs/uso-de-ia.md, sem conversas privadas.
 
 - Produto aprovado pelo usuário: Sonora. Marca ampla da empresa ainda em aberto; LOC não foi aprovado. Repositório privado: peguidotte/sonora. Não ampliar escopo para inundação. Disponibilidade comercial não foi verificada.
+
+- Decisão do usuário: contratos e rotas em inglês, API de dados privada. Versão v0.3.0; Location/locationId, /locations, /noise-profile, /observations, /imports/observations, /analytics/summary e /batches. Campos camelCase e erros técnicos em inglês; explicações PT-BR preservadas.
+- X-Api-Key único com escopos por operação; ver docs/api-security.md. Todas as rotas /api/v1 privadas. Sem segredo embutido em Mobile/SQLite/Git/URLs; app demo recebe chave de leitura em memória. Mock usa chaves públicas fictícias, nunca de produção.

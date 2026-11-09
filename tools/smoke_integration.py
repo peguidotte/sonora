@@ -28,26 +28,31 @@ def main():
     parser.add_argument("--to", dest="end", required=True)
     args = parser.parse_args()
     assert args.api_base, "Configure API_BASE_URL ou --api-base."
+    read_key = os.environ.get("API_READ_KEY")
+    operator_key = os.environ.get("API_OPERATOR_KEY")
+    assert read_key and operator_key, "Configure API_READ_KEY e API_OPERATOR_KEY."
+    read_headers = {"X-Api-Key": read_key}
+    operator_headers = {"X-Api-Key": operator_key}
     begin = datetime.fromisoformat(args.begin.replace("Z", "+00:00"))
     end = datetime.fromisoformat(args.end.replace("Z", "+00:00"))
     assert end > begin and (end - begin).total_seconds() <= 31 * 86400
     api = load_service("csharp")
     get(args.api_base, "/health/live", api, "/health/live")
-    get(args.api_base, "/health/ready", api, "/health/ready")
-    points = get(args.api_base, "/api/v1/pontos", api, "/api/v1/pontos")
-    assert points["items"], "Sem seed/pontos para demonstrar jornada."
-    point_id = points["items"][0]["id"]
+    get(args.api_base, "/health/ready", api, "/health/ready", headers=operator_headers)
+    points = get(args.api_base, "/api/v1/locations", api, "/api/v1/locations", headers=read_headers)
+    assert points["items"], "Sem seed/locations para demonstrar jornada."
+    location_id = points["items"][0]["id"]
     qs = urlencode({"from":args.begin,"to":args.end,"origin":"simulated"})
-    profile = get(args.api_base, f"/api/v1/pontos/{point_id}/perfil?{qs}", api, "/api/v1/pontos/{id}/perfil")
+    profile = get(args.api_base, f"/api/v1/locations/{location_id}/noise-profile?{qs}", api, "/api/v1/locations/{locationId}/noise-profile", headers=read_headers)
     if profile["status"] == "no_data":
         assert profile["laeqDbA"] is None and not profile["series"], "Ausência confundida com valor medido."
     if args.soa_base:
         soa = load_service("soa")
         get(args.soa_base, "/health/live", soa, "/health/live")
-        get(args.soa_base, "/health/ready", soa, "/health/ready")
         key = os.environ.get("SOA_OPERATOR_KEY")
         assert key, "Configure SOA_OPERATOR_KEY para consultar lotes reais."
-        get(args.soa_base, "/api/v1/lotes", soa, "/api/v1/lotes", headers={"X-Operator-Key":key})
+        get(args.soa_base, "/health/ready", soa, "/health/ready", headers={"X-Api-Key":key})
+        get(args.soa_base, "/api/v1/batches", soa, "/api/v1/batches", headers={"X-Api-Key":key})
     print("OK: endpoints reais consultados e respostas compatíveis. Não testa escrita, persistência ou jornada Mobile.")
 
 

@@ -17,6 +17,7 @@ MAX_BODY = 262144
 
 def create_server(service="csharp", host="127.0.0.1", port=4010):
     document = load_service(service)
+    credentials = json.loads((ROOT / "contracts/fixtures/mock-credentials.json").read_text(encoding="utf-8"))[service]
 
     class Handler(BaseHTTPRequestHandler):
         def log_message(self, *_args):
@@ -36,11 +37,26 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
         def error(self, status, code, message):
             self.send(status, {"code": code, "message": message})
 
+        def authenticate(self, operation):
+            requirements = operation.get("security", document.get("security", []))
+            if not requirements:
+                return True
+            token = self.headers.get("X-Api-Key")
+            self.credential = next((item for item in credentials if item["key"] == token), None)
+            if self.credential is None:
+                self.error(401, "unauthorized", "Missing or invalid mock API key.")
+                return False
+            required = set(operation.get("x-required-scopes", []))
+            if not required.issubset(self.credential["scopes"]):
+                self.error(403, "forbidden", "API key lacks the required scope.")
+                return False
+            return True
+
         def do_OPTIONS(self):
             self.send_response(204)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
-            self.send_header("Access-Control-Allow-Headers", "Content-Type,X-Ingest-Key,X-Admin-Key,X-Operator-Key")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type,X-Api-Key")
             self.end_headers()
 
         def do_GET(self):
@@ -53,6 +69,8 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
             url = urlsplit(self.path)
             query = parse_qs(url.query, keep_blank_values=True)
             if url.path == "/openapi.json" and method == "get":
+                if not self.authenticate({"x-required-scopes": ["operations:read"]}):
+                    return
                 return self.send(200, document)
             for path, path_item in document["paths"].items():
                 pattern = re.sub(r"\\\{[^}]+\\\}", "([^/]+)", re.escape(path))
@@ -60,8 +78,10 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
                 if not match:
                     continue
                 if method not in path_item:
-                    return self.error(405, "method_not_allowed", "Método não previsto.")
+                    return self.error(405, "method_not_allowed", "Method not allowed.")
                 operation = path_item[method]
+                if not self.authenticate(operation):
+                    return
                 try:
                     path_names = re.findall(r"\{([^}]+)\}", path)
                     path_values = dict(zip(path_names, match.groups()))
@@ -70,34 +90,31 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
                         raw = path_values.get(name) if parameter["in"] == "path" else query.get(name, [None])[0]
                         if raw is None:
                             if parameter.get("required"):
-                                return self.error(400, "missing_parameter", "Parâmetro obrigatório ausente: " + name)
+                                return self.error(400, "missing_parameter", "Missing required parameter: " + name)
                             continue
                         typ = parameter["schema"].get("type")
                         value = float(raw) if typ == "number" else int(raw) if typ == "integer" else raw
                         check_value(document, parameter["schema"], value)
                     if ("latitude" in query) != ("longitude" in query):
-                        return self.error(400, "invalid_coordinates", "Latitude e longitude devem ser fornecidas juntas.")
+                        return self.error(400, "invalid_coordinates", "Latitude and longitude must be provided together.")
                     if "from" in query:
                         begin = datetime.fromisoformat(query["from"][0].replace("Z", "+00:00"))
                         end = datetime.fromisoformat(query["to"][0].replace("Z", "+00:00"))
                         if end <= begin or (end - begin).total_seconds() > 31 * 86400:
-                            return self.error(400, "invalid_window", "Janela inválida ou superior a 31 dias.")
-                    for security in operation.get("security", []):
-                        for name in security:
-                            header = document["components"]["securitySchemes"][name]["name"]
-                            if not self.headers.get(header):
-                                return self.error(401, "missing_demo_credential", "Envie uma credencial fictícia; o mock verifica somente presença.")
+                            return self.error(400, "invalid_window", "Invalid time window or period longer than 31 days.")
                     if method == "post":
                         length = int(self.headers.get("Content-Length", "0"))
                         if length < 1 or length > MAX_BODY:
-                            return self.error(400, "invalid_body_size", "Corpo ausente ou acima do limite do mock.")
+                            return self.error(400, "invalid_body_size", "Missing body or mock size limit exceeded.")
                         body = json.loads(self.rfile.read(length), parse_constant=lambda _value: (_ for _ in ()).throw(ValueError("non-finite JSON")))
                         schema = operation["requestBody"]["content"]["application/json"]["schema"]
                         check_value(document, schema, body)
+                        if self.credential.get("deviceId") and body.get("deviceId") != self.credential["deviceId"]:
+                            return self.error(403, "forbidden", "API key is not authorized for this device.")
                 except (ValueError, ValidationError, KeyError, OverflowError):
-                    return self.error(400, "invalid_request", "Entrada incompatível com o contrato.")
-                if url.path == "/painel":
-                    return self.send(200, "<!doctype html><html lang='pt-BR'><meta charset='utf-8'><title>Mock de contrato</title><h1>Mock de contrato</h1><p>Fixtures sintéticas e estáticas. Nenhuma API de disciplina está implementada por este servidor.</p><a href='/api/v1/pontos'>Locais</a><br><a href='/openapi.json'>OpenAPI</a></html>", "text/html")
+                    return self.error(400, "invalid_request", "Request does not match the contract.")
+                if url.path == "/dashboard":
+                    return self.send(200, "<!doctype html><html lang='en'><meta charset='utf-8'><title>Sonora contract mock</title><h1>Static contract mock</h1><p>Synthetic fixtures only. Data endpoints require X-Api-Key. This page contains no private data.</p></html>", "text/html")
                 statuses = operation["responses"]
                 status = "201" if method == "post" and "201" in statuses else "200" if "200" in statuses else "204"
                 media = statuses[status].get("content", {}).get("application/json", {})
@@ -106,8 +123,8 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
                     key = "empty" if query.get("scenario") == ["empty"] else "available"
                     value = copy.deepcopy(media["examples"][key]["value"])
                 # Somente eco de identificador/janela para navegação; nenhum cálculo ou gravação real.
-                if isinstance(value, dict) and "pointId" in value and "id" in path_values:
-                    value["pointId"] = path_values["id"]
+                if isinstance(value, dict) and "locationId" in value and "locationId" in path_values:
+                    value["locationId"] = path_values["locationId"]
                 if isinstance(value, dict) and "from" in query:
                     if "from" in value:
                         value["from"], value["to"] = query["from"][0], query["to"][0]
@@ -120,7 +137,7 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
                         elif "items" in value:
                             value.update(items=[], total=0)
                 return self.send(int(status), value)
-            return self.error(404, "not_found", "Rota não prevista no contrato.")
+            return self.error(404, "not_found", "Route not found.")
 
     return ThreadingHTTPServer((host, port), Handler)
 
@@ -132,7 +149,7 @@ if __name__ == "__main__":
     parser.add_argument("--port", type=int)
     args = parser.parse_args()
     server = create_server(args.service, args.host, args.port or (4010 if args.service == "csharp" else 4011))
-    print(f"MOCK ESTÁTICO {args.service}: http://{args.host}:{server.server_port}; sem persistência/validação de credencial real.", flush=True)
+    print(f"STATIC MOCK {args.service}: http://{args.host}:{server.server_port}; public fixture keys only, no persistence or production authentication.", flush=True)
     try:
         server.serve_forever()
     except KeyboardInterrupt:

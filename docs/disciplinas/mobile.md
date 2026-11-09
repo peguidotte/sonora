@@ -8,12 +8,12 @@ PDF p. 34 e tarefa coletada: React Native + TypeScript, Expo Router, API ou mock
 
 ## Proposta de implementação
 
-Pasta mobile/. App sem login, sem ouvir microfone e sem rastreamento contínuo de localização. Consultar pontos cadastrados; não precisar pagar por geocoding/mapas. Mapa é opcional: lista e coordenadas já permitem cumprir a jornada.
+Pasta mobile/. App sem cadastro de morador, sem ouvir microfone e sem rastreamento contínuo de localização. Modo integrado pede URL e chave de leitura na conexão, mantida apenas em memória; nenhuma chave comercial/admin no bundle ou SQLite. Consultar pontos cadastrados; não precisar pagar por geocoding/mapas. Mapa é opcional: lista e coordenadas já permitem cumprir a jornada.
 
 | Tela | Conteúdo e ação |
 | --- | --- |
 | Locais | Lista, cidade, identificação de demonstração e seleção de dois pontos |
-| Detalhe | Série/perfil disponível, origem, fonte, período, amostras e cobertura |
+| Detalhe | Série/noise-profile disponível, origem, fonte, período, amostras e cobertura |
 | Comparar | Dois pontos no mesmo intervalo e origem; valores e limitações lado a lado |
 | Favoritos | Itens persistidos e resumo em cache com horário da última consulta |
 
@@ -46,4 +46,8 @@ Versão Expo compatível fixada por lockfile e rubrica detalhada atualizada. Apr
 
 ## Organização no monorepo
 
-Pasta `mobile/`; branch `herbert/mobile`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.2.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Pasta `mobile/`; branch `herbert/mobile`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+
+## Conexão privada
+
+Rotas/JSON v0.3.0 em inglês. Enviar X-Api-Key com acoustics:read nas consultas. Tratar 401 como credencial ausente/inválida/expirada e 403 como permissão insuficiente, sem loop de retry. Mock usa somente mock-consumer-key, que é fixture pública e nunca vale no deploy. Favoritos/cache permanecem offline e separados da credencial. Ao reabrir para acessar rede, pedir novamente a chave; nunca guardá-la em favoritos/logs/URL.

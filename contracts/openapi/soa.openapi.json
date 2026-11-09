@@ -1,28 +1,28 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Sonora | Importação SOA",
-    "version": "0.2.0",
-    "description": "Banco de lotes próprio. Fixture de entrega não comprova recebimento no C#."
+    "title": "Sonora | Import Service API",
+    "version": "0.3.0",
+    "description": "Private API. Technical identifiers and error messages use English; JSON fields use camelCase. Synthetic examples do not prove implementation. Authentication: X-Api-Key. Authorization: x-required-scopes per operation. See docs/api-security.md."
   },
   "servers": [
     {
       "url": "http://localhost:8082",
-      "description": "SOA real; a implementar"
+      "description": "Local implementation (planned)"
     },
     {
       "url": "http://localhost:4011",
-      "description": "Mock estático"
+      "description": "Static contract mock; synthetic data only"
     }
   ],
   "paths": {
     "/health/live": {
       "get": {
         "operationId": "soaLive",
-        "summary": "Processo ativo",
+        "summary": "Check process liveness",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -34,16 +34,18 @@
               }
             }
           }
-        }
+        },
+        "security": [],
+        "x-required-scopes": []
       }
     },
     "/health/ready": {
       "get": {
         "operationId": "soaReady",
-        "summary": "Dependências disponíveis",
+        "summary": "Check dependency readiness",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,7 +58,7 @@
             }
           },
           "503": {
-            "description": "Erro HTTP 503; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -64,21 +66,52 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
           }
-        }
+        },
+        "x-required-scopes": [
+          "operations:read"
+        ]
       }
     },
-    "/api/v1/lotes": {
+    "/api/v1/batches": {
       "get": {
         "operationId": "listBatches",
-        "summary": "Histórico de lotes",
+        "summary": "List import batches",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -107,15 +140,29 @@
             }
           },
           "401": {
-            "description": "Erro HTTP 401; estrutura sanitizada, sem segredos.",
+            "description": "Missing, invalid, revoked or expired API key.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -146,18 +193,16 @@
             "description": ""
           }
         ],
-        "security": [
-          {
-            "OperatorKey": []
-          }
+        "x-required-scopes": [
+          "imports:manage"
         ]
       },
       "post": {
         "operationId": "createBatch",
-        "summary": "Criar lote a partir de arquivo permitido na configuração",
+        "summary": "Create an import batch from an allowed file",
         "responses": {
           "201": {
-            "description": "Sucesso",
+            "description": "Created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -179,7 +224,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -187,27 +232,27 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "401": {
-            "description": "Erro HTTP 401; estrutura sanitizada, sem segredos.",
+            "description": "Missing, invalid, revoked or expired API key.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
                 }
               }
             }
           },
           "404": {
-            "description": "Erro HTTP 404; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -215,7 +260,21 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -231,20 +290,18 @@
             }
           }
         },
-        "security": [
-          {
-            "OperatorKey": []
-          }
+        "x-required-scopes": [
+          "imports:manage"
         ]
       }
     },
-    "/api/v1/lotes/{id}": {
+    "/api/v1/batches/{batchId}": {
       "get": {
         "operationId": "getBatch",
-        "summary": "Consultar estado e resultado do lote",
+        "summary": "Get import batch status and counters",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -266,7 +323,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -274,27 +331,27 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "401": {
-            "description": "Erro HTTP 401; estrutura sanitizada, sem segredos.",
+            "description": "Missing, invalid, revoked or expired API key.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
                 }
               }
             }
           },
           "404": {
-            "description": "Erro HTTP 404; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -302,7 +359,21 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -310,7 +381,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "batchId",
             "in": "path",
             "required": true,
             "schema": {
@@ -320,10 +391,8 @@
             "description": ""
           }
         ],
-        "security": [
-          {
-            "OperatorKey": []
-          }
+        "x-required-scopes": [
+          "imports:manage"
         ]
       }
     }
@@ -484,11 +553,17 @@
       }
     },
     "securitySchemes": {
-      "OperatorKey": {
+      "ApiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "X-Operator-Key"
+        "name": "X-Api-Key",
+        "description": "Opaque service-specific credential. Missing, invalid, revoked or expired: 401. Valid credential without required scope: 403. Never send credentials in URLs."
       }
     }
-  }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
 }

@@ -1,4 +1,4 @@
-# Regras de negócio — contrato v0.2.0
+# Regras de negócio — contrato v0.3.0
 
 Fonte de verdade da proposta: este arquivo, docs/03-integracao.md e contracts/openapi/. Sem implementação real neste bootstrap. Divergências devem ser resolvidas por PR com os consumidores.
 
@@ -34,3 +34,13 @@ Perfil com múltiplos produtores/séries não recebe um LAeq global que misture 
 ## Mocks e dados reais
 
 Todos os arquivos em contracts/fixtures/ são exemplos sintéticos, inclusive os que ilustram o formato de importação pública. O arquivo ml-summary.mock.json contém resultados inexistentes explicitamente marcados, métricas nulas e hash de demonstração. Usá-los em treinamento ou como evidência de resultado é incorreto. A base real fica fora do Git e segue ml/dados/README.md.
+
+## Acesso privado e idioma — decisão v0.3.0
+
+| ID | Regra | Aceite mínimo |
+| --- | --- | --- |
+| RN21 | Todos os endpoints /api/v1 são privados | X-Api-Key válido e escopo por operação; 401/403 documentados |
+| RN22 | Credencial de dispositivo não é credencial de cliente/importador | Dispositivo só escreve no próprio deviceId; cliente só consulta |
+| RN23 | Credenciais não são dados de aplicativo | Nada em URL, Git, logs, SQLite de favoritos ou bundle; memória por sessão no demonstrador |
+| RN24 | Contratos técnicos em inglês | Locations, observations, imports, batches; campos camelCase e erros em inglês |
+| RN25 | Mock não é autenticação de produção | Chaves públicas de fixture nunca aceitas em deploy; backend real gera/verifica/revoga credenciais |

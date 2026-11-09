@@ -25,11 +25,11 @@ Domínio mínimo: DatasetFile (arquivo permitido), ImportBatch e ImportItemResul
 ## Fluxo e endpoints
 
 1. Selecionar pequeno arquivo local de exemplo derivado de dados públicos, preservando atribuição. Cadastrar fileId e caminho pela configuração do operador.
-2. POST /api/v1/lotes com fileId e mapeamento aprovado de pontos cria lote e valida entrada.
+2. POST /api/v1/batches com fileId cria lote e valida entrada; o mapeamento aprovado de locais fica na configuração do arquivo.
 3. Ler coordenadas/timestamps/nível/duração, transformar UTC e marcar public_dataset.
 4. Associar cada observação a ponto amostral documentado por critério de proximidade; sem correspondência, rejeitar/contabilizar em vez de deslocar coordenadas.
 5. Dividir em lotes de até 100 e enviar ao C# por HTTP administrativo.
-6. Persistir resultado por item e contagens; GET /api/v1/lotes e /{id} mostram o resultado.
+6. Persistir resultado por item e contagens; GET /api/v1/batches e /{id} mostram o resultado.
 7. Reiniciar e comprovar histórico preservado.
 
 Não aceitar URL arbitrária ou caminho livre na requisição. Envio com timeout e poucas tentativas limitadas. Reprocessamento usa externalId estável, sem duplicar no destino. Uma falha parcial deve distinguir recebido, aceito e entregue: marcar lote criado não comprova entrega.
@@ -48,7 +48,7 @@ Não aceitar URL arbitrária ou caminho livre na requisição. Envio com timeout
 
 **Meta 10/11:** OpenAPI de lotes, migrations e validador com um pequeno fixture público documentado. **Meta 13/11:** envio real ao C# e reenvio idempotente.
 
-Entregar README, nomes/RMs, .env.example com API_BASE_URL e chave administrativa sem valor, comandos, migrations, evidências e relatório de lote. Informar ao responsável C# os campos normalizados; fornecer ao Testing um lote válido e outro com erros.
+Entregar README, nomes/RMs, .env.example com API_BASE_URL e CORE_API_IMPORT_KEY sem valor, comandos, migrations, evidências e relatório de lote. Informar ao responsável C# os campos normalizados; fornecer ao Testing um lote válido e outro com erros.
 
 O objetivo do grupo é hospedar C# e SOA integrados na Azure. Pela rubrica de Linux, hospedar C# continua o mínimo obrigatório; o deploy SOA também será planejado e coordenado com Pedro. SOA mantém execução local com banco próprio e receptor mock para contingência.
 
@@ -58,4 +58,8 @@ Linguagem/framework de aula. Se os professores autorizarem backend comum, o grup
 
 ## Organização no monorepo
 
-Pasta `soa/`; branch `felipe/soa`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.2.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Pasta `soa/`; branch `felipe/soa`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+
+## Contratos privados
+
+X-Api-Key do operador SOA: imports:manage para /api/v1/batches e operations:read para readiness/docs. A requisição POST /api/v1/batches recebe somente fileId; mapeamento geográfico permitido fica na configuração do arquivo, não em campo HTTP livre. Para enviar ao C#, usar CORE_API_IMPORT_KEY com imports:write, diferente da chave SOA. Rotas/JSON/erros em inglês, contrato v0.3.0. Testar 401/403 e não publicar OpenAPI operacional sem proteção no deploy.

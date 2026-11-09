@@ -21,7 +21,7 @@ GitHub com scripts/configurações/README/integrantes/evidências e vídeo até 
 
 Ubuntu Server 24.04 LTS em VM local, API C# .NET 10 + SQLite. Versões devem corresponder ao pacote real recebido do colega. Sem Kubernetes, obrigação de nuvem paga ou banco remoto. WSL com systemd é alternativa se Pedro preferir; script de rede precisa ser adaptado ao ambiente, não copiado sem ajustes.
 
-API em /opt/gs-ruido/app, banco em /var/lib/gs-ruido/ruido.db, configuração em /etc/gs-ruido/app.env e auditoria em /var/log/gs-ruido. Usuário de serviço gs-ruido com menor privilégio. Porta interna proposta 8080, healthchecks do contrato e /painel para mostrar a solução no navegador.
+API em /opt/gs-ruido/app, banco em /var/lib/gs-ruido/ruido.db, configuração em /etc/gs-ruido/app.env e auditoria em /var/log/gs-ruido. Usuário de serviço gs-ruido com menor privilégio. Porta interna proposta 8080, healthchecks do contrato e /dashboard para mostrar a solução no navegador.
 
 SOA e ML não precisam rodar continuamente no servidor: SOA entrega lotes por HTTP e ML entrega resumo por importação. A API mínima real do C# deve estar pronta cedo; uma página estática que sempre responde 200 não conclui a matéria.
 
@@ -55,7 +55,7 @@ Esses arquivos são planejamento; ainda não foram implementados.
 
 - Instalação inicial e reexecução convergem; falha retorna exit code não zero com etapa registrada.
 - Hostname, IP, rota e DNS correspondem ao perfil configurado.
-- Criar observação simulada, consultar /painel e reiniciar API; dado continua no banco.
+- Criar observação simulada, consultar /dashboard e reiniciar API; dado continua no banco.
 - Reiniciar máquina: app e monitor voltam.
 - Encerrar abruptamente o processo principal do **monitor**: systemd recupera, novo PID e logs comprovam. Testar app também é útil, mas não substitui o monitor.
 - Usar Restart=on-failure com política de tentativas documentada. systemctl stop é parada administrativa, não crash; não deve ser a única prova.
@@ -64,7 +64,7 @@ Esses arquivos são planejamento; ainda não foram implementados.
 
 ## Handoff, metas e vídeo
 
-**Meta 09/11:** VM/perfil definido. **10/11:** receber C# mínimo. **12/11:** provisionamento e persistência. **14/11:** monitor/falhas/reexecução. **16/11:** evidências e integração. **17–18/11:** vídeo e conferência.
+**Meta 09/11:** VM/noise-profile definido. **10/11:** receber C# mínimo. **12/11:** provisionamento e persistência. **14/11:** monitor/falhas/reexecução. **16/11:** evidências e integração. **17–18/11:** vídeo e conferência.
 
 Roteiro até 7 min: problema/papel da infra (30 s); provisionamento (1m30); rede/app/banco (1 min); monitor/logs (1 min); falha e recuperação (1m30); reboot/reexecução e reprodução (1 min); conclusão/repositório (30 s). Usar resultados reais, declarando cortes/time-lapse quando houver.
 

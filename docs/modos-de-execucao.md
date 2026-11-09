@@ -10,7 +10,7 @@ Hoje existe a fundação: contratos, fixtures, mock HTTP e validações. **Os oi
 
 | Componente | Como deverá demonstrar sozinho | Dependência substituída |
 | --- | --- | --- |
-| C# | Migrations + seed SQLite, API/painel locais, dados sintéticos marcados | Sem SOA, ML ou IoT ativos; resumo ML opcional/indisponível |
+| C# | Migrations + seed SQLite, API/dashboard locais, dados sintéticos marcados | Sem SOA, ML ou IoT ativos; resumo ML opcional/indisponível |
 | SOA | SQLite de lotes, pequeno arquivo permitido e receptor HTTP controlado | C# substituído pelo mock de contrato; entrega real ao receptor não pode ser alegada |
 | Mobile | Fixture local, SQLite de favoritos e estados de erro/offline | Backend substituído por adaptador mock |
 | IoT | Circuito Wokwi/serial e saídas visuais; envio ao mock quando acessível | API real substituída; conectividade/replay declarado |
@@ -37,8 +37,12 @@ Não compartilhar arquivos SQLite entre serviços nem acessar tabelas do colega 
 
 Usar .env.example por componente sem segredo; URLs de localhost diferentes das de aparelho/VM/nuvem. Proposta local: C# 8080; SOA 8082; mocks 4010/4011; Mobile via Expo. Em deploy, backend externo usa HTTPS e portas internas não ficam públicas.
 
-O mock compartilhado tem POST estático, não grava nem autentica de verdade. Ele ajuda navegação e formato, não comprova regra de negócio. Testes de ingestão/idempotência/persistência devem apontar para implementação real.
+O mock compartilhado tem POST estático e não grava; valida somente as chaves/escopos públicos da fixture, sem autenticação de produção. Ele ajuda navegação e formato, não comprova regra de negócio. Testes de ingestão/idempotência/persistência devem apontar para implementação real.
 
 ## Critério de versão integrada
 
 Registrar commits das partes, contratos, seed, fonte real importada, estado do experimento e URLs usadas. Demonstrar um percurso IoT -> C# -> painel/Mobile e SOA -> C# com idempotência. Fazer o smoke de leitura de tools/smoke_integration.py e adicionar testes de escrita próprios. Se alguma parte usar mock, dizer exatamente qual e por quê.
+
+## Autenticação nos dois modos
+
+Standalone da implementação real continua privado: setup local gera credenciais e seed sem conta Azure. Mock usa chaves públicas de laboratório listadas em contracts/fixtures/mock-credentials.json. Integrado usa credenciais reais fora do Git. Mobile solicita chave de leitura em memória; SOA guarda CORE_API_IMPORT_KEY no servidor; Wokwi só tem chave descartável de dispositivo.

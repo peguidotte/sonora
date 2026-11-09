@@ -20,7 +20,7 @@ Primeiro localizar e executar a base de aula. O contrato/README dessa ferramenta
 A API de ruído não precisa coletar CPF ou saúde de moradores. Fixtures sintéticas demonstram essas detecções em ambiente de teste. Pontos/sensores não armazenam áudio. Inspecionar código e saídas C#, importador e logs; foco nas credenciais, mensagens de erro e possíveis identificadores/trajetórias.
 
 Mapear fluxos:
-- Fonte: header X-Ingest-Key/X-Admin-Key, config de ambiente, payload e campo de teste sensível.
+- Fonte: header X-Api-Key e suas permissões/vínculo de dispositivo, config de ambiente, payload e campo de teste sensível.
 - Propagação: DTO -> serviço -> tratamento de erro/log/resposta.
 - Sinks: logs de request, erro HTTP, dashboard e prompt de LLM.
 - Controles: allowlist de campos, máscara/remoção, separação de chaves, resposta sanitizada e bloqueio.
@@ -63,4 +63,8 @@ Acesso ao motor/dashboard de aula e forma de uso do LLM sem segredo em repositó
 
 ## Organização no monorepo
 
-Pasta `cybersecurity/`; branch `herbert/cybersecurity`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.2.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Pasta `cybersecurity/`; branch `herbert/cybersecurity`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+
+## Cenários adicionais da API privada
+
+Auditar chave de leitura no Mobile/painel (sem segredo no bundle/log/SQLite), uso indevido de chave de cliente para importar/ingerir e chave de dispositivo fora do deviceId. Conferir 401/403, rotação/revogação e autenticação por padrão. Esses controles não substituem parsing/taint/LLM/dashboard da rubrica.

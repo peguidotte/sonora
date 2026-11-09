@@ -16,7 +16,7 @@ ESP32 + potenciômetro + display OLED (ou serial legível) + LEDs/resistores. Po
 - LEDs indicam faixas **didáticas**, por exemplo <55 / 55–70 / >70, sem afirmar limites legais ou de saúde.
 - Gerar externalId que não colida após reboot; usar identificador de inicialização mais sequência, preservando o mesmo ID ao reenviar.
 - Sincronizar relógio; se não houver data válida, mostrar erro e não enviar timestamp inventado.
-- POST /api/v1/observacoes com credencial descartável vinculada ao dispositivo. Não colocar chave administrativa no circuito.
+- POST /api/v1/observations com credencial descartável vinculada ao dispositivo. Não colocar chave administrativa no circuito.
 
 O valor “LAeq” sintético é um valor de demonstração para a janela, não uma calibração linear válida de um sonômetro. Explique essa diferença no vídeo/README.
 
@@ -47,7 +47,7 @@ Pasta iot/ com sketch, diagram.json, libraries.txt quando necessário, README, c
 
 **Meta 10/11:** circuito e serial. **Meta 12/11:** conectividade decidida/testada. **Meta 15/11:** fluxo completo e vídeo.
 
-Roteiro até 4 min: problema/uso; função do nó na plataforma; explicar simulação; variar entrada; mostrar API/painel; demonstrar falha/limites e repositório.
+Roteiro até 4 min: problema/uso; função do nó na plataforma; explicar simulação; variar entrada; mostrar API/dashboard; demonstrar falha/limites e repositório.
 
 ## Pendências
 
@@ -55,4 +55,8 @@ Acesso de rede entre simulador e API. Instalação física em postes e calibraç
 
 ## Organização no monorepo
 
-Pasta `iot/`; branch `leo/iot`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.2.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Pasta `iot/`; branch `leo/iot`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+
+## Credencial do dispositivo
+
+POST /api/v1/observations usa X-Api-Key com observations:write e vínculo ao deviceId. Nunca enviar chave de cliente/importador/operador no sketch. Modo mock usa mock-device-key apenas como fixture; a implantação usa chave descartável provisionada fora do código público. Tratar 401/403 sem retry infinito.
