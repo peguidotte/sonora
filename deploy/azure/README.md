@@ -43,6 +43,8 @@ OIDC aceita somente `repo:peguidotte/sonora:ref:refs/heads/main`; PRs não receb
 
 Backends devem consumir `SONORA_DB_*`, host/porta e `SONORA_KEYS_FILE`. .NET/Spring também recebem suas variáveis convencionais. O arquivo de credenciais contém `keys[]` com `id`, `sha256` hexadecimal, `scopes[]` e `deviceId` quando restrito. Backend implementa validação/hash/autorização/rotação; arquivo configurado não implementa autenticação. As chaves em texto ficam em `/etc/sonora/admin`, root-only, fora de Git, state e logs. Não recuperá-las imprimindo-as pelo Azure Run Command.
 
+CI fornece PostgreSQL 16 descartável e contas distintas de migrador/ingestão/consulta. Senhas `ci-*-only` são fixtures exclusivas desse banco, nunca aceitas no deploy. Testes devem preparar domínio/views/seed usando as migrations comuns do SOA e a conta migradora; o workflow não define tabelas de negócio. Configuração de teste não deve exigir segredos de produção.
+
 ## Publicação e recuperação
 
 Releases identificam commit/run/attempt, manifesto e SHA-256. GitHub envia ao Blob privado via OIDC; VM baixa por identidade gerenciada, verifica procedência/hash e rejeita traversal/links. SOA faz backup antes de migrations com usuário separado. Migrations precisam preservar consumidores existentes. Deploy troca link simbólico e verifica saúde autenticada; falha tenta restaurar o binário anterior. Não existe rollback automático de schema/dados.

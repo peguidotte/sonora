@@ -45,6 +45,27 @@ jobs:
       matrix: ${{ fromJSON(needs.inventory.outputs.backends) }}
     env:
       DOTNET_RUNTIME_IDENTIFIER: ${{ vars.DOTNET_RUNTIME_IDENTIFIER || 'linux-arm64' }}
+      PGHOST: 127.0.0.1
+      PGPORT: '5432'
+      PGDATABASE: sonora
+      PGUSER: sonora_migrator
+      PGPASSWORD: ci-migration-only
+      SONORA_DB_HOST: 127.0.0.1
+      SONORA_DB_PORT: '5432'
+      SONORA_DB_NAME: sonora
+      SONORA_DB_USER: ${{ matrix.component == 'api' && 'sonora_query' || 'sonora_ingest' }}
+      SONORA_DB_PASSWORD: ${{ matrix.component == 'api' && 'ci-query-only' || 'ci-ingest-only' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: sonora
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-admin-only
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sonora"
+          --health-interval 5s --health-timeout 3s --health-retries 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -55,12 +76,22 @@ jobs:
         with:
           dotnet-version: ${{ matrix.sdk }}
       - uses: actions/setup-java@v4
-        if: matrix.component == 'soa'
         with:
           distribution: temurin
           java-version: ${{ matrix.java }}
-          cache: maven
-          cache-dependency-path: soa/pom.xml
+      - name: Preparar contas isoladas no banco descartável de CI
+        env:
+          PGPASSWORD: ci-admin-only
+        run: |
+          psql -h 127.0.0.1 -U postgres -d sonora -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE sonora_migrator LOGIN PASSWORD 'ci-migration-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          CREATE ROLE sonora_ingest LOGIN PASSWORD 'ci-ingest-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          CREATE ROLE sonora_query LOGIN PASSWORD 'ci-query-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          ALTER DATABASE sonora OWNER TO sonora_migrator;
+          REVOKE ALL ON DATABASE sonora FROM PUBLIC;
+          GRANT CONNECT ON DATABASE sonora TO sonora_migrator, sonora_ingest, sonora_query;
+          REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+          SQL
       - name: Testar, compilar e empacotar
         env:
           COMPONENT: ${{ matrix.component }}
