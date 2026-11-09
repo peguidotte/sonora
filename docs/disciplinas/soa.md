@@ -1,6 +1,6 @@
-# SOA — serviço de importação acústica
+# SOA — ingestão Java
 
-**Responsável:** Felipe Soares Xavier, RM556931. **Dependências:** linguagem/framework de aula; pode usar mock HTTP da API principal até ela existir.
+**Responsável:** Felipe Soares Xavier, RM556931. Pasta `soa/`; branch `felipe/soa`.
 
 ## Exigência do professor
 
@@ -14,52 +14,31 @@ PDF p. 27: backend em qualquer linguagem, domínio estruturado, banco, migration
 | Documentação | 1,5 | OpenAPI automática dos endpoints de lote |
 | Testes | 1,0 | Regras e integração com persistência/receptor |
 
-## Proposta de implementação
+## Responsabilidade
 
-Backend separado do C#, na linguagem usada em aula; SQLite próprio. Pasta proposta soa/. Não escolher framework sem conhecer a base que o colega domina.
+Backend Java independente da API C#. Receber observações do ESP32/Wokwi, importar arquivos públicos NoiseCapture, validar/normalizar/deduplicar e persistir no PostgreSQL. Administrar jobs de importação. Sem envio de lote HTTP ao C# ou banco intermediário SQLite.
 
-Esse serviço transforma um subconjunto do NoiseCapture em observações aceitas pela API principal, valida e registra o resultado. É uma responsabilidade útil para a plataforma e permite entrega independente. A rubrica não exige microserviços: a separação é nossa estratégia de organização, que pode ser revista com os professores.
+Domínio mínimo: fonte, local, dispositivo, observação, arquivo permitido e importação. Serviço de ingestão modular permite adaptadores futuros, mas apenas Sonora entra nesta GS. Escolher framework/versões compatíveis com a aula e fixar dependências no projeto.
 
-Domínio mínimo: DatasetFile (arquivo permitido), ImportBatch e ImportItemResult. Estados propostos: created, validated, delivering, completed, failed e completed_with_errors. Guardar hash, fonte, contagens e erro sanitizado; não registrar o GeoJSON completo nos logs.
+## Banco e contratos
 
-## Fluxo e endpoints
+SOA possui migrations do schema sonora e publicação de sonora_read conforme database.json, incluindo grants e seed sintético. Fornecer setup local reutilizável sem manter Java HTTP ativo: isso permite ao C# executar sozinho. Conta migradora é separada do runtime.
 
-1. Selecionar pequeno arquivo local de exemplo derivado de dados públicos, preservando atribuição. Cadastrar fileId e caminho pela configuração do operador.
-2. POST /api/v1/batches com fileId cria lote e valida entrada; o mapeamento aprovado de locais fica na configuração do arquivo.
-3. Ler coordenadas/timestamps/nível/duração, transformar UTC e marcar public_dataset.
-4. Associar cada observação a ponto amostral documentado por critério de proximidade; sem correspondência, rejeitar/contabilizar em vez de deslocar coordenadas.
-5. Dividir em lotes de até 100 e enviar ao C# por HTTP administrativo.
-6. Persistir resultado por item e contagens; GET /api/v1/batches e /{id} mostram o resultado.
-7. Reiniciar e comprovar histórico preservado.
+POST de observação resolve origem/local/fonte pela credencial e dispositivo; protege com observations:write. API de batches usa imports:manage. fileId referencia caminho/fonte/mapeamento permitido no servidor; não aceitar URL/caminho arbitrário no corpo. Importação real preserva origem e coordenadas; nunca deslocar toda a cidade para ponto fictício.
 
-Não aceitar URL arbitrária ou caminho livre na requisição. Envio com timeout e poucas tentativas limitadas. Reprocessamento usa externalId estável, sem duplicar no destino. Uma falha parcial deve distinguir recebido, aceito e entregue: marcar lote criado não comprova entrega.
+## Sequência e aceite
 
-## Aceite e testes
+1. Criar domínio, PostgreSQL, migrations, views/grants e seed.
+2. Implementar ingestão privada, validação, unicidade source_id + external_id e idempotência.
+3. Implementar criação/consulta de batches. acceptedCount conta linhas commitadas; erro/rejeição parcial e completedAt são visíveis. Não existe deliveryStatus.
+4. Publicar OpenAPI real e testar regras, autenticação e persistência usando PostgreSQL.
+5. Fornecer importação administrativa de summary.json validado pelo schema ML para armazenamento/publicação na view; não executar pickle/modelo Python.
 
-- Arquivo permitido e válido produz observações compatíveis com o contrato.
-- ID de arquivo desconhecido, formato inválido, data ou coordenada inválida não provocam importação silenciosa.
-- Repetição não duplica histórico lógico nem observações no receptor.
-- API principal indisponível gera estado de falha/retry visível, com timeout limitado.
-- Rejeição parcial do receptor mantém contagens e detalhes consistentes.
-- Migrations executam em banco vazio; reinício mantém lote consultável.
-- OpenAPI mostra requests, responses e erros; testes automatizados usam receptor HTTP controlado e SQLite temporário.
+Aceite: retry idêntico não duplica e conflito é 409; dispositivo alheio é 403; 401 sem chave válida; origem não pode ser escolhida por dispositivo; arquivo desconhecido/falho não é sucesso silencioso; erro/rollback não incrementa acceptedCount; reinício preserva dados; view e grants correspondem ao contrato; C# não precisa estar ativo para concluir a importação.
 
-## Handoff e entrega
+## Entrega
 
-**Meta 10/11:** OpenAPI de lotes, migrations e validador com um pequeno fixture público documentado. **Meta 13/11:** envio real ao C# e reenvio idempotente.
+README com runtime/build/start, conexão/grants, migrations/seed, configuração de credenciais sem segredo, arquivo de exemplo atribuído à fonte e evidências de persistência. Entregar a Leonardo/Pedro o setup de banco e o contrato publicado. Aplicação local usa o mesmo PostgreSQL do desenho integrado, sem dependência da nuvem.
 
-Entregar README, nomes/RMs, .env.example com API_BASE_URL e CORE_API_IMPORT_KEY sem valor, comandos, migrations, evidências e relatório de lote. Informar ao responsável C# os campos normalizados; fornecer ao Testing um lote válido e outro com erros.
 
-O objetivo do grupo é hospedar C# e SOA integrados na Azure. Pela rubrica de Linux, hospedar C# continua o mínimo obrigatório; o deploy SOA também será planejado e coordenado com Pedro. SOA mantém execução local com banco próprio e receptor mock para contingência.
-
-## Pendências
-
-Linguagem/framework de aula. Se os professores autorizarem backend comum, o grupo pode simplificar sem perder evidências específicas; não presumir essa autorização.
-
-## Organização no monorepo
-
-Pasta `soa/`; branch `felipe/soa`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
-
-## Contratos privados
-
-X-Api-Key do operador SOA: imports:manage para /api/v1/batches e operations:read para readiness/docs. A requisição POST /api/v1/batches recebe somente fileId; mapeamento geográfico permitido fica na configuração do arquivo, não em campo HTTP livre. Para enviar ao C#, usar CORE_API_IMPORT_KEY com imports:write, diferente da chave SOA. Rotas/JSON/erros em inglês, contrato v0.3.0. Testar 401/403 e não publicar OpenAPI operacional sem proteção no deploy.
+Referências comuns: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md). Comandos e evidências reais ficam no README/PR da entrega.

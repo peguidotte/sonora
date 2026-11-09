@@ -9,5 +9,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 | 08/11/2026 | Escolher API de ruído e especificar oito entregas | Domínio, contratos, fichas e auditoria inicial de dados públicos; sem treino ML |
 | 08/11/2026 | Organizar monorepo, equipe, integração, mocks e deploys | Repositório/estrutura, contratos verificáveis e testes da fundação; componentes das matérias ainda planejados; deploy Azure pendente |
 | 08/11/2026 | Padronizar contratos em inglês e API privada | Contratos v0.3.0, rotas/DTOs em inglês, X-Api-Key por escopo, mocks e 17 testes locais; implementação real continua pendente |
+| 08/11/2026 | Consolidar arquitetura aprovada e documentação mínima | Referência única de arquitetura, contratos v0.4.0 com Java gravando/PostgreSQL compartilhado/C# lendo; fichas alinhadas, duplicações removidas e verificações da fundação executadas; aplicações reais ainda a implementar |
 
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

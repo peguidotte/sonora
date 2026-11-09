@@ -1,6 +1,6 @@
 # Contexto e requisitos da GS CitizenTech
 
-Base: PDF oficial CitizenTech, 40 páginas, e leitura do Teams da turma 3ESPV-2026 em 06/11/2026. Os links de origem e a cobertura da coleta estão em [inventário](../fontes/INVENTARIO.md).
+Base: PDF oficial CitizenTech, 40 páginas, e leitura do Teams da turma 3ESPV-2026 em 06/11/2026. Os links de origem e a cobertura da coleta estão no inventário local em fontes/INVENTARIO.md, mantido fora do Git por conter referências privadas.
 
 ## O que a equipe precisa resolver
 
@@ -61,3 +61,5 @@ O título da p. 26 diz “Sete disciplinas”, mas a tabela lista **oito**. Fora
 | Vídeo de Testing | Apoio à criação de casos manuais no Azure DevOps | Arquivo baixado; não é um novo entregável |
 
 Não foi acessado o Portal do Aluno. A coleta cobre o PDF oficial, avisos recentes nos nove canais da turma e as cinco tarefas GS visíveis em Em breve.
+
+A implementação segue a [arquitetura aprovada](arquitetura.md). Divisão de componentes e tecnologia de banco são decisões do projeto, não novas exigências dos professores.

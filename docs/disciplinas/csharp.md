@@ -1,6 +1,6 @@
-# C# — API principal de ruído
+# C# — API de consulta
 
-**Responsável:** Leonardo Correa de Mello, RM555573. **Dependências:** contrato v0.1; pode começar sem SOA, Mobile, IoT ou ML prontos.
+**Responsável:** Leonardo Correa de Mello, RM555573. Pasta `api/`; branch `leo/csharp`.
 
 ## Exigência do professor
 
@@ -14,60 +14,26 @@ PDF p. 30 e tarefa coletada em 06/11: Web API/Minimal API .NET, POO, interfaces,
 | Async/await | 1,0 | I/O assíncrono com cancelamento e sem bloqueio desnecessário |
 | Qualidade | 2,0 | DI, interfaces úteis, organização, testes e ausência de segredos |
 
-## Proposta de implementação
+## Responsabilidade
 
-Stack: .NET 10 + EF Core/SQLite, SDK e dependências fixados. Confirmar versão de aula antes de criar o projeto. Pasta proposta: api/; não existe implementação ainda.
+Implementar API .NET com EF Core/Npgsql, LINQ e consultas assíncronas às views sonora_read. Calcular perfis, cobertura e comparações, tratar ausência de dados e servir o painel. Java é dono da gravação/migrations; C# não recebe IoT, não importa lotes e não executa migrations de captura.
 
-Implementar as entidades Source, Location, Device, Observation e MlSummary do [contrato](../03-integracao.md). A API principal é a fonte de verdade do catálogo e das medições. Usar interfaces como IObservationRepository e IAcousticProfileService onde houver função concreta; não criar camadas vazias só para demonstrar conceitos.
+Domínio com objetos de janela, procedência e perfil; interfaces e DI nos limites de persistência/cálculo. Não criar herança ou camadas sem função só para pontuar. DTOs HTTP seguem o OpenAPI C#; nomes/tipos SQL e permissões seguem database.json. Credencial de runtime somente leitura, distinta da de setup.
 
-POO pode aparecer em regras polimórficas para entrada de dispositivo e importação pública, que validam procedência diferente. Herança não deve permitir que um cliente altere a origem de um registro. Migrations criam banco vazio; seed idempotente cria três pontos explicitamente fictícios, dispositivos e histórico sintético para comparar dois pontos. Uma simulação Wokwi efetiva pode usar apenas um deles.
+## Sequência e aceite
 
-## Passos de trabalho
+1. Usar setup/migrations/seed comuns do SOA para preparar PostgreSQL local, sem iniciar Java HTTP.
+2. Mapear views em EF Core, implementar healthchecks, consultas paginadas e filtros do contrato.
+3. Implementar cálculo energético, separação de séries/origens, no_data, intervalos/fuso e cobertura; não representar falta de amostra como silêncio.
+4. Proteger consultas e operação por escopo; servir somente shell vazio sem autenticação. Painel busca dados privados.
+5. Testar regras de cálculo e validação; integração HTTP/EF em PostgreSQL verifica filtros, paginação, persistência do seed e impossibilidade de escrita com sonora_query.
+6. Documentar build/publish/entrypoint, configuração sem segredo, porta e healthchecks para Pedro; API deve executar fora da IDE.
 
-1. Criar projeto, migrations, seed e health/live e health/ready.
-2. Implementar listagem/detalhe de pontos e filtros geográficos limitados.
-3. Implementar ingestão com autenticação vinculada ao dispositivo e deduplicação.
-4. Implementar observações/noise-profile com período, origem e cobertura explícitos.
-5. Implementar recepção de lote administrativo real; respeitar resultados por item.
-6. Servir /dashboard com tabela/lista de pontos, gráficos simples ou valores por período, dispositivos stale e proveniência. Não exigir outro projeto frontend.
-7. Implementar importação por comando do resumo ML e consulta do resumo.
-8. Fechar OpenAPI, testes e pacote hospedável para Pedro.
+Aceite mínimo: 60/70 dB em janelas iguais -> aproximadamente 67,40; fonte/origem explícitas; no_data nulo; chave ausente/inválida 401, escopo errado 403; consulta funciona com Java parado e dados persistidos; ready acusa indisponibilidade do banco. Resumo ML é leitura de payload validado ou 204.
 
-Pode usar SQLite em desenvolvimento e na VM; banco fora da pasta publicada. Leituras e escritas privadas por X-Api-Key com autorização por escopo; configurar proteção por padrão no ASP.NET Core. Chaves fora de Git/logs/URLs. Modo local usa credenciais de laboratório geradas no setup, sem desativar autenticação. Não implementar faturamento, cadastro de moradores ou geocoding.
+## Entrega
 
-## Critérios de aceite e testes
+Projeto, README de execução, testes, OpenAPI e evidências reais. Relacionar POO/EF/LINQ/async/DI aos trechos implementados. Handoff de deploy inclui versão/runtime fixados, publish, comando de início, variáveis e permissões. Bootstrap do banco é fornecido pelo SOA; não criar uma segunda definição do schema.
 
-| Cenário | Resultado |
-| --- | --- |
-| Ingestão autorizada válida | 201 e registro consultável |
-| Reenvio idêntico / conflitante | 200 duplicate=true / 409, sem duplicação |
-| Chave inválida / dispositivo de outro escopo | 401 / 403 |
-| Campo inválido, NaN ou duração inválida | Rejeição documentada, sem persistência |
-| Dois níveis 60/70, mesma duração | Perfil aproximadamente 67,40, não 65 |
-| Perfil sem observações | no_data, métrica nula, não 0 dB |
-| Origens distintas | Nunca combinadas num mesmo agregado |
-| Horários, bordas de bin e sobreposição | Duração correta e séries separadas quando necessário |
-| Reinício | Banco, pontos e observações preservados |
-| Falha de banco | ready=503; resposta sem stack trace/segredo |
 
-Cobrir regras de domínio com testes unitários; integração HTTP/EF com banco temporário SQLite real valida persistência e unicidade. Mostrar LINQ e async em trechos reais, além do resultado. Não chamar endpoint de integração validado antes da execução.
-
-## Handoff e entrega
-
-**Meta 10/11:** commit compilável com banco, seed, healthchecks, /locations e ingestão, runtime/porta, .env.example e procedimento de migrations. Não esperar o produto inteiro para destravar Linux.
-
-**Meta 13/11:** perfil e lote compatíveis com Mobile/SOA. **Meta 16/11:** painel e resumo ML integrados quando disponíveis.
-
-Entregar api/README.md, build/publish e execução fora da IDE, especificação OpenAPI, testes, evidências e nomes/RMs. Seguir o [handoff para Linux](../03-integracao.md). Responsabilidade de C# inclui a página web de demonstração; Swagger sozinho não substitui a visualização proposta.
-
-## Pendências
-
-Versão de aula e confirmação dos endpoints pelo grupo. Reaproveitamento com SOA não foi autorizado; esta ficha não depende disso.
-
-## Organização no monorepo
-
-Pasta `api/`; branch `leo/csharp`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
-
-## API privada e inglês
-
-Seguir contracts/openapi/csharp.openapi.json v0.3.0 e docs/api-security.md. Consumidor lê com acoustics:read; dispositivo envia com observations:write e vínculo a deviceId; SOA importa com imports:write; operação usa operations:read. Ausente/inválida/revogada/expirada: 401; credencial válida fora do escopo: 403. Hash/verificação segura, rotação/revogação e nenhuma chave mestra no frontend. /dashboard é apenas shell; dados vêm da API privada. Testar leituras sem chave, escopo errado e revogação, além dos testes de ingestão.
+Referências comuns: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md). Comandos e evidências reais ficam no README/PR da entrega.

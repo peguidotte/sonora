@@ -68,7 +68,7 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
         def handle_operation(self, method):
             url = urlsplit(self.path)
             query = parse_qs(url.query, keep_blank_values=True)
-            if url.path == "/openapi.json" and method == "get":
+            if url.path == document["x-api-prefix"] + "/openapi.json" and method == "get":
                 if not self.authenticate({"x-required-scopes": ["operations:read"]}):
                     return
                 return self.send(200, document)

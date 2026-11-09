@@ -9,8 +9,8 @@
       "acceptedCount": 1,
       "duplicateCount": 0,
       "rejectedCount": 0,
-      "deliveryStatus": "delivered",
-      "createdAt": "2026-11-08T15:00:00Z"
+      "createdAt": "2026-11-08T15:00:00Z",
+      "completedAt": "2026-11-08T15:00:00Z"
     }
   ],
   "page": 1,

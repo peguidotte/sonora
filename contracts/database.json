@@ -1,0 +1,301 @@
+{
+  "contractVersion": "0.4.0",
+  "engine": "PostgreSQL",
+  "product": "sonora",
+  "migrationOwner": "soa",
+  "storageSchema": "sonora",
+  "readSchema": "sonora_read",
+  "roles": {
+    "sonora_migrator": {
+      "purpose": "Deployment-only DDL, migrations and view publication; never used by the query runtime.",
+      "canReadPublishedViews": true,
+      "canWriteStorage": true,
+      "canMigrate": true
+    },
+    "sonora_ingest": {
+      "purpose": "Java runtime capture and import persistence; no DDL or role administration.",
+      "canReadPublishedViews": true,
+      "canWriteStorage": true,
+      "canMigrate": false
+    },
+    "sonora_query": {
+      "purpose": "C# runtime SELECT on published views only; no base-table writes, DDL, role administration or credentials access.",
+      "canReadPublishedViews": true,
+      "canWriteStorage": false,
+      "canMigrate": false
+    }
+  },
+  "storageEntities": [
+    "locations",
+    "sources",
+    "devices",
+    "observations",
+    "import_batches",
+    "ml_summaries"
+  ],
+  "readViews": {
+    "locations": {
+      "responseSchema": "Location",
+      "columns": [
+        {
+          "name": "id",
+          "postgresType": "uuid",
+          "jsonField": "id",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "postgresType": "text",
+          "jsonField": "name",
+          "nullable": false
+        },
+        {
+          "name": "city",
+          "postgresType": "text",
+          "jsonField": "city",
+          "nullable": false
+        },
+        {
+          "name": "latitude",
+          "postgresType": "double precision",
+          "jsonField": "latitude",
+          "nullable": false
+        },
+        {
+          "name": "longitude",
+          "postgresType": "double precision",
+          "jsonField": "longitude",
+          "nullable": false
+        },
+        {
+          "name": "is_demo",
+          "postgresType": "boolean",
+          "jsonField": "isDemo",
+          "nullable": false
+        }
+      ],
+      "computedFields": [
+        "distanceMeters"
+      ]
+    },
+    "sources": {
+      "responseSchema": "Source",
+      "columns": [
+        {
+          "name": "id",
+          "postgresType": "uuid",
+          "jsonField": "id",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "postgresType": "text",
+          "jsonField": "name",
+          "nullable": false
+        },
+        {
+          "name": "source_url",
+          "postgresType": "text",
+          "jsonField": "sourceUrl",
+          "nullable": false
+        },
+        {
+          "name": "snapshot_date",
+          "postgresType": "date",
+          "jsonField": "snapshotDate",
+          "nullable": false
+        },
+        {
+          "name": "license",
+          "postgresType": "text",
+          "jsonField": "license",
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "postgresType": "text",
+          "jsonField": "origin",
+          "nullable": false
+        },
+        {
+          "name": "limitations",
+          "postgresType": "jsonb",
+          "jsonField": "limitations",
+          "nullable": false
+        }
+      ]
+    },
+    "devices": {
+      "responseSchema": "Device",
+      "columns": [
+        {
+          "name": "id",
+          "postgresType": "uuid",
+          "jsonField": "id",
+          "nullable": false
+        },
+        {
+          "name": "location_id",
+          "postgresType": "uuid",
+          "jsonField": "locationId",
+          "nullable": false
+        },
+        {
+          "name": "name",
+          "postgresType": "text",
+          "jsonField": "name",
+          "nullable": false
+        },
+        {
+          "name": "enabled",
+          "postgresType": "boolean",
+          "jsonField": "enabled",
+          "nullable": false
+        },
+        {
+          "name": "last_received_at",
+          "postgresType": "timestamptz",
+          "jsonField": "lastReceivedAt",
+          "nullable": true
+        }
+      ],
+      "computedFields": [
+        "state"
+      ]
+    },
+    "observations": {
+      "responseSchema": "Observation",
+      "columns": [
+        {
+          "name": "id",
+          "postgresType": "uuid",
+          "jsonField": "id",
+          "nullable": false
+        },
+        {
+          "name": "source_id",
+          "postgresType": "uuid",
+          "jsonField": "sourceId",
+          "nullable": false
+        },
+        {
+          "name": "location_id",
+          "postgresType": "uuid",
+          "jsonField": "locationId",
+          "nullable": false
+        },
+        {
+          "name": "device_id",
+          "postgresType": "uuid",
+          "jsonField": "deviceId",
+          "nullable": true,
+          "omitWhenNull": true
+        },
+        {
+          "name": "session_id",
+          "postgresType": "text",
+          "jsonField": "sessionId",
+          "nullable": false
+        },
+        {
+          "name": "external_id",
+          "postgresType": "text",
+          "jsonField": "externalId",
+          "nullable": false
+        },
+        {
+          "name": "observed_at",
+          "postgresType": "timestamptz",
+          "jsonField": "observedAt",
+          "nullable": false
+        },
+        {
+          "name": "received_at",
+          "postgresType": "timestamptz",
+          "jsonField": "receivedAt",
+          "nullable": false
+        },
+        {
+          "name": "duration_seconds",
+          "postgresType": "double precision",
+          "jsonField": "durationSeconds",
+          "nullable": false
+        },
+        {
+          "name": "laeq_db_a",
+          "postgresType": "double precision",
+          "jsonField": "laeqDbA",
+          "nullable": false
+        },
+        {
+          "name": "origin",
+          "postgresType": "text",
+          "jsonField": "origin",
+          "nullable": false
+        },
+        {
+          "name": "method",
+          "postgresType": "text",
+          "jsonField": "method",
+          "nullable": false
+        },
+        {
+          "name": "calibration_status",
+          "postgresType": "text",
+          "jsonField": "calibrationStatus",
+          "nullable": false
+        }
+      ]
+    },
+    "ml_summaries": {
+      "responseSchema": "MlSummary",
+      "payloadSchema": "schemas/ml-summary.schema.json",
+      "columns": [
+        {
+          "name": "model_version",
+          "postgresType": "text",
+          "jsonField": "modelVersion",
+          "nullable": false
+        },
+        {
+          "name": "created_at",
+          "postgresType": "timestamptz",
+          "jsonField": "createdAt",
+          "nullable": false
+        },
+        {
+          "name": "payload",
+          "postgresType": "jsonb",
+          "jsonField": "payload",
+          "nullable": false
+        }
+      ],
+      "mapping": "C# returns the validated payload document; metadata columns are not flattened into its schema."
+    }
+  },
+  "invariants": [
+    "source_id + external_id is unique; identical replay does not create another row.",
+    "Origin is resolved by ingestion, not asserted by a device request.",
+    "Import counters reflect committed database rows.",
+    "Read views expose no secrets, credential hashes or raw audio.",
+    "Storage changes preserve the published read contract or coordinate a new version.",
+    "Runtime users are distinct from the migration account.",
+    "The contract defines names and types; PostgreSQL migrations and GRANT statements must still be implemented by SOA/deployment."
+  ],
+  "localSetup": {
+    "owner": "soa",
+    "requiredArtifacts": [
+      "Versioned PostgreSQL migrations creating storage, read views and grants.",
+      "Synthetic seed matching the shared HTTP fixtures.",
+      "Local setup command usable by C# without running the Java HTTP service."
+    ]
+  },
+  "administrativeArtifactImports": {
+    "mlSummary": {
+      "owner": "soa",
+      "transport": "local-administrative-command",
+      "payloadSchema": "schemas/ml-summary.schema.json",
+      "targetEntity": "ml_summaries"
+    }
+  }
+}

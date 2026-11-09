@@ -1,10 +1,8 @@
-# Como trabalhar no monorepo
+# Contribuição e auditoria
 
-Leia [equipe](docs/equipe.md), [sua especificação](docs/disciplinas/README.md), [contratos](contracts/README.md) e [regras de negócio](docs/regras-de-negocio.md).
+Começar pelo [README/equipe](README.md), [arquitetura](docs/arquitetura.md), [contratos](contracts/README.md) e [ficha da matéria](docs/disciplinas/README.md).
 
-## Branches e pull requests
-
-Uma branch por entrega/tarefa mantém o escopo revisável. As oito branches iniciais estão na tabela da equipe. Para começar:
+## Branch e revisão
 
 ```bash
 git clone https://github.com/peguidotte/sonora.git
@@ -14,36 +12,26 @@ git fetch origin
 git merge origin/main
 ```
 
-Substitua pela sua branch. Antes de abrir o PR, traga a main novamente, resolva conflitos e execute seus testes. Não fazer force-push na main. Não trabalhar diretamente na main após o bootstrap do repositório.
+Usar a branch da própria entrega ou uma branch curta derivada dela. Não fazer push/force-push direto na main. Abrir PR cedo, com escopo, comandos, resultados reais e limites. Pedro coordena auditoria e responsáveis afetados revisam mudanças de contrato. Confirmar o estado das proteções no GitHub: uma política escrita não bloqueia push tecnicamente. Não inferir usuários GitHub dos colegas nem conceder acesso a homônimos.
 
-Abrir pull request para main com o modelo disponível, descrevendo problema/comportamento, como rodar sozinho, como integrar, quais contratos mudou e o que foi testado. Commits pequenos; não esperar o projeto inteiro para abrir um draft. Pedro faz revisão inicial e os responsáveis afetados revisam mudanças de interface.
+## Aceite de uma entrega
 
-Branches iniciais podem ser usadas como área de trabalho, mas novas tarefas podem usar leo/csharp/ingestao, por exemplo. Para evitar conflito entre nomes de refs, prefira leo/csharp-ingestao quando leo/csharp já existir. Não manter cópias divergentes do contrato em cada pasta.
+- README com equipe/link, versões, configuração e comandos reais, sem depender da IDE.
+- Standalone e integrado conforme arquitetura, seed/mock identificados e autenticação local preservada.
+- Testes reais do componente, contratos compatíveis e tratamento de indisponibilidade.
+- Evidências e artefatos da rubrica; component.json reflete o estado real.
+- Sem dados pessoais reais, segredos, áudio, arquivos privados do Teams ou dataset bruto no Git.
 
-## O que cada entrega deve conter
+A CI compartilhada valida a fundação, não comprova as oito matérias. Cada componente adiciona seu build/testes ao ser implementado. Mocks estáticos não são aplicação pronta, integração real ou fonte de treino ML.
 
-- README com equipe, instalação, versões, configuração e comandos reais.
-- Modo standalone sem credencial de nuvem, usando seed/fixture explícita; bibliotecas podem exigir internet para instalação inicial.
-- Modo integrado com URLs externas por ambiente; timeout, erro e indisponibilidade visíveis.
-- Testes próprios e verificação do contrato compartilhado.
-- Evidências reais e limitações; mock não prova integração ou requisito que exige dados reais.
-- component.json atualizado: planned -> in_progress -> ready, com comandos reproduzíveis. Ready exige evidência; não é rótulo automático de CI.
+## Auditoria de Pedro com apoio do assistente
 
-## Escopo e segurança de colaboração
+Identificar autor, branch/commit e ambiente; ler rubrica/ficha; confrontar arquitetura, OpenAPI e database.json; executar standalone e integração quando possível; conferir persistência, erros, segurança e evidências. Para C#, verificar leitura sem poder gravar; para SOA, commit/idempotência/views/migrations; Mobile, SQLite/offline/acessibilidade; IoT, simulação e envio Java; ML, dados reais/split/CV/hiperparâmetros/métricas; Linux, app/rede/monitor/crash/boot/logs; Cyber, parsing/taint/LLM/painel; Testing, Azure/Features/casos/PDF/pitch.
 
-Cada diretório tem responsável, mas mudanças em outro diretório são possíveis quando necessárias e revisadas. Não usar versão pessoal duplicada da API. Não commitar .env, chaves, dados de moradores, materiais privados do Teams ou ZIP bruto do NoiseCapture. Exemplos positivos de PII em Cyber são sintéticos e identificados.
+Registrar resultado no PR: atendido/parcial/ausente/não verificável, reprodução, comandos executados, achados com arquivo/evidência e prioridade. Concluir pronto para integrar, pronto com limites, precisa de correção ou não verificável. Não inventar nota, teste passado ou correção. Revalidar os pontos afetados em novos commits. Resultados datados e cronogramas ficam nos PRs/Azure Boards, não em arquivos de documentação permanentes.
 
-Não enviar convites, comentários a professores/colegas ou entregas acadêmicas sem solicitação explícita. O PR é a unidade de revisão do código; Testing continua com sua entrega obrigatória no Azure Boards.
+Mudanças de interface atualizam contratos, fixtures, consumidores e testes juntos. SOA é dono das migrations e views; C# não cria uma migração concorrente. Detalhes de implementação ficam no código e comandos no README do componente; não duplicar arquitetura/rubricas em vários arquivos.
 
-## Verificações compartilhadas
+## Comunicação e privacidade
 
-```bash
-python -m venv .venv
-# Linux/macOS:
-.venv/bin/python -m pip install -r requirements-dev.txt
-.venv/bin/python tools/validate_contracts.py
-.venv/bin/python -m unittest discover -s tools -p 'test_*.py' -v
-# Windows: trocar .venv/bin/python por .venv/Scripts/python.exe
-```
-
-CI compartilhada verde comprova apenas contratos, fixtures e ferramentas comuns. O responsável deve adicionar o job de build/teste real de seu componente ao implementá-lo. Ela não comprova que as oito entregas estão concluídas.
+Não enviar mensagens, convites ou submissões sem solicitação explícita. PII de Cyber é sintética. Conversas locais/fontes privadas/dados brutos ficam ignorados; registrar uso publicável de IA em docs/uso-de-ia.md. Repositório privado exige acesso correto para colegas/professores; isso não substitui o Admin no Azure Boards de Testing.

@@ -9,12 +9,12 @@
   "standalone": {
     "requiresCloud": false,
     "commands": [],
-    "dataMode": "explicit-seed-or-fixture"
+    "dataMode": "postgresql-and-local-inputs"
   },
   "integrated": {
     "status": "planned",
     "dependencies": [
-      "api"
+      "postgresql"
     ]
   },
   "validation": {

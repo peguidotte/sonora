@@ -1,22 +1,22 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Sonora | Core API",
-    "version": "0.3.0",
-    "description": "Private API. Technical identifiers and error messages use English; JSON fields use camelCase. Synthetic examples do not prove implementation. Authentication: X-Api-Key. Authorization: x-required-scopes per operation. See docs/api-security.md."
+    "title": "Sonora | Query API",
+    "version": "0.4.0",
+    "description": "Private acoustic query API. Reads the published PostgreSQL views with a read-only role. No ingestion, migrations or HTTP relay from Java. JSON fields and technical errors use English. See docs/arquitetura.md and contracts/database.json."
   },
   "servers": [
     {
       "url": "http://localhost:8080",
-      "description": "Local implementation (planned)"
+      "description": "Local C# implementation"
     },
     {
       "url": "http://localhost:4010",
-      "description": "Static contract mock; synthetic data only"
+      "description": "Static query contract mock"
     }
   ],
   "paths": {
-    "/health/live": {
+    "/api/sonora/v1/health/live": {
       "get": {
         "operationId": "healthLive",
         "summary": "Check process liveness",
@@ -39,7 +39,7 @@
         "x-required-scopes": []
       }
     },
-    "/health/ready": {
+    "/api/sonora/v1/health/ready": {
       "get": {
         "operationId": "healthReady",
         "summary": "Check dependency readiness",
@@ -105,7 +105,7 @@
         ]
       }
     },
-    "/api/v1/locations": {
+    "/api/sonora/v1/locations": {
       "get": {
         "operationId": "listLocations",
         "summary": "List registered locations near optional coordinates",
@@ -242,7 +242,7 @@
         ]
       }
     },
-    "/api/v1/locations/{locationId}": {
+    "/api/sonora/v1/locations/{locationId}": {
       "get": {
         "operationId": "getLocation",
         "summary": "Get a registered location",
@@ -339,7 +339,7 @@
         ]
       }
     },
-    "/api/v1/locations/{locationId}/noise-profile": {
+    "/api/sonora/v1/locations/{locationId}/noise-profile": {
       "get": {
         "operationId": "getProfile",
         "summary": "Get observed noise profile with provenance and coverage",
@@ -544,7 +544,7 @@
         ]
       }
     },
-    "/api/v1/locations/{locationId}/observations": {
+    "/api/sonora/v1/locations/{locationId}/observations": {
       "get": {
         "operationId": "listObservations",
         "summary": "List observations by period and origin",
@@ -559,12 +559,12 @@
                 "example": {
                   "items": [
                     {
-                      "externalId": "demo-a-000001",
+                      "externalId": "fixture-a-1",
                       "deviceId": "11111111-1111-4111-8111-111111111111",
                       "sessionId": "demo-a-boot-001",
                       "observedAt": "2026-11-08T15:00:00Z",
                       "durationSeconds": 5,
-                      "laeqDbA": 62.5,
+                      "laeqDbA": 60,
                       "id": "33333333-3333-4333-8333-333333333333",
                       "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
                       "sourceId": "22222222-2222-4222-8222-222222222222",
@@ -572,11 +572,26 @@
                       "method": "wokwi_linear_demo",
                       "calibrationStatus": "simulated",
                       "receivedAt": "2026-11-08T15:00:00Z"
+                    },
+                    {
+                      "externalId": "fixture-a-2",
+                      "deviceId": "11111111-1111-4111-8111-111111111111",
+                      "sessionId": "demo-a-boot-001",
+                      "observedAt": "2026-11-08T15:00:05Z",
+                      "durationSeconds": 5,
+                      "laeqDbA": 70,
+                      "id": "33333333-3333-4333-8333-333333333334",
+                      "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                      "sourceId": "22222222-2222-4222-8222-222222222222",
+                      "origin": "simulated",
+                      "method": "wokwi_linear_demo",
+                      "calibrationStatus": "simulated",
+                      "receivedAt": "2026-11-08T15:00:05Z"
                     }
                   ],
                   "page": 1,
                   "pageSize": 20,
-                  "total": 1
+                  "total": 2
                 }
               }
             }
@@ -713,7 +728,7 @@
         ]
       }
     },
-    "/api/v1/devices": {
+    "/api/sonora/v1/devices": {
       "get": {
         "operationId": "listDevices",
         "summary": "List device operational states without credentials",
@@ -774,213 +789,7 @@
         ]
       }
     },
-    "/api/v1/observations": {
-      "post": {
-        "operationId": "ingestObservation",
-        "summary": "Ingest an authorized simulated device observation",
-        "responses": {
-          "201": {
-            "description": "Created.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IngestResult"
-                },
-                "example": {
-                  "id": "33333333-3333-4333-8333-333333333333",
-                  "duplicate": false,
-                  "origin": "simulated"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Request failed. Sanitized English error response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "invalid_request",
-                  "message": "Invalid request."
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing, invalid, revoked or expired API key.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "unauthorized",
-                  "message": "Missing, invalid, revoked or expired API key."
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated credential lacks the required scope.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "forbidden",
-                  "message": "Authenticated credential lacks the required scope."
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Request failed. Sanitized English error response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "invalid_request",
-                  "message": "Invalid request."
-                }
-              }
-            }
-          },
-          "422": {
-            "description": "Request failed. Sanitized English error response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "invalid_request",
-                  "message": "Invalid request."
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "Successful response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/IngestResult"
-                },
-                "example": {
-                  "id": "33333333-3333-4333-8333-333333333333",
-                  "duplicate": true,
-                  "origin": "simulated"
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ObservationIngest"
-              }
-            }
-          }
-        },
-        "x-required-scopes": [
-          "observations:write"
-        ]
-      }
-    },
-    "/api/v1/imports/observations": {
-      "post": {
-        "operationId": "importObservations",
-        "summary": "Import historical observations with per-item results",
-        "responses": {
-          "200": {
-            "description": "Successful response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ImportResult"
-                },
-                "example": {
-                  "accepted": 1,
-                  "duplicates": 0,
-                  "rejected": 0,
-                  "items": [
-                    {
-                      "externalId": "public-session-point-001",
-                      "status": "accepted",
-                      "observationId": "33333333-3333-4333-8333-333333333333"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Request failed. Sanitized English error response.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "invalid_request",
-                  "message": "Invalid request."
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Missing, invalid, revoked or expired API key.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "unauthorized",
-                  "message": "Missing, invalid, revoked or expired API key."
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Authenticated credential lacks the required scope.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "example": {
-                  "code": "forbidden",
-                  "message": "Authenticated credential lacks the required scope."
-                }
-              }
-            }
-          }
-        },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ImportRequest"
-              }
-            }
-          }
-        },
-        "x-required-scopes": [
-          "imports:write"
-        ]
-      }
-    },
-    "/api/v1/analytics/summary": {
+    "/api/sonora/v1/analytics/summary": {
       "get": {
         "operationId": "getMlSummary",
         "summary": "Get a versioned ML summary, or 204 when unavailable",
@@ -1242,49 +1051,6 @@
         ],
         "additionalProperties": false
       },
-      "ObservationIngest": {
-        "type": "object",
-        "properties": {
-          "externalId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
-          },
-          "deviceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "sessionId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
-          },
-          "observedAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "Z$"
-          },
-          "durationSeconds": {
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 3600
-          },
-          "laeqDbA": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 140
-          }
-        },
-        "required": [
-          "externalId",
-          "deviceId",
-          "sessionId",
-          "observedAt",
-          "durationSeconds",
-          "laeqDbA"
-        ],
-        "additionalProperties": false
-      },
       "Observation": {
         "type": "object",
         "properties": {
@@ -1401,28 +1167,6 @@
           "page",
           "pageSize",
           "total"
-        ],
-        "additionalProperties": false
-      },
-      "IngestResult": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "duplicate": {
-            "type": "boolean"
-          },
-          "origin": {
-            "type": "string",
-            "const": "simulated"
-          }
-        },
-        "required": [
-          "id",
-          "duplicate",
-          "origin"
         ],
         "additionalProperties": false
       },
@@ -1659,144 +1403,6 @@
         ],
         "additionalProperties": false
       },
-      "PublicObservation": {
-        "type": "object",
-        "properties": {
-          "externalId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
-          },
-          "sessionId": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 128
-          },
-          "observedAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "Z$"
-          },
-          "durationSeconds": {
-            "type": "number",
-            "exclusiveMinimum": 0,
-            "maximum": 3600
-          },
-          "laeqDbA": {
-            "type": "number",
-            "minimum": 0,
-            "maximum": 140
-          },
-          "locationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "method": {
-            "type": "string",
-            "const": "noisecapture_1s"
-          },
-          "calibrationStatus": {
-            "type": "string",
-            "enum": [
-              "unknown",
-              "simulated",
-              "documented"
-            ]
-          }
-        },
-        "required": [
-          "externalId",
-          "sessionId",
-          "observedAt",
-          "durationSeconds",
-          "laeqDbA",
-          "locationId",
-          "method",
-          "calibrationStatus"
-        ],
-        "additionalProperties": false
-      },
-      "ImportRequest": {
-        "type": "object",
-        "properties": {
-          "sourceId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "items": {
-            "type": "array",
-            "minItems": 1,
-            "maxItems": 100,
-            "items": {
-              "type": "object",
-              "description": "Each item is validated against PublicObservation. A valid envelope permits partial item rejection."
-            }
-          }
-        },
-        "required": [
-          "sourceId",
-          "items"
-        ],
-        "additionalProperties": false
-      },
-      "ImportItemResult": {
-        "type": "object",
-        "properties": {
-          "externalId": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string",
-            "enum": [
-              "accepted",
-              "duplicate",
-              "rejected"
-            ]
-          },
-          "observationId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "code": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "externalId",
-          "status"
-        ],
-        "additionalProperties": false
-      },
-      "ImportResult": {
-        "type": "object",
-        "properties": {
-          "accepted": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "duplicates": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "rejected": {
-            "type": "integer",
-            "minimum": 0
-          },
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ImportItemResult"
-            }
-          }
-        },
-        "required": [
-          "accepted",
-          "duplicates",
-          "rejected",
-          "items"
-        ],
-        "additionalProperties": false
-      },
       "MlSummary": {
         "type": "object",
         "properties": {
@@ -1930,5 +1536,12 @@
     {
       "ApiKeyAuth": []
     }
-  ]
+  ],
+  "x-api-prefix": "/api/sonora/v1",
+  "x-database-access": {
+    "contract": "../database.json",
+    "role": "sonora_query",
+    "access": "read-only",
+    "schema": "sonora_read"
+  }
 }

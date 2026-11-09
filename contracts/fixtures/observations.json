@@ -1,12 +1,12 @@
 {
   "items": [
     {
-      "externalId": "demo-a-000001",
+      "externalId": "fixture-a-1",
       "deviceId": "11111111-1111-4111-8111-111111111111",
       "sessionId": "demo-a-boot-001",
       "observedAt": "2026-11-08T15:00:00Z",
       "durationSeconds": 5,
-      "laeqDbA": 62.5,
+      "laeqDbA": 60,
       "id": "33333333-3333-4333-8333-333333333333",
       "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       "sourceId": "22222222-2222-4222-8222-222222222222",
@@ -14,9 +14,24 @@
       "method": "wokwi_linear_demo",
       "calibrationStatus": "simulated",
       "receivedAt": "2026-11-08T15:00:00Z"
+    },
+    {
+      "externalId": "fixture-a-2",
+      "deviceId": "11111111-1111-4111-8111-111111111111",
+      "sessionId": "demo-a-boot-001",
+      "observedAt": "2026-11-08T15:00:05Z",
+      "durationSeconds": 5,
+      "laeqDbA": 70,
+      "id": "33333333-3333-4333-8333-333333333334",
+      "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "sourceId": "22222222-2222-4222-8222-222222222222",
+      "origin": "simulated",
+      "method": "wokwi_linear_demo",
+      "calibrationStatus": "simulated",
+      "receivedAt": "2026-11-08T15:00:05Z"
     }
   ],
   "page": 1,
   "pageSize": 20,
-  "total": 1
+  "total": 2
 }

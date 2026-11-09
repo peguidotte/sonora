@@ -1,6 +1,6 @@
-# Operating Systems — hospedagem da API de ruído
+# Operating Systems — execução e monitoramento
 
-**Responsável:** Pedro Visconti Guidotte, RM556630. **Dependência obrigatória:** API web funcional de outra disciplina, proposta C#.
+**Responsável:** Pedro Visconti Guidotte, RM556630. Pasta `linux/`; branch `pedro/operating-systems`.
 
 ## Exigência do professor
 
@@ -17,55 +17,29 @@ PDF pp. 35–37 e tarefa detalhada coletada em 06/11: Bash automatizando infraes
 
 GitHub com scripts/configurações/README/integrantes/evidências e vídeo até 7 minutos.
 
-## Arquitetura proposta
+## Responsabilidade
 
-Ubuntu Server 24.04 LTS em VM local, API C# .NET 10 + SQLite. Versões devem corresponder ao pacote real recebido do colega. Sem Kubernetes, obrigação de nuvem paga ou banco remoto. WSL com systemd é alternativa se Pedro preferir; script de rede precisa ser adaptado ao ambiente, não copiado sem ajustes.
+Provisionar Linux com aplicações Java/C#, PostgreSQL e proxy HTTPS como serviços independentes. A aplicação web de outra disciplina é obrigatória; uma página que só responde 200 não a substitui. Para demonstração mínima de Linux, C# com PostgreSQL/seed pode funcionar sem Java ativo; o objetivo integrado inclui os dois backends.
 
-API em /opt/gs-ruido/app, banco em /var/lib/gs-ruido/ruido.db, configuração em /etc/gs-ruido/app.env e auditoria em /var/log/gs-ruido. Usuário de serviço gs-ruido com menor privilégio. Porta interna proposta 8080, healthchecks do contrato e /dashboard para mostrar a solução no navegador.
+SOA fornece migrations/views/grants/seed; C# fornece publish/runtime/start. O provisionamento aplica setup comum com conta migradora e inicia runtimes com usuários/credenciais distintos. C# recebe sonora_query, sem poder de escrita/DDL. Banco usa diretório de dados PostgreSQL persistente, fora dos artefatos de aplicação.
 
-SOA e ML não precisam rodar continuamente no servidor: SOA entrega lotes por HTTP e ML entrega resumo por importação. A API mínima real do C# deve estar pronta cedo; uma página estática que sempre responde 200 não conclui a matéria.
+## Automação a implementar
 
-## Arquivos a implementar
+- Infra: parâmetros de interface/IP/prefixo/rota/DNS/hostname, usuários de serviço, diretórios e permissões. Validar e salvar configuração anterior antes de alterar rede; prever console/recuperação.
+- Banco: instalar/configurar PostgreSQL, aplicar migrations/grants/seed com ferramenta do SOA, sem duplicar schema no Bash.
+- Apps: instalar runtimes/dependências, publicar versões fixadas, configurar ambiente fora do Git, proxy/prefixos e systemd.
+- Monitor: CPU por diferença de /proc/stat, RAM por MemAvailable, disco do filesystem de dados; intervalo/limiares configuráveis, logs/alerta e retorno ao normal.
+- Verificação/falha: saúde autenticada, consultas e testes controlados no laboratório, com limites/limpeza; logs de etapa, timestamp e código de saída, sem segredo.
 
-| Arquivo | Função |
-| --- | --- |
-| linux/scripts/provision-infra.sh | Validar ambiente, hostname, IP/rota/DNS, usuário, diretórios e permissões |
-| linux/scripts/provision-app.sh | Instalar runtime/dependências, publicar versão, migrations, seed e serviço |
-| linux/scripts/monitor.sh | Loop de amostragem e alertas |
-| linux/scripts/verify.sh | Configuração, serviços, saúde e consulta funcional |
-| linux/scripts/test-failure.sh | Falhas limitadas no laboratório, coleta de resultado e limpeza |
-| linux/config/gs.env.example | Parâmetros sem segredos |
-| linux/systemd/gs-ruido-app.service | App no boot e recuperação |
-| linux/systemd/gs-ruido-monitor.service | Monitor no boot e recuperação |
-| linux/evidencias/ | Saídas/capturas reais |
+## Aceite
 
-Esses arquivos são planejamento; ainda não foram implementados.
+Reexecução converge sem duplicar seed/usuários ou apagar banco; IP/DNS/rota/hostname conferem; aplicações e monitor iniciam no boot. Observação persistida pelo Java continua consultável após reiniciar C# e PostgreSQL. Com banco indisponível, readiness acusa falha.
 
-## Passos de execução
+Encerrar abruptamente o processo principal do monitor e comprovar recuperação pelo systemd, novo PID e logs. systemctl stop é parada administrativa e não substitui crash em Restart=on-failure. Carga limitada gera alerta e recuperação, sem encher disco/travar host pessoal. Falha de script interrompe com código não zero e log sanitizado.
 
-1. Escolher VM/WSL, distribuição e interface/IP/prefixo/gateway/DNS reais. Configurar console/recuperação antes de mudar a rede; salvar configuração anterior.
-2. Bash valida parâmetros, instala dependências, cria usuário/diretórios e registra resultado. Segredos são configurados fora do Git; logs não imprimem variáveis sensíveis.
-3. Receber commit, SDK/runtime, publish/entrypoint, migrations e seed do C#. Provisionar sem abrir IDE, inicializar banco persistente e serviço.
-4. Habilitar app e monitor no boot. Reexecutar scripts: não duplicar seed, usuário ou units, nem apagar banco.
-5. Monitor a cada 30 s, parametrizável; CPU por diferença de /proc/stat, RAM por MemAvailable, disco pelo filesystem de dados. Limiares iniciais CPU/RAM 80%, disco 85%, ajustáveis e não exigidos pelo professor.
-6. Gravar recurso/uso/limiar/estado, alertar no log e registrar retorno ao normal. Journald para serviços, auditoria estruturada e rotação para scripts.
-7. Testar falhas e comprovar funcionamento completo.
+## Entrega
 
-## Critérios de aceite
+Scripts Bash, configurações/systemd, README de reprodução e evidências reais, mais vídeo no limite oficial. Mostrar provisionamento, rede, banco, consulta funcional, monitor/logs, falha/recuperação e boot. VM local e Azure devem preservar o mesmo desenho; parâmetros de ambiente ficam em configuração, não em documentação duplicada.
 
-- Instalação inicial e reexecução convergem; falha retorna exit code não zero com etapa registrada.
-- Hostname, IP, rota e DNS correspondem ao perfil configurado.
-- Criar observação simulada, consultar /dashboard e reiniciar API; dado continua no banco.
-- Reiniciar máquina: app e monitor voltam.
-- Encerrar abruptamente o processo principal do **monitor**: systemd recupera, novo PID e logs comprovam. Testar app também é útil, mas não substitui o monitor.
-- Usar Restart=on-failure com política de tentativas documentada. systemctl stop é parada administrativa, não crash; não deve ser a única prova.
-- Carga limitada e com limpeza gera alerta e posterior recuperação; evitar encher o disco do host ou travar a máquina pessoal.
-- Sem banco disponível, readiness responde 503 e logs permitem diagnóstico sem segredo.
 
-## Handoff, metas e vídeo
-
-**Meta 09/11:** VM/noise-profile definido. **10/11:** receber C# mínimo. **12/11:** provisionamento e persistência. **14/11:** monitor/falhas/reexecução. **16/11:** evidências e integração. **17–18/11:** vídeo e conferência.
-
-Roteiro até 7 min: problema/papel da infra (30 s); provisionamento (1m30); rede/app/banco (1 min); monitor/logs (1 min); falha e recuperação (1m30); reboot/reexecução e reprodução (1 min); conclusão/repositório (30 s). Usar resultados reais, declarando cortes/time-lapse quando houver.
-
-Pendências: ambiente e parâmetros reais de rede, versão e pacote C#. Nenhum Linux foi instalado ou provisionado nesta etapa. A inspeção antiga de WSL não deve ser tratada como inventário atualizado da máquina.
+Referências comuns: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md). Comandos e evidências reais ficam no README/PR da entrega.

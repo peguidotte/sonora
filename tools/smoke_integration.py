@@ -37,22 +37,24 @@ def main():
     end = datetime.fromisoformat(args.end.replace("Z", "+00:00"))
     assert end > begin and (end - begin).total_seconds() <= 31 * 86400
     api = load_service("csharp")
-    get(args.api_base, "/health/live", api, "/health/live")
-    get(args.api_base, "/health/ready", api, "/health/ready", headers=operator_headers)
-    points = get(args.api_base, "/api/v1/locations", api, "/api/v1/locations", headers=read_headers)
+    prefix = api["x-api-prefix"]
+    get(args.api_base, prefix + "/health/live", api, prefix + "/health/live")
+    get(args.api_base, prefix + "/health/ready", api, prefix + "/health/ready", headers=operator_headers)
+    points = get(args.api_base, prefix + "/locations", api, prefix + "/locations", headers=read_headers)
     assert points["items"], "Sem seed/locations para demonstrar jornada."
     location_id = points["items"][0]["id"]
     qs = urlencode({"from":args.begin,"to":args.end,"origin":"simulated"})
-    profile = get(args.api_base, f"/api/v1/locations/{location_id}/noise-profile?{qs}", api, "/api/v1/locations/{locationId}/noise-profile", headers=read_headers)
+    profile = get(args.api_base, prefix + f"/locations/{location_id}/noise-profile?{qs}", api, prefix + "/locations/{locationId}/noise-profile", headers=read_headers)
     if profile["status"] == "no_data":
         assert profile["laeqDbA"] is None and not profile["series"], "Ausência confundida com valor medido."
     if args.soa_base:
         soa = load_service("soa")
-        get(args.soa_base, "/health/live", soa, "/health/live")
+        prefix = soa["x-api-prefix"]
+        get(args.soa_base, prefix + "/health/live", soa, prefix + "/health/live")
         key = os.environ.get("SOA_OPERATOR_KEY")
         assert key, "Configure SOA_OPERATOR_KEY para consultar lotes reais."
-        get(args.soa_base, "/health/ready", soa, "/health/ready", headers={"X-Api-Key":key})
-        get(args.soa_base, "/api/v1/batches", soa, "/api/v1/batches", headers={"X-Api-Key":key})
+        get(args.soa_base, prefix + "/health/ready", soa, prefix + "/health/ready", headers={"X-Api-Key":key})
+        get(args.soa_base, prefix + "/sonora/batches", soa, prefix + "/sonora/batches", headers={"X-Api-Key":key})
     print("OK: endpoints reais consultados e respostas compatíveis. Não testa escrita, persistência ou jornada Mobile.")
 
 
