@@ -44,7 +44,7 @@ O título da p. 26 diz “Sete disciplinas”, mas a tabela lista **oito**. Fora
 
 - Linux deve hospedar uma aplicação desenvolvida em outra disciplina. A infraestrutura precisa instalar dependências e preparar o funcionamento completo da aplicação escolhida.
 - A tarefa de Linux autoriza WSL, VM local ou VM em Azure. O WSL precisa cumprir todas as configurações e usar systemd.
-- C# e SOA têm sobreposição de backend. É tecnicamente possível montar uma base comum; confirmar com os professores se o mesmo repositório pode satisfazer as duas entregas, mantendo evidências por rubrica.
+- Organização escolhida pelo usuário em 08/11: monorepo com aplicações/entregas C# e SOA separadas e evidências por rubrica. A eventual reutilização da mesma implementação nas duas matérias seria outra decisão e depende de confirmação docente; compartilhar o repositório não significa compartilhar a entrega.
 - Mobile admite mock, mas manter contrato compatível com a API para a integração.
 - A simulação ESP32 atende Physical Computing; **não** atende a exigência de dados reais de ML.
 - Cybersecurity pede evolução de um motor de parsing e dashboard. A base utilizada em aula ainda precisa ser identificada; não substituir essa exigência por um checklist genérico.

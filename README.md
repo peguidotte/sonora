@@ -1,6 +1,6 @@
-# API de ruído — CitizenTech
+# Sonora
 
-Monorepo da **Global Solution FIAP 2026.2**, turma **3ESPV-2026**. Produto de contexto acústico para plataformas imobiliárias: ajuda a comparar observações do entorno, com fonte, período e cobertura explícitos. Nome comercial em discussão com o grupo.
+Monorepo da **Global Solution FIAP 2026.2**, turma **3ESPV-2026**. Produto de contexto acústico para plataformas imobiliárias: ajuda a comparar observações do entorno, com fonte, período e cobertura explícitos. **Sonora** é o nome aprovado do produto acústico desta GS. A marca da empresa/plataforma continua em discussão. [Marca e produtos](docs/marca-e-produtos.md).
 
 ## Equipe
 
@@ -72,7 +72,7 @@ Mock C#: http://127.0.0.1:4010/painel e /openapi.json. Mock SOA: http://127.0.0.
 
 C# recebe IoT simulado e lotes reais do SOA, serve Mobile/painel e importa resumo ML. Fonte real, histórico e simulação ficam separados; ausência não é 0 dB. Nenhum áudio é armazenado.
 
-Destino planejado pelo grupo: **Azure**, inicialmente VM Linux com serviços C#/SOA independentes, HTTPS e dados persistentes. Aplicações e provisionamento ainda serão implementados. Assinatura, região, recursos/créditos e acesso precisam ser definidos; nenhum recurso Azure foi criado nesta etapa.
+Destino provável indicado pelo grupo: **Azure**, inicialmente VM Linux com serviços C#/SOA independentes, HTTPS e dados persistentes. Aplicações e provisionamento ainda serão implementados. Assinatura, região, recursos/créditos e acesso precisam ser definidos; nenhum recurso Azure foi criado nesta etapa.
 
 ## Dados reais
 

@@ -1,6 +1,6 @@
 # Governança do repositório
 
-Monorepo privado criado na conta @peguidotte por solicitação de Pedro. Nome comercial/repositório ainda em discussão com ele. A divisão de pastas e branches está em [equipe](equipe.md).
+Monorepo privado criado na conta @peguidotte por solicitação de Pedro. Repositório atual: https://github.com/peguidotte/sonora. Sonora é o produto aprovado; a marca ampla da empresa/plataforma continua em aberto. Disponibilidade comercial não foi validada. A divisão de pastas e branches está em [equipe](equipe.md).
 
 ## Política do grupo
 
@@ -21,7 +21,7 @@ Configurações aplicadas: main como branch padrão, squash merge habilitado, me
 
 Em 08/11, os primeiros runs de push e workflow_dispatch terminaram em startup_failure antes de criar qualquer job. A API não retornou anotações/causa específica. As mesmas validações passaram localmente; actionlint 1.7.12, obtido do release oficial e conferido por SHA-256, não apontou erro nos dois workflows. Isso não demonstra sucesso da execução no GitHub.
 
-A inspeção da mensagem visual ficou indisponível porque navegação local está desativada nas configurações do aplicativo. Pendente conferir o erro na aba Actions e eventuais restrições da conta/execução. Não afirmar que a CI remota está verde nem atribuir a falha a faturamento sem evidência. Referências dos runs iniciais: 42538039118 e 42538127838 (repo temporário criado nesta sessão).
+A inspeção da mensagem visual ficou indisponível porque navegação local está desativada nas configurações do aplicativo. Pendente conferir o erro na aba Actions e eventuais restrições da conta/execução. Não afirmar que a CI remota está verde nem atribuir a falha a faturamento sem evidência. Referências dos runs iniciais: 42538039118 e 42538127838 (os links anteriores redirecionam após renomear o repositório para sonora).
 
 Referência: [GitHub — protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
 

@@ -29,6 +29,8 @@ Fonte de verdade da proposta: este arquivo, docs/03-integracao.md e contracts/op
 
 O OpenAPI define os campos/status estruturais; regras relacionais e cálculos exigem testes no código de cada responsável. Mudança incompatível exige atualizar versão/contrato, fixtures e consumidores no mesmo PR, ou migração coordenada. Não basta atualizar Swagger gerado para mudar um acordo do grupo.
 
+Perfil com múltiplos produtores/séries não recebe um LAeq global que misture medições: valor de topo nulo, valores nas séries/bins. available significa que há observações; não significa comparabilidade automática. Sem observações, no_data exige valor nulo e séries/fontes vazias.
+
 ## Mocks e dados reais
 
 Todos os arquivos em contracts/fixtures/ são exemplos sintéticos, inclusive os que ilustram o formato de importação pública. O arquivo ml-summary.mock.json contém resultados inexistentes explicitamente marcados, métricas nulas e hash de demonstração. Usá-los em treinamento ou como evidência de resultado é incorreto. A base real fica fora do Git e segue ml/dados/README.md.

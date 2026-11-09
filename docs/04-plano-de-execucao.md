@@ -14,9 +14,9 @@
 | D06 | ESP32 simulado; sem instalação física | Proposta técnica | Um circuito, três pontos de demonstração; validar rede Wokwi/API cedo |
 | D07 | ML KMeans + PCA sobre sessões reais de São Paulo | Proposta com fonte inspecionada | Limpeza e suficiência final pendentes; não é previsão temporal |
 | D08 | Linux VM Ubuntu 24.04, app e monitor systemd | Proposta técnica | Pedro escolhe VM/perfil; WSL com systemd é alternativa |
-| D09 | Nome comercial | Em discussão | Nome técnico do repositório é provisório |
+| D09 | Sonora: produto; empresa/plataforma com nome a definir | Sonora aprovado; marca ampla em aberto | Repo sonora, sem depender da marca da empresa |
 | D10 | Monorepo privado, branches e PR/main | Decisão do usuário | Repositório criado; consultar README/governança para estado atual |
-| D11 | Deploys Azure | Decisão de destino | Assinatura/recursos/custo pendentes; nenhum recurso criado |
+| D11 | Deploys provavelmente na Azure | Preferência informada pelo usuário | Assinatura/recursos/custo pendentes; nenhum recurso criado |
 | D12 | Equipe e responsabilidades | Definidos pelo usuário | Ver docs/equipe.md; usernames dos outros membros pendentes |
 
 Essas propostas permitem iniciar protótipos e organização. Decisões que mudem o contrato devem ser combinadas com os responsáveis afetados; não há necessidade de esperar por nome, logotipo ou preço.
