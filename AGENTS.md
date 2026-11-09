@@ -12,6 +12,7 @@
 - Responsáveis: Leonardo api/iot; Felipe soa/testing; Herbert cybersecurity/mobile; Gabriel ml; Pedro linux e coordenação/auditoria. Nomes/RMs no README principal.
 - Implementar somente o trabalho solicitado. Ter especificações das outras matérias não autoriza executá-las integralmente por inferência.
 - Trabalho em branch/PR, sem push direto na main. Mudanças de interface atualizam OpenAPI, banco, fixtures, ferramentas e consumidores juntos.
+- CI/CD fica no GitHub Actions, somente dentro da franquia gratuita e sem cobranças adicionais. Antes de habilitar execuções, confirmar orçamento Actions de US$ 0 com bloqueio de uso ativo. Não elevar orçamento nem desativar o bloqueio para corrigir CI. Azure usa apenas créditos estudantis com spendingLimit=On. Scripts reutilizáveis são preferíveis a pipelines redundantes.
 - Distinguir requisito do professor, decisão do projeto e implementação real. Nunca inventar entrevista, medição, teste, resultado, nota, deploy ou entrega.
 - Documentação mínima: arquitetura central; contratos verificáveis; rubricas nas oito fichas; comandos reais nos READMEs dos componentes. Não criar cronogramas, snapshots ou documentos duplicados; histórico no Git e resultados de revisão nos PRs.
 - Preservar materiais privados, prompts locais, output e dataset bruto fora do Git. Registrar prompts em prompts.md local e resumo publicável em docs/uso-de-ia.md.

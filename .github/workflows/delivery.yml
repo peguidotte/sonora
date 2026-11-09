@@ -97,19 +97,22 @@ jobs:
           COMPONENT: ${{ matrix.component }}
         run: python deploy/pipeline.py package "$COMPONENT"
       - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
         with:
           name: backend-${{ matrix.component }}
           path: |
             output/releases/${{ matrix.component }}.tar.gz
             output/releases/${{ matrix.component }}.json
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1
 
   deploy:
     needs: [inventory, backends]
     if: >-
-      github.ref == 'refs/heads/main' &&
-      needs.inventory.outputs.has_backends == 'true' && vars.AZURE_CLIENT_ID != ''
+      always() && github.ref == 'refs/heads/main' &&
+      needs.inventory.result == 'success' &&
+      (needs.backends.result == 'success' || needs.backends.result == 'skipped') &&
+      vars.AZURE_CLIENT_ID != ''
     runs-on: ubuntu-latest
     timeout-minutes: 25
     concurrency:
@@ -131,6 +134,7 @@ jobs:
         with:
           python-version: '3.12'
       - uses: actions/download-artifact@v4
+        if: needs.inventory.outputs.has_backends == 'true'
         with:
           pattern: backend-*
           path: output/releases
@@ -140,6 +144,16 @@ jobs:
           client-id: ${{ vars.AZURE_CLIENT_ID }}
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Verificar identidade e acesso ao destino antes do deploy
+        run: |
+          az vm show --resource-group "$AZURE_RESOURCE_GROUP" --name "$AZURE_VM_NAME" --query provisioningState --output tsv
+          az storage container show --account-name "$AZURE_RELEASE_STORAGE" --name releases --auth-mode login --query name --output tsv
+          python - <<'PY'
+          import os, sys
+          sys.path.insert(0, 'deploy')
+          from pipeline import require_student_limit
+          require_student_limit(os.environ['AZURE_SUBSCRIPTION_ID'])
+          PY
       - name: Publicar SOA/migrations antes da API de consulta
         run: |
           set -euo pipefail
@@ -178,10 +192,11 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
         with:
           name: sonora-android-demo
           path: mobile/android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1
       - name: Explicar distribuição
         run: echo 'APK de demonstração nos artefatos desta execução; não publica em loja nem contém chave de API.' >> "$GITHUB_STEP_SUMMARY"
