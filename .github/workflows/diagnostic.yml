@@ -1,0 +1,12 @@
+name: CI-Probe
+on:
+  push:
+    branches: [pedro/deployment-foundation]
+permissions:
+  contents: read
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - run: echo CI_PROBE_OK
