@@ -14,13 +14,14 @@ trap 'rc=$?; echo "$(date -Is) ERROR provision line=$LINENO exit=$rc"; exit "$rc
 echo "$(date -Is) START provision"
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qq
-apt-get install -y -qq ca-certificates curl gnupg postgresql postgresql-client openjdk-21-jre-headless python3 libicu74 libssl3t64 libgssapi-krb5-2
-hostnamectl set-hostname sonora
-ip -brief address
-ip route show
-resolvectl status --no-pager
-getent hosts login.microsoftonline.com >/dev/null
+apt-get install -y -qq ca-certificates curl gnupg postgresql postgresql-client openjdk-21-jre-headless python3 libicu74 libssl3t64 libgssapi-krb5-2 netplan.io logrotate
+desired_hostname=${SONORA_HOSTNAME:-sonora}
+[[ $desired_hostname =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] || exit 2
+echo "$(date -Is) stage=network"
+hostnamectl set-hostname "$desired_hostname"
+/bin/bash /opt/sonora/bootstrap/network.sh check
 
+echo "$(date -Is) stage=users_and_directories"
 for component in api soa migrator monitor; do
   id "sonora-$component" >/dev/null 2>&1 || useradd --system --no-create-home --shell /usr/sbin/nologin "sonora-$component"
 done
@@ -95,6 +96,7 @@ write(p, ''.join(f'{k}="{v}"\n' for k, v in {
 }.items()))
 PY
 
+echo "$(date -Is) stage=database_roles"
 # SQL via stdin: senhas não entram em argumentos nem no log do shell.
 python3 - <<'PY' | runuser -u postgres -- psql -X --set=ON_ERROR_STOP=1 --quiet postgres
 from pathlib import Path
@@ -112,6 +114,7 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 SQL
 # Sem tabelas/views/seed aqui: as migrations pertencem exclusivamente ao SOA.
 
+echo "$(date -Is) stage=proxy"
 if ! command -v caddy >/dev/null; then
   curl -fsSL https://dl.cloudsmith.io/public/caddy/stable/gpg.key -o /tmp/sonora-caddy.gpg
   gpg --batch --yes --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg /tmp/sonora-caddy.gpg
@@ -140,6 +143,7 @@ chmod 0644 /etc/caddy/Caddyfile
 caddy fmt --overwrite /etc/caddy/Caddyfile
 caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 
+echo "$(date -Is) stage=services"
 for component in api soa; do
   cat > "/etc/systemd/system/sonora-$component.service" <<EOF
 [Unit]
@@ -168,6 +172,8 @@ WantedBy=multi-user.target
 EOF
 done
 install -m 0755 /opt/sonora/bootstrap/monitor.sh /usr/local/bin/sonora-monitor
+install -m 0755 /opt/sonora/bootstrap/network.sh /usr/local/sbin/sonora-network
+install -m 0700 /opt/sonora/bootstrap/verify.sh /usr/local/sbin/sonora-verify
 install -m 0700 /opt/sonora/bootstrap/deploy-release.py /usr/local/sbin/sonora-deploy
 if [[ ! -e /etc/sonora/monitor.env ]]; then
   printf 'INTERVAL_SECONDS=30\nCPU_THRESHOLD=85\nMEMORY_THRESHOLD=85\nDISK_THRESHOLD=85\n' > /etc/sonora/monitor.env
@@ -194,4 +200,28 @@ systemctl daemon-reload
 systemctl enable --now postgresql caddy sonora-monitor
 systemctl restart sonora-monitor
 systemctl reload caddy
+echo "$(date -Is) stage=audit_retention"
+# Limitar retenção e persistir logs de serviço entre reboots da VM dedicada.
+install -d -m 0755 /etc/systemd/journald.conf.d
+cat > /etc/systemd/journald.conf.d/sonora.conf <<'EOF'
+[Journal]
+Storage=persistent
+SystemMaxUse=100M
+MaxRetentionSec=14day
+EOF
+cat > /etc/logrotate.d/sonora <<'EOF'
+/var/log/sonora-*.log {
+    su root root
+    weekly
+    maxsize 5M
+    rotate 4
+    compress
+    missingok
+    notifempty
+    create 0600 root root
+}
+EOF
+systemctl restart systemd-journald
+journalctl --flush
+logrotate --debug /etc/logrotate.d/sonora > /var/log/sonora-logrotate-validation.log 2>&1
 echo "$(date -Is) COMPLETE provision; aplicações aguardam artefatos reais e migrations SOA."

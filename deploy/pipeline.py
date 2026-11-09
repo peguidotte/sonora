@@ -16,7 +16,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / 'deploy/azure'
 REPOSITORY = 'peguidotte/sonora'
-INFRA_FILES = ('provision.sh', 'monitor.sh', 'deploy-release.py')
+INFRA_FILES = ('provision.sh', 'monitor.sh', 'network.sh', 'verify.sh', 'deploy-release.py')
 
 
 def command(program):
@@ -240,12 +240,46 @@ def publish(args):
         az('storage', 'blob', 'upload', *blob_args, '--file', str(archive),
            '--metadata', 'sha256=' + digest, '--overwrite', 'false')
     script = 'set -eu\ncloud-init status --wait >/dev/null\n'
-    script += f'/usr/local/sbin/sonora-deploy {component} {release} {account} {digest}'
     if component == 'infra':
         origin = os.environ['API_BASE_URL']
         if not re.fullmatch(r'https://[a-z0-9.-]+', origin):
             raise ValueError('Origem HTTPS inválida.')
-        script += ' --fqdn ' + origin.removeprefix('https://')
+        # O instalador original copiava só três arquivos. Usar suas fronteiras de
+        # download/hash/extração para atualizar todos os helpers da release validada.
+        payload = json.dumps({'account': account, 'release': release, 'digest': digest,
+                              'fqdn': origin.removeprefix('https://'), 'files': INFRA_FILES})
+        script += "python3 - <<'PY'\n"
+        script += f"config = {payload!r}\n"
+        script += '''import fcntl, importlib.machinery, importlib.util, json, os, shutil, subprocess, tempfile
+from pathlib import Path
+c = json.loads(config)
+loader = importlib.machinery.SourceFileLoader('installed_release', '/usr/local/sbin/sonora-deploy')
+spec = importlib.util.spec_from_loader(loader.name, loader)
+agent = importlib.util.module_from_spec(spec)
+loader.exec_module(agent)
+with open('/run/sonora-deploy.lock', 'w') as lock:
+    fcntl.flock(lock, fcntl.LOCK_EX)
+    with tempfile.TemporaryDirectory(prefix='infra-', dir='/var/lib/sonora/incoming') as folder:
+        folder = Path(folder)
+        archive = folder / 'release.tar.gz'
+        agent.fetch_archive(c['account'], 'infra', c['release'], archive, c['digest'])
+        extracted = folder / 'unpacked'
+        extracted.mkdir()
+        agent.extract_release(archive, extracted)
+        agent.validate_manifest(extracted, 'infra', c['release'])
+        if not all((extracted / name).is_file() for name in c['files']):
+            raise ValueError('Missing infrastructure files.')
+        for name in c['files']:
+            target = Path('/opt/sonora/bootstrap') / name
+            staged = target.with_suffix(target.suffix + '.new')
+            shutil.copyfile(extracted / name, staged)
+            staged.chmod(0o700)
+            staged.replace(target)
+        subprocess.run(['/bin/bash', '/opt/sonora/bootstrap/provision.sh', c['fqdn']], check=True)
+PY
+'''
+    else:
+        script += f'/usr/local/sbin/sonora-deploy {component} {release} {account} {digest}'
     marker = f'SONORA_DEPLOY_OK {component} {release}'
     script += f"\nprintf '\\n{marker}\\n'"
     with tempfile.TemporaryDirectory() as temporary:

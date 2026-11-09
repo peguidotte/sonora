@@ -43,7 +43,7 @@ def validate_manifest(target, component, release):
     manifest = json.loads((target / 'release.json').read_text())
     if manifest != {'component': component, 'releaseId': release, 'commit': release[:40]}:
         raise ValueError('Proveniência do artefato não confere.')
-    required = ['provision.sh', 'monitor.sh', 'deploy-release.py'] if component == 'infra' else ['bin/start.sh']
+    required = ['provision.sh', 'monitor.sh', 'network.sh', 'verify.sh', 'deploy-release.py'] if component == 'infra' else ['bin/start.sh']
     if component == 'soa':
         required.append('bin/migrate.sh')
     for name in required:
@@ -118,7 +118,7 @@ def deploy(args):
             if args.component == 'infra':
                 if not re.fullmatch(r'[a-z0-9][a-z0-9.-]+\.[a-z]{2,}', args.fqdn or ''):
                     raise ValueError('FQDN inválido.')
-                for name in ('provision.sh', 'monitor.sh', 'deploy-release.py'):
+                for name in ('provision.sh', 'monitor.sh', 'network.sh', 'verify.sh', 'deploy-release.py'):
                     shutil.copyfile(extracted / name, Path('/opt/sonora/bootstrap') / name)
                 run('/bin/bash', '/opt/sonora/bootstrap/provision.sh', args.fqdn)
                 return

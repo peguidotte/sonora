@@ -8,7 +8,11 @@
   "contract": "contracts/database.json",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
+    "commands": [
+      "sudo install -d -m 0755 /opt/sonora/bootstrap",
+      "sudo install -m 0700 linux/*.sh linux/deploy-release.py /opt/sonora/bootstrap/",
+      "sudo bash /opt/sonora/bootstrap/provision.sh sonora.localhost --local"
+    ],
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
@@ -20,7 +24,12 @@
     ]
   },
   "validation": {
-    "commands": [],
+    "commands": [
+      "python -m unittest discover -s tools -p 'test_linux.py' -v",
+      "sudo bash linux/verify.sh --infrastructure-only --fault-test",
+      "sudo bash linux/verify.sh --infrastructure-only --load-test",
+      "sudo bash linux/verify.sh"
+    ],
     "evidence": []
   },
   "deployment": {
