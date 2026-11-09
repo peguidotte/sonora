@@ -26,7 +26,7 @@ jobs:
       - run: terraform -chdir=deploy/azure validate
       - name: Validar Bash e Python de deploy
         run: |
-          bash -n linux/provision.sh linux/monitor.sh
+          for script in linux/*.sh; do bash -n "$script"; done
           python -m compileall -q deploy linux
           python -m unittest discover -s tools -p 'test_deployment.py' -v
 
