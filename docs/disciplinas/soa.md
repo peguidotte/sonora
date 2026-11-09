@@ -11,14 +11,14 @@ PDF p. 27: backend em qualquer linguagem, domínio estruturado, banco, migration
 | Domínio | 3,0 | Fonte, dispositivo, observação, validação e estados da importação |
 | Banco | 3,0 | Histórico de importações e resultados persistidos |
 | Migrations | 1,5 | Preparar schema a partir de banco vazio |
-| Documentação | 1,5 | OpenAPI automática dos endpoints de lote |
+| Documentação | 1,5 | OpenAPI automática dos endpoints de observações, lotes e operação |
 | Testes | 1,0 | Regras, endpoints REST, idempotência e integração com PostgreSQL |
 
 ## Responsabilidade
 
 Backend Java independente da API C#. Receber observações do ESP32/Wokwi, importar arquivos públicos NoiseCapture, validar/normalizar/deduplicar e persistir no PostgreSQL. Administrar jobs de importação. Sem envio de lote HTTP ao C# ou banco intermediário SQLite.
 
-Domínio mínimo: fonte, local, dispositivo, observação, arquivo permitido e importação. Serviço de ingestão modular permite adaptadores futuros, mas apenas Sonora entra nesta GS. Escolher framework/versões compatíveis com a aula e fixar dependências no projeto.
+Domínio mínimo: fonte, local, dispositivo, observação, arquivo permitido e importação. Serviço de ingestão modular permite adaptadores futuros, mas apenas Sonora entra nesta GS. O framework deve ser compatível com a aula; caminhos e toolchain de build/publicação seguem [pipeline.json](../../deploy/pipeline.json) e o [contrato de deploy](../../deploy/azure/README.md#contrato-das-aplicações). Fixar dependências no projeto e alinhar qualquer mudança à CI no mesmo PR.
 
 ## Banco e contratos
 
