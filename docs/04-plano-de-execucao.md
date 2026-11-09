@@ -13,7 +13,7 @@
 | D05 | SOA importador separado, banco de lotes próprio | Proposta técnica | Linguagem de aula pendente; não depende de aceitar backend comum |
 | D06 | ESP32 simulado; sem instalação física | Proposta técnica | Um circuito, três pontos de demonstração; validar rede Wokwi/API cedo |
 | D07 | ML KMeans + PCA sobre sessões reais de São Paulo | Proposta com fonte inspecionada | Limpeza e suficiência final pendentes; não é previsão temporal |
-| D08 | Linux VM Ubuntu 24.04, app e monitor systemd | Proposta técnica | Pedro escolhe VM/perfil; WSL com systemd é alternativa |
+| D08 | Linux VM Ubuntu 24.04, app e monitor systemd | Proposta técnica | Pedro escolhe VM/noise-profile; WSL com systemd é alternativa |
 | D09 | Sonora: produto; empresa/plataforma com nome a definir | Sonora aprovado; marca ampla em aberto | Repo sonora, sem depender da marca da empresa |
 | D10 | Monorepo privado, branches e PR/main | Decisão do usuário | Repositório criado; consultar README/governança para estado atual |
 | D11 | Deploys provavelmente na Azure | Preferência informada pelo usuário | Assinatura/recursos/custo pendentes; nenhum recurso criado |
@@ -45,7 +45,7 @@ Datas são **metas internas propostas em 08/11**, não novos prazos dos professo
 | 08–09/11 | Distribuir fichas, confirmar bases de aula, observar/planejar território; diagnóstico ML |
 | 10/11 | C# mínimo com migrations/seed/ingestão/healthchecks e handoff; Mobile mock; circuito serial |
 | 11–12/11 | Linux provisionando; ML com split/pipeline; SOA validando lote; Cyber com fluxo de taint |
-| 13–14/11 | Perfil/painel e lote integrados; SQLite Mobile; monitor e testes Linux; resultados ML |
+| 13–14/11 | Perfil/dashboard e lote integrados; SQLite Mobile; monitor e testes Linux; resultados ML |
 | 15–16/11 | Integração final, limitações claras, testes e evidências reais |
 | 17–18/11 | Vídeos, READMEs, relatório ML, ZIP Cyber e PDF Azure; revisar acessos |
 | 19/11 | Enviar com margem antes de 23h55 e guardar confirmações |
@@ -71,3 +71,7 @@ Pasta canônica: C:/Users/Usuario/Documents/FIAP/GS-2026-02. Não presumir assoc
 ## Conferência final
 
 Nomes/RMs, links acessíveis, versão dos fontes, duração de vídeo, evidências próprias e correspondência com rubrica/tarefa atual. Prazo conservador do PDF: 19/11/2026 às 23h55; tarefas coletadas mostram 23h59. Pitch em Testing com identificação VIDEO PITCH GS. Nenhuma mensagem ou submissão é enviada por esta especificação.
+
+## Contratos v0.3.0
+
+Usuário determinou padronização em inglês e API privada: OpenAPI/fixtures/mocks/testes alinhados. C# exige escopos para leitura, dispositivo, importação e operação; SOA autentica seus operadores separadamente. Atualização incompatível com as rotas v0.2: consumidores devem usar os novos contratos, sem depender de aliases. Nome do produto Sonora preservado.

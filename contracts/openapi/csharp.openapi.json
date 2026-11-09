@@ -1,28 +1,28 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Sonora | API principal",
-    "version": "0.2.0",
-    "description": "Contrato para C#, Mobile, SOA e IoT. Exemplos sintéticos não comprovam implementação. Regras relacionais em docs/03-integracao.md e docs/regras-de-negocio.md."
+    "title": "Sonora | Core API",
+    "version": "0.3.0",
+    "description": "Private API. Technical identifiers and error messages use English; JSON fields use camelCase. Synthetic examples do not prove implementation. Authentication: X-Api-Key. Authorization: x-required-scopes per operation. See docs/api-security.md."
   },
   "servers": [
     {
       "url": "http://localhost:8080",
-      "description": "C# local; a implementar"
+      "description": "Local implementation (planned)"
     },
     {
       "url": "http://localhost:4010",
-      "description": "Mock de contrato; fixtures estáticas"
+      "description": "Static contract mock; synthetic data only"
     }
   ],
   "paths": {
     "/health/live": {
       "get": {
         "operationId": "healthLive",
-        "summary": "Processo ativo",
+        "summary": "Check process liveness",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -34,16 +34,18 @@
               }
             }
           }
-        }
+        },
+        "security": [],
+        "x-required-scopes": []
       }
     },
     "/health/ready": {
       "get": {
         "operationId": "healthReady",
-        "summary": "Banco disponível",
+        "summary": "Check dependency readiness",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -56,7 +58,7 @@
             }
           },
           "503": {
-            "description": "Erro HTTP 503; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -64,31 +66,62 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
           }
-        }
+        },
+        "x-required-scopes": [
+          "operations:read"
+        ]
       }
     },
-    "/api/v1/pontos": {
+    "/api/v1/locations": {
       "get": {
-        "operationId": "listPoints",
-        "summary": "Listar pontos cadastrados; raio não equivale à cobertura acústica",
+        "operationId": "listLocations",
+        "summary": "List registered locations near optional coordinates",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/PointPage"
+                  "$ref": "#/components/schemas/LocationPage"
                 },
                 "example": {
                   "items": [
                     {
                       "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
-                      "name": "Ponto A — demonstração",
+                      "name": "Demo location A",
                       "city": "São Paulo",
                       "latitude": -23.56,
                       "longitude": -46.65,
@@ -103,7 +136,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -111,7 +144,35 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -175,24 +236,27 @@
             },
             "description": ""
           }
+        ],
+        "x-required-scopes": [
+          "acoustics:read"
         ]
       }
     },
-    "/api/v1/pontos/{id}": {
+    "/api/v1/locations/{locationId}": {
       "get": {
-        "operationId": "getPoint",
-        "summary": "Consultar ponto",
+        "operationId": "getLocation",
+        "summary": "Get a registered location",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Point"
+                  "$ref": "#/components/schemas/Location"
                 },
                 "example": {
                   "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
-                  "name": "Ponto A — demonstração",
+                  "name": "Demo location A",
                   "city": "São Paulo",
                   "latitude": -23.56,
                   "longitude": -46.65,
@@ -202,7 +266,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -210,13 +274,13 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "404": {
-            "description": "Erro HTTP 404; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -224,7 +288,35 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -232,7 +324,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "locationId",
             "in": "path",
             "required": true,
             "schema": {
@@ -241,16 +333,19 @@
             },
             "description": ""
           }
+        ],
+        "x-required-scopes": [
+          "acoustics:read"
         ]
       }
     },
-    "/api/v1/pontos/{id}/perfil": {
+    "/api/v1/locations/{locationId}/noise-profile": {
       "get": {
         "operationId": "getProfile",
-        "summary": "Consultar perfil com proveniência e cobertura; nunca misturar origens",
+        "summary": "Get observed noise profile with provenance and coverage",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -259,7 +354,7 @@
                 "examples": {
                   "available": {
                     "value": {
-                      "pointId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                      "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
                       "from": "2026-11-08T15:00:00Z",
                       "to": "2026-11-08T15:01:00Z",
                       "timezone": "America/Sao_Paulo",
@@ -270,13 +365,13 @@
                       "sources": [
                         {
                           "id": "22222222-2222-4222-8222-222222222222",
-                          "name": "Massa sintética compartilhada",
+                          "name": "Shared synthetic dataset",
                           "sourceUrl": "https://example.invalid/fixtures",
                           "snapshotDate": "2026-11-08",
-                          "license": "Fixture sintética do grupo",
+                          "license": "Synthetic project fixture",
                           "origin": "simulated",
                           "limitations": [
-                            "Não é medição física real."
+                            "Not a physical sound measurement."
                           ]
                         }
                       ],
@@ -300,14 +395,14 @@
                         }
                       ],
                       "limitations": [
-                        "Somente 10 segundos observados; não representa a hora inteira.",
-                        "Valores sintéticos."
+                        "Only 10 seconds observed; this does not represent the entire hour.",
+                        "Synthetic values."
                       ]
                     }
                   },
                   "empty": {
                     "value": {
-                      "pointId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                      "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
                       "from": "2026-11-08T15:00:00Z",
                       "to": "2026-11-08T15:01:00Z",
                       "timezone": "America/Sao_Paulo",
@@ -318,7 +413,7 @@
                       "sources": [],
                       "series": [],
                       "limitations": [
-                        "Não há dados no período solicitado."
+                        "No observations in the requested period."
                       ]
                     }
                   }
@@ -327,7 +422,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -335,13 +430,13 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "404": {
-            "description": "Erro HTTP 404; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -349,7 +444,35 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -357,7 +480,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "locationId",
             "in": "path",
             "required": true,
             "schema": {
@@ -375,7 +498,7 @@
               "format": "date-time",
               "pattern": "Z$"
             },
-            "description": "Inclusivo; em UTC."
+            "description": "Inclusive UTC timestamp."
           },
           {
             "name": "to",
@@ -386,7 +509,7 @@
               "format": "date-time",
               "pattern": "Z$"
             },
-            "description": "Exclusivo; maior que from; intervalo máximo 31 dias."
+            "description": "Exclusive UTC timestamp; after from; maximum period 31 days."
           },
           {
             "name": "origin",
@@ -415,16 +538,19 @@
             },
             "description": ""
           }
+        ],
+        "x-required-scopes": [
+          "acoustics:read"
         ]
       }
     },
-    "/api/v1/pontos/{id}/observacoes": {
+    "/api/v1/locations/{locationId}/observations": {
       "get": {
         "operationId": "listObservations",
-        "summary": "Consultar observações por origem",
+        "summary": "List observations by period and origin",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -440,7 +566,7 @@
                       "durationSeconds": 5,
                       "laeqDbA": 62.5,
                       "id": "33333333-3333-4333-8333-333333333333",
-                      "pointId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                      "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
                       "sourceId": "22222222-2222-4222-8222-222222222222",
                       "origin": "simulated",
                       "method": "wokwi_linear_demo",
@@ -456,7 +582,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -464,13 +590,13 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "404": {
-            "description": "Erro HTTP 404; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -478,7 +604,35 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -486,7 +640,7 @@
         },
         "parameters": [
           {
-            "name": "id",
+            "name": "locationId",
             "in": "path",
             "required": true,
             "schema": {
@@ -504,7 +658,7 @@
               "format": "date-time",
               "pattern": "Z$"
             },
-            "description": "Inclusivo; em UTC."
+            "description": "Inclusive UTC timestamp."
           },
           {
             "name": "to",
@@ -515,7 +669,7 @@
               "format": "date-time",
               "pattern": "Z$"
             },
-            "description": "Exclusivo; maior que from; intervalo máximo 31 dias."
+            "description": "Exclusive UTC timestamp; after from; maximum period 31 days."
           },
           {
             "name": "origin",
@@ -553,16 +707,19 @@
             },
             "description": ""
           }
+        ],
+        "x-required-scopes": [
+          "acoustics:read"
         ]
       }
     },
-    "/api/v1/dispositivos": {
+    "/api/v1/devices": {
       "get": {
         "operationId": "listDevices",
-        "summary": "Estado dos dispositivos sem credenciais",
+        "summary": "List device operational states without credentials",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -572,8 +729,8 @@
                   "items": [
                     {
                       "id": "11111111-1111-4111-8111-111111111111",
-                      "pointId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
-                      "name": "Dispositivo A — demonstração",
+                      "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+                      "name": "Demo device A",
                       "enabled": true,
                       "lastReceivedAt": "2026-11-08T15:00:00Z",
                       "state": "stale"
@@ -582,17 +739,48 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
+                }
+              }
+            }
           }
-        }
+        },
+        "x-required-scopes": [
+          "operations:read"
+        ]
       }
     },
-    "/api/v1/observacoes": {
+    "/api/v1/observations": {
       "post": {
         "operationId": "ingestObservation",
-        "summary": "Ingestão simulada vinculada ao dispositivo; retry idempotente",
+        "summary": "Ingest an authorized simulated device observation",
         "responses": {
           "201": {
-            "description": "Sucesso",
+            "description": "Created.",
             "content": {
               "application/json": {
                 "schema": {
@@ -607,7 +795,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -615,41 +803,41 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "401": {
-            "description": "Erro HTTP 401; estrutura sanitizada, sem segredos.",
+            "description": "Missing, invalid, revoked or expired API key.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
                 }
               }
             }
           },
           "403": {
-            "description": "Erro HTTP 403; estrutura sanitizada, sem segredos.",
+            "description": "Authenticated credential lacks the required scope.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
           },
           "409": {
-            "description": "Erro HTTP 409; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -657,13 +845,13 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "422": {
-            "description": "Erro HTTP 422; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -671,13 +859,13 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "200": {
-            "description": "Reenvio idêntico; mesmo registro.",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -702,20 +890,18 @@
             }
           }
         },
-        "security": [
-          {
-            "DeviceKey": []
-          }
+        "x-required-scopes": [
+          "observations:write"
         ]
       }
     },
-    "/api/v1/importacoes/observacoes": {
+    "/api/v1/imports/observations": {
       "post": {
         "operationId": "importObservations",
-        "summary": "Importação administrativa; validação por item permite resultado parcial",
+        "summary": "Import historical observations with per-item results",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -737,7 +923,7 @@
             }
           },
           "400": {
-            "description": "Erro HTTP 400; estrutura sanitizada, sem segredos.",
+            "description": "Request failed. Sanitized English error response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -745,35 +931,35 @@
                 },
                 "example": {
                   "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "message": "Invalid request."
                 }
               }
             }
           },
           "401": {
-            "description": "Erro HTTP 401; estrutura sanitizada, sem segredos.",
+            "description": "Missing, invalid, revoked or expired API key.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
                 }
               }
             }
           },
           "403": {
-            "description": "Erro HTTP 403; estrutura sanitizada, sem segredos.",
+            "description": "Authenticated credential lacks the required scope.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Requisição inválida."
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
                 }
               }
             }
@@ -789,20 +975,18 @@
             }
           }
         },
-        "security": [
-          {
-            "AdminKey": []
-          }
+        "x-required-scopes": [
+          "imports:write"
         ]
       }
     },
-    "/api/v1/analises/resumo": {
+    "/api/v1/analytics/summary": {
       "get": {
         "operationId": "getMlSummary",
-        "summary": "Consultar resumo ML, identificado como fixture no mock",
+        "summary": "Get a versioned ML summary, or 204 when unavailable",
         "responses": {
           "200": {
-            "description": "Sucesso",
+            "description": "Successful response.",
             "content": {
               "application/json": {
                 "schema": {
@@ -823,12 +1007,12 @@
                     {
                       "id": "fixture-0",
                       "count": 1,
-                      "description": "Exemplo sintético de formato; não é resultado de ML."
+                      "description": "Synthetic format example; not an ML result."
                     },
                     {
                       "id": "fixture-1",
                       "count": 1,
-                      "description": "Não foi treinado."
+                      "description": "No model was trained."
                     }
                   ],
                   "metrics": [
@@ -839,25 +1023,56 @@
                     }
                   ],
                   "limitations": [
-                    "FIXTURE SINTÉTICA. Nenhum modelo treinado ou resultado validado."
+                    "SYNTHETIC FIXTURE. No model trained or results validated."
                   ]
                 }
               }
             }
           },
           "204": {
-            "description": "Nenhum resumo importado."
+            "description": "No ML summary has been imported."
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
+                }
+              }
+            }
           }
-        }
+        },
+        "x-required-scopes": [
+          "acoustics:read"
+        ]
       }
     },
-    "/painel": {
+    "/dashboard": {
       "get": {
         "operationId": "getDashboard",
-        "summary": "Painel simples da aplicação real",
+        "summary": "Serve a static dashboard shell; data access requires an API key",
         "responses": {
           "200": {
-            "description": "HTML",
+            "description": "Successful response.",
             "content": {
               "text/html": {
                 "schema": {
@@ -866,7 +1081,9 @@
               }
             }
           }
-        }
+        },
+        "security": [],
+        "x-required-scopes": []
       }
     }
   },
@@ -953,7 +1170,7 @@
         ],
         "additionalProperties": false
       },
-      "Point": {
+      "Location": {
         "type": "object",
         "properties": {
           "id": {
@@ -994,13 +1211,13 @@
         ],
         "additionalProperties": false
       },
-      "PointPage": {
+      "LocationPage": {
         "type": "object",
         "properties": {
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Point"
+              "$ref": "#/components/schemas/Location"
             }
           },
           "page": {
@@ -1108,7 +1325,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "pointId": {
+          "locationId": {
             "type": "string",
             "format": "uuid"
           },
@@ -1148,7 +1365,7 @@
           "durationSeconds",
           "laeqDbA",
           "sourceId",
-          "pointId",
+          "locationId",
           "origin",
           "method",
           "calibrationStatus",
@@ -1303,7 +1520,7 @@
       "Profile": {
         "type": "object",
         "properties": {
-          "pointId": {
+          "locationId": {
             "type": "string",
             "format": "uuid"
           },
@@ -1370,7 +1587,7 @@
           }
         },
         "required": [
-          "pointId",
+          "locationId",
           "from",
           "to",
           "timezone",
@@ -1391,7 +1608,7 @@
             "type": "string",
             "format": "uuid"
           },
-          "pointId": {
+          "locationId": {
             "type": "string",
             "format": "uuid"
           },
@@ -1419,7 +1636,7 @@
         },
         "required": [
           "id",
-          "pointId",
+          "locationId",
           "name",
           "enabled",
           "lastReceivedAt",
@@ -1470,7 +1687,7 @@
             "minimum": 0,
             "maximum": 140
           },
-          "pointId": {
+          "locationId": {
             "type": "string",
             "format": "uuid"
           },
@@ -1493,7 +1710,7 @@
           "observedAt",
           "durationSeconds",
           "laeqDbA",
-          "pointId",
+          "locationId",
           "method",
           "calibrationStatus"
         ],
@@ -1512,7 +1729,7 @@
             "maxItems": 100,
             "items": {
               "type": "object",
-              "description": "Validação por item, conforme PublicObservation; envelope válido admite rejeições parciais."
+              "description": "Each item is validated against PublicObservation. A valid envelope permits partial item rejection."
             }
           }
         },
@@ -1701,16 +1918,17 @@
       }
     },
     "securitySchemes": {
-      "DeviceKey": {
+      "ApiKeyAuth": {
         "type": "apiKey",
         "in": "header",
-        "name": "X-Ingest-Key"
-      },
-      "AdminKey": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-Admin-Key"
+        "name": "X-Api-Key",
+        "description": "Opaque service-specific credential. Missing, invalid, revoked or expired: 401. Valid credential without required scope: 403. Never send credentials in URLs."
       }
     }
-  }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ]
 }

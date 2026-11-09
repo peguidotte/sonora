@@ -1,5 +1,5 @@
 {
-  "pointId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   "from": "2026-11-08T15:00:00Z",
   "to": "2026-11-08T15:01:00Z",
   "timezone": "America/Sao_Paulo",
@@ -10,6 +10,6 @@
   "sources": [],
   "series": [],
   "limitations": [
-    "Não há dados no período solicitado."
+    "No observations in the requested period."
   ]
 }

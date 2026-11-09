@@ -1,6 +1,6 @@
 {
-  "version": "0.2.0",
-  "notice": "TODOS os exemplos são sintéticos. O mock não é implementação das matérias.",
+  "version": "0.3.0",
+  "notice": "ALL examples are synthetic. Contract mocks do not implement the academic components.",
   "responses": [
     {
       "service": "csharp",
@@ -25,177 +25,275 @@
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos",
+      "path": "/health/ready",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/health/ready",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos",
+      "path": "/api/v1/locations",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}",
+      "path": "/api/v1/locations",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations/{locationId}",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}",
+      "path": "/api/v1/locations/{locationId}",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}",
+      "path": "/api/v1/locations/{locationId}",
       "method": "get",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}/perfil",
+      "path": "/api/v1/locations/{locationId}",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations/{locationId}",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}/perfil",
+      "path": "/api/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "200",
       "exampleIndex": 1
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}/perfil",
+      "path": "/api/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}/perfil",
+      "path": "/api/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}/observacoes",
+      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}/observacoes",
+      "path": "/api/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/pontos/{id}/observacoes",
+      "path": "/api/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/dispositivos",
+      "path": "/api/v1/locations/{locationId}/observations",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/locations/{locationId}/observations",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/devices",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/devices",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/devices",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/observations",
       "method": "post",
       "status": "201",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/observations",
       "method": "post",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/observations",
       "method": "post",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/observations",
       "method": "post",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/observations",
       "method": "post",
       "status": "409",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/observations",
       "method": "post",
       "status": "422",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/observations",
       "method": "post",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/importacoes/observacoes",
+      "path": "/api/v1/imports/observations",
       "method": "post",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/importacoes/observacoes",
+      "path": "/api/v1/imports/observations",
       "method": "post",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/importacoes/observacoes",
+      "path": "/api/v1/imports/observations",
       "method": "post",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/importacoes/observacoes",
+      "path": "/api/v1/imports/observations",
       "method": "post",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/analises/resumo",
+      "path": "/api/v1/analytics/summary",
       "method": "get",
       "status": "200",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/analytics/summary",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "csharp",
+      "path": "/api/v1/analytics/summary",
+      "method": "get",
+      "status": "403",
       "exampleIndex": 0
     },
     {
@@ -221,89 +319,124 @@
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes",
-      "method": "get",
-      "status": "200",
-      "exampleIndex": 0
-    },
-    {
-      "service": "soa",
-      "path": "/api/v1/lotes",
+      "path": "/health/ready",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes",
+      "path": "/health/ready",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/v1/batches",
+      "method": "get",
+      "status": "200",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/v1/batches",
+      "method": "get",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/v1/batches",
+      "method": "get",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/v1/batches",
       "method": "post",
       "status": "201",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes",
+      "path": "/api/v1/batches",
       "method": "post",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes",
+      "path": "/api/v1/batches",
       "method": "post",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes",
+      "path": "/api/v1/batches",
       "method": "post",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes/{id}",
+      "path": "/api/v1/batches",
+      "method": "post",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/v1/batches/{batchId}",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes/{id}",
+      "path": "/api/v1/batches/{batchId}",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes/{id}",
+      "path": "/api/v1/batches/{batchId}",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes/{id}",
+      "path": "/api/v1/batches/{batchId}",
       "method": "get",
       "status": "404",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/v1/batches/{batchId}",
+      "method": "get",
+      "status": "403",
       "exampleIndex": 0
     }
   ],
   "requests": [
     {
       "service": "csharp",
-      "path": "/api/v1/observacoes",
+      "path": "/api/v1/observations",
       "fixture": "iot-request.json"
     },
     {
       "service": "csharp",
-      "path": "/api/v1/importacoes/observacoes",
+      "path": "/api/v1/imports/observations",
       "fixture": "import-request.json"
     },
     {
       "service": "soa",
-      "path": "/api/v1/lotes",
+      "path": "/api/v1/batches",
       "fixture": "soa-create-request.json"
     }
   ]

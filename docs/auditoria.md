@@ -42,3 +42,5 @@ Nunca inventar nota do professor ou marcar teste não executado como aprovado. C
 ## Pronto para entrega versus pronto para demo
 
 Pronto para entrega exige a rubrica da disciplina e reprodução local; pronto para demo integrada exige também contratos e dependências funcionando. Se a nuvem falhar, o professor deve ter instruções e massa suficiente para rodar localmente. Cada README deve dizer o que é real, histórico, simulado, fixture e indisponível.
+
+Na versão v0.3.0, auditar RN21–RN25 além de RN01–RN20: nenhuma leitura de dados anônima, escopo/vínculo corretos e contratos em inglês. Chaves do mock não são evidência de proteção de produção.

@@ -1,5 +1,5 @@
 {
-  "pointId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
   "from": "2026-11-08T15:00:00Z",
   "to": "2026-11-08T15:01:00Z",
   "timezone": "America/Sao_Paulo",
@@ -10,13 +10,13 @@
   "sources": [
     {
       "id": "22222222-2222-4222-8222-222222222222",
-      "name": "Massa sintética compartilhada",
+      "name": "Shared synthetic dataset",
       "sourceUrl": "https://example.invalid/fixtures",
       "snapshotDate": "2026-11-08",
-      "license": "Fixture sintética do grupo",
+      "license": "Synthetic project fixture",
       "origin": "simulated",
       "limitations": [
-        "Não é medição física real."
+        "Not a physical sound measurement."
       ]
     }
   ],
@@ -40,7 +40,7 @@
     }
   ],
   "limitations": [
-    "Somente 10 segundos observados; não representa a hora inteira.",
-    "Valores sintéticos."
+    "Only 10 seconds observed; this does not represent the entire hour.",
+    "Synthetic values."
   ]
 }

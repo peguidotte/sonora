@@ -4,7 +4,7 @@
     {
       "externalId": "public-session-point-001",
       "sessionId": "public-session-demo",
-      "pointId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+      "locationId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       "observedAt": "2025-01-01T15:00:00Z",
       "durationSeconds": 1,
       "laeqDbA": 63.0,

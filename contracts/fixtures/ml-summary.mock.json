@@ -13,12 +13,12 @@
     {
       "id": "fixture-0",
       "count": 1,
-      "description": "Exemplo sintético de formato; não é resultado de ML."
+      "description": "Synthetic format example; not an ML result."
     },
     {
       "id": "fixture-1",
       "count": 1,
-      "description": "Não foi treinado."
+      "description": "No model was trained."
     }
   ],
   "metrics": [
@@ -29,6 +29,6 @@
     }
   ],
   "limitations": [
-    "FIXTURE SINTÉTICA. Nenhum modelo treinado ou resultado validado."
+    "SYNTHETIC FIXTURE. No model trained or results validated."
   ]
 }

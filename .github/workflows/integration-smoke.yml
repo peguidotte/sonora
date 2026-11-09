@@ -30,6 +30,8 @@ jobs:
         env:
           API_BASE_URL: ${{ vars.API_BASE_URL }}
           SOA_BASE_URL: ${{ vars.SOA_BASE_URL }}
+          API_READ_KEY: ${{ secrets.API_READ_KEY }}
+          API_OPERATOR_KEY: ${{ secrets.API_OPERATOR_KEY }}
           SOA_OPERATOR_KEY: ${{ secrets.SOA_OPERATOR_KEY }}
           PERIOD_FROM: ${{ inputs.from }}
           PERIOD_TO: ${{ inputs.to }}

@@ -27,9 +27,14 @@ def main():
         document = load_service(service)
         validate(document)
         operation_ids = []
-        for path_item in document["paths"].values():
+        assert document["security"] == [{"ApiKeyAuth": []}], "API deve exigir autenticação por padrão"
+        for path, path_item in document["paths"].items():
             for operation in path_item.values():
                 operation_ids.append(operation["operationId"])
+                if path.startswith("/api/v1/") or path == "/health/ready":
+                    assert operation.get("security", document["security"]), f"Rota privada sem autenticação: {path}"
+                    assert operation.get("x-required-scopes"), f"Permissão ausente: {path}"
+                    assert {"401", "403"}.issubset(operation["responses"]), f"Erros de acesso ausentes: {path}"
                 for response in operation["responses"].values():
                     media = response.get("content", {}).get("application/json", {})
                     if not media:

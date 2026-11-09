@@ -18,7 +18,7 @@ PDF p. 30 e tarefa coletada em 06/11: Web API/Minimal API .NET, POO, interfaces,
 
 Stack: .NET 10 + EF Core/SQLite, SDK e dependências fixados. Confirmar versão de aula antes de criar o projeto. Pasta proposta: api/; não existe implementação ainda.
 
-Implementar as entidades Source, Point, Device, Observation e MlSummary do [contrato](../03-integracao.md). A API principal é a fonte de verdade do catálogo e das medições. Usar interfaces como IObservationRepository e IAcousticProfileService onde houver função concreta; não criar camadas vazias só para demonstrar conceitos.
+Implementar as entidades Source, Location, Device, Observation e MlSummary do [contrato](../03-integracao.md). A API principal é a fonte de verdade do catálogo e das medições. Usar interfaces como IObservationRepository e IAcousticProfileService onde houver função concreta; não criar camadas vazias só para demonstrar conceitos.
 
 POO pode aparecer em regras polimórficas para entrada de dispositivo e importação pública, que validam procedência diferente. Herança não deve permitir que um cliente altere a origem de um registro. Migrations criam banco vazio; seed idempotente cria três pontos explicitamente fictícios, dispositivos e histórico sintético para comparar dois pontos. Uma simulação Wokwi efetiva pode usar apenas um deles.
 
@@ -27,13 +27,13 @@ POO pode aparecer em regras polimórficas para entrada de dispositivo e importa�
 1. Criar projeto, migrations, seed e health/live e health/ready.
 2. Implementar listagem/detalhe de pontos e filtros geográficos limitados.
 3. Implementar ingestão com autenticação vinculada ao dispositivo e deduplicação.
-4. Implementar observações/perfil com período, origem e cobertura explícitos.
+4. Implementar observações/noise-profile com período, origem e cobertura explícitos.
 5. Implementar recepção de lote administrativo real; respeitar resultados por item.
-6. Servir /painel com tabela/lista de pontos, gráficos simples ou valores por período, dispositivos stale e proveniência. Não exigir outro projeto frontend.
+6. Servir /dashboard com tabela/lista de pontos, gráficos simples ou valores por período, dispositivos stale e proveniência. Não exigir outro projeto frontend.
 7. Implementar importação por comando do resumo ML e consulta do resumo.
 8. Fechar OpenAPI, testes e pacote hospedável para Pedro.
 
-Pode usar SQLite em desenvolvimento e na VM; banco fora da pasta publicada. Leitura pública só em modo demonstração, sem PII. Escritas protegidas, chaves fora de Git/logs. Não implementar faturamento, cadastro de moradores ou geocoding.
+Pode usar SQLite em desenvolvimento e na VM; banco fora da pasta publicada. Leituras e escritas privadas por X-Api-Key com autorização por escopo; configurar proteção por padrão no ASP.NET Core. Chaves fora de Git/logs/URLs. Modo local usa credenciais de laboratório geradas no setup, sem desativar autenticação. Não implementar faturamento, cadastro de moradores ou geocoding.
 
 ## Critérios de aceite e testes
 
@@ -54,7 +54,7 @@ Cobrir regras de domínio com testes unitários; integração HTTP/EF com banco 
 
 ## Handoff e entrega
 
-**Meta 10/11:** commit compilável com banco, seed, healthchecks, /pontos e ingestão, runtime/porta, .env.example e procedimento de migrations. Não esperar o produto inteiro para destravar Linux.
+**Meta 10/11:** commit compilável com banco, seed, healthchecks, /locations e ingestão, runtime/porta, .env.example e procedimento de migrations. Não esperar o produto inteiro para destravar Linux.
 
 **Meta 13/11:** perfil e lote compatíveis com Mobile/SOA. **Meta 16/11:** painel e resumo ML integrados quando disponíveis.
 
@@ -66,4 +66,8 @@ Versão de aula e confirmação dos endpoints pelo grupo. Reaproveitamento com S
 
 ## Organização no monorepo
 
-Pasta `api/`; branch `leo/csharp`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.2.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Pasta `api/`; branch `leo/csharp`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+
+## API privada e inglês
+
+Seguir contracts/openapi/csharp.openapi.json v0.3.0 e docs/api-security.md. Consumidor lê com acoustics:read; dispositivo envia com observations:write e vínculo a deviceId; SOA importa com imports:write; operação usa operations:read. Ausente/inválida/revogada/expirada: 401; credencial válida fora do escopo: 403. Hash/verificação segura, rotação/revogação e nenhuma chave mestra no frontend. /dashboard é apenas shell; dados vêm da API privada. Testar leituras sem chave, escopo errado e revogação, além dos testes de ingestão.

@@ -1,6 +1,6 @@
 # Especificações — API de ruído
 
-**Versão 0.2.0 — 08/11/2026. Produto Sonora; equipe e monorepo definidos.**
+**Versão 0.3.0 — 08/11/2026. Produto Sonora; equipe e monorepo definidos.**
 
 Estas fichas já usam o domínio acústico e podem orientar o trabalho. Responsáveis definidos em [equipe](../equipe.md); confirmar particularidades de aula. **Exigência do professor**, **proposta de implementação** e **pendência** estão identificadas em cada ficha.
 
