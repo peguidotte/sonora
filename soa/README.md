@@ -6,6 +6,6 @@ Responsável: **Felipe Soares Xavier, RM556931**. [Equipe completa](../README.md
 
 Reprodução esperada: PostgreSQL + migrations/seed/arquivos locais, sem API C# ativa.
 
-Build, configuração e publicação devem seguir o [contrato das aplicações](../deploy/azure/README.md#contrato-das-aplicações); caminhos e toolchain ficam em [pipeline.json](../deploy/pipeline.json). Fornecer o comando de migrations/seed sem iniciar HTTP, reutilizável por C#, CI e Linux.
+Build, configuração e publicação devem seguir o [contrato das aplicações](../deploy/azure/README.md#contrato-das-aplicações); caminhos e toolchain ficam em [pipeline.json](../deploy/pipeline.json). Manter migrations/views/seed no [módulo database/](../database/README.md), parte da entrega de SOA, com execução independente dos projetos Java/C# e reutilizável por CI/Linux.
 
 Esta pasta ainda não contém implementação executável da matéria. Ao implementar, registrar aqui pré-requisitos/versões, instalação, configuração sem segredos, comandos standalone/integrado, testes e artefatos. Estado verificável em component.json; mocks compartilhados não substituem a entrega real.

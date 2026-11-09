@@ -2,7 +2,7 @@
   "contractVersion": "0.4.0",
   "engine": "PostgreSQL",
   "product": "sonora",
-  "migrationOwner": "soa",
+  "migrationOwner": "database",
   "storageSchema": "sonora",
   "readSchema": "sonora_read",
   "roles": {
@@ -280,14 +280,14 @@
     "Read views expose no secrets, credential hashes or raw audio.",
     "Storage changes preserve the published read contract or coordinate a new version.",
     "Runtime users are distinct from the migration account.",
-    "The contract defines names and types; PostgreSQL migrations and GRANT statements must still be implemented by SOA/deployment."
+    "The database module prepares namespaces; storage tables, read views and domain seed remain SOA deliverables."
   ],
   "localSetup": {
-    "owner": "soa",
+    "owner": "database",
     "requiredArtifacts": [
       "Versioned PostgreSQL migrations creating storage, read views and grants.",
       "Synthetic seed matching the shared HTTP fixtures.",
-      "Local setup command usable by C# without running the Java HTTP service."
+      "Independent Flyway CLI setup usable without building or running Java/C# applications."
     ]
   },
   "administrativeArtifactImports": {
@@ -297,5 +297,6 @@
       "payloadSchema": "schemas/ml-summary.schema.json",
       "targetEntity": "ml_summaries"
     }
-  }
+  },
+  "academicOwner": "soa"
 }

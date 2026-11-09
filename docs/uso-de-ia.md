@@ -16,4 +16,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09/11/2026 | Iniciar implementação e auditoria de Operating Systems | Scripts de rede, monitor por recurso, verificações e testes limitados de carga/falha na branch de Pedro; conferência com a rubrica. Aplicações, migrations de domínio e vídeo continuam pendentes; evidências executadas ficam no PR |
 
+| 09/11/2026 | Separar migrations das aplicações após integrar Linux | Módulo database/ com Flyway CLI, artefato/etapa próprios e testes PostgreSQL; responsabilidade acadêmica mantida em SOA. Base de schemas preparada, domínio/views/seed e aplicações continuam com os responsáveis |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

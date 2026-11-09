@@ -22,7 +22,7 @@ Domínio mínimo: fonte, local, dispositivo, observação, arquivo permitido e i
 
 ## Banco e contratos
 
-SOA possui migrations do schema sonora e publicação de sonora_read conforme database.json, incluindo grants e seed sintético. Fornecer setup local reutilizável sem manter Java HTTP ativo: isso permite ao C# executar sozinho. Conta migradora é separada do runtime.
+A entrega de SOA inclui autoria, evolução e testes das migrations do schema sonora e publicação de sonora_read conforme database.json, incluindo grants e seed sintético. Esses artefatos ficam no [módulo database/](../../database/README.md), com Flyway CLI e comando independente dos builds/runtimes Java/C#. Felipe deve demonstrar banco vazio -> migrations -> backend funcional e relacionar esse código à rubrica. O C# prepara o banco pelo mesmo módulo. Conta migradora é separada do runtime.
 
 POST de observação resolve origem/local/fonte pela credencial e dispositivo; protege com observations:write. API de batches usa imports:manage. fileId referencia caminho/fonte/mapeamento permitido no servidor; não aceitar URL/caminho arbitrário no corpo. Importação real preserva origem e coordenadas; nunca deslocar toda a cidade para ponto fictício.
 

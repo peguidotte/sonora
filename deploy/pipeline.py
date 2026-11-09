@@ -144,6 +144,8 @@ def inventory():
                       for c in ('soa', 'api') if result[c]]
             output.write('backends=' + json.dumps({'include': matrix}) + '\n')
             output.write(f'has_backends={str(bool(matrix)).lower()}\n')
+            output.write(f'dotnet_sdk={specs["api"]["dotnetSdk"]}\n')
+            output.write(f'java_version={specs["soa"]["javaVersion"]}\n')
     print(json.dumps(result))
     return result
 
@@ -173,6 +175,17 @@ def package(args):
         if component == 'infra':
             for name in INFRA_FILES:
                 shutil.copyfile(ROOT / 'linux' / name, temporary / name)
+        elif component == 'database':
+            runtime = Path(os.environ.get('FLYWAY_HOME', ROOT / 'output/tools/flyway')).resolve()
+            tooling = json.loads((ROOT / 'database/toolchain.json').read_text())
+            if json.loads((runtime / 'source.json').read_text()) != tooling:
+                raise ValueError('Prepare the pinned Flyway runtime before packaging database.')
+            shutil.copytree(runtime, temporary / 'flyway')
+            module = temporary / 'database'
+            module.mkdir()
+            for name in ('migrate.sh', 'flyway.toml', 'toolchain.json'):
+                shutil.copyfile(ROOT / 'database' / name, module / name)
+            shutil.copytree(ROOT / 'database/migrations', module / 'migrations')
         else:
             (temporary / 'bin').mkdir()
             app = temporary / 'app'
@@ -196,10 +209,6 @@ def package(args):
                     raise ValueError('SOA deve gerar um único JAR executável em target/.')
                 app.mkdir()
                 shutil.copyfile(jars[0], app / 'sonora.jar')
-                migrate = ROOT / specs['soa']['migrate']
-                if not migrate.is_file():
-                    raise ValueError('SOA precisa fornecer script de migrations standalone.')
-                shutil.copyfile(migrate, temporary / 'bin/migrate.sh')
                 start = '#!/bin/bash\nset -euo pipefail\nexec java -Xmx512m -jar ./app/sonora.jar\n'
             (temporary / 'bin/start.sh').write_text(start, encoding='utf-8')
         (temporary / 'release.json').write_text(json.dumps({'component': component, 'releaseId': release,
@@ -213,6 +222,21 @@ def package(args):
         digest = hashlib.sha256(archive.read_bytes()).hexdigest()
         (out / f'{component}.json').write_text(json.dumps({'releaseId': release, 'sha256': digest}) + '\n')
         print(json.dumps({'component': component, 'releaseId': release, 'sha256': digest}))
+
+
+def deployment_script(component, release, account, digest, origin=None):
+    arguments = ['sonora-deploy', component, release, account, digest]
+    if component == 'infra':
+        if not re.fullmatch(r'https://[a-z0-9.-]+', origin or ''):
+            raise ValueError('Origem HTTPS inválida.')
+        arguments += ['--fqdn', origin.removeprefix('https://')]
+    # Execute the controller from the same commit as the artifact, so old VMs
+    # need no application runtime or manual updater upgrade before migrations.
+    controller = (ROOT / 'linux/deploy-release.py').read_text(encoding='utf-8')
+    script = 'set -eu\ncloud-init status --wait >/dev/null\npython3 - <<\'SONORA_CONTROLLER\'\n'
+    script += 'import sys\nsys.argv = ' + repr(arguments) + '\n' + controller
+    script += '\nSONORA_CONTROLLER\n'
+    return script
 
 
 def publish(args):
@@ -239,47 +263,7 @@ def publish(args):
     else:
         az('storage', 'blob', 'upload', *blob_args, '--file', str(archive),
            '--metadata', 'sha256=' + digest, '--overwrite', 'false')
-    script = 'set -eu\ncloud-init status --wait >/dev/null\n'
-    if component == 'infra':
-        origin = os.environ['API_BASE_URL']
-        if not re.fullmatch(r'https://[a-z0-9.-]+', origin):
-            raise ValueError('Origem HTTPS inválida.')
-        # O instalador original copiava só três arquivos. Usar suas fronteiras de
-        # download/hash/extração para atualizar todos os helpers da release validada.
-        payload = json.dumps({'account': account, 'release': release, 'digest': digest,
-                              'fqdn': origin.removeprefix('https://'), 'files': INFRA_FILES})
-        script += "python3 - <<'PY'\n"
-        script += f"config = {payload!r}\n"
-        script += '''import fcntl, importlib.machinery, importlib.util, json, os, shutil, subprocess, tempfile
-from pathlib import Path
-c = json.loads(config)
-loader = importlib.machinery.SourceFileLoader('installed_release', '/usr/local/sbin/sonora-deploy')
-spec = importlib.util.spec_from_loader(loader.name, loader)
-agent = importlib.util.module_from_spec(spec)
-loader.exec_module(agent)
-with open('/run/sonora-deploy.lock', 'w') as lock:
-    fcntl.flock(lock, fcntl.LOCK_EX)
-    with tempfile.TemporaryDirectory(prefix='infra-', dir='/var/lib/sonora/incoming') as folder:
-        folder = Path(folder)
-        archive = folder / 'release.tar.gz'
-        agent.fetch_archive(c['account'], 'infra', c['release'], archive, c['digest'])
-        extracted = folder / 'unpacked'
-        extracted.mkdir()
-        agent.extract_release(archive, extracted)
-        agent.validate_manifest(extracted, 'infra', c['release'])
-        if not all((extracted / name).is_file() for name in c['files']):
-            raise ValueError('Missing infrastructure files.')
-        for name in c['files']:
-            target = Path('/opt/sonora/bootstrap') / name
-            staged = target.with_suffix(target.suffix + '.new')
-            shutil.copyfile(extracted / name, staged)
-            staged.chmod(0o700)
-            staged.replace(target)
-        subprocess.run(['/bin/bash', '/opt/sonora/bootstrap/provision.sh', c['fqdn']], check=True)
-PY
-'''
-    else:
-        script += f'/usr/local/sbin/sonora-deploy {component} {release} {account} {digest}'
+    script = deployment_script(component, release, account, digest, os.environ.get('API_BASE_URL'))
     marker = f'SONORA_DEPLOY_OK {component} {release}'
     script += f"\nprintf '\\n{marker}\\n'"
     with tempfile.TemporaryDirectory() as temporary:
@@ -330,7 +314,7 @@ def main():
     commands.add_parser('inventory')
     for action in ('package', 'publish'):
         sub = commands.add_parser(action)
-        sub.add_argument('component', choices=['infra', 'soa', 'api'])
+        sub.add_argument('component', choices=['infra', 'soa', 'api', 'database'])
     config = commands.add_parser('configure')
     config.add_argument('--terraform', default='terraform')
     args = parser.parse_args()

@@ -28,7 +28,7 @@ Usar somente franquia gratuita do GitHub Actions, com orçamento do produto Acti
 | --- | --- | --- |
 | contracts.yml | Contratos/mocks/ferramentas | Mesmas verificações |
 | infrastructure.yml | Terraform fmt/validate e sintaxe Linux/Python | Plan/apply e atualização do provisionamento |
-| delivery.yml | Contratos, testes e builds dos componentes presentes | Publica SOA/migrations antes de C#; gera APK Mobile |
+| delivery.yml | Contratos, testes e builds dos componentes presentes | Testa/publica database, depois SOA/C#; gera APK Mobile |
 | integration-smoke.yml | — | Smoke manual com credenciais configuradas separadamente |
 
 OIDC aceita somente a main do repositório identificado pelos IDs imutáveis de proprietário/repositório, obtidos pela API de configuração OIDC. O prefixo fica em `github_oidc_subject_prefix`, sem wildcard. PRs não recebem identidade Azure. A identidade de infraestrutura tem Contributor, administração de RBAC e acesso aos blobs no grupo dedicado. A de deploy acessa somente a VM/container de releases; a VM apenas lê esses releases. Não instalar runner de PR no servidor da aplicação.
@@ -44,15 +44,15 @@ Empacotamento e publicação ficam em `deploy/pipeline.py`, separados da orquest
 [pipeline.json](../pipeline.json) centraliza caminhos/toolchains; ajustar quando o responsável definir seu projeto. Projeto ausente é declarado como não implementado. Código presente com caminho incompatível falha, sem publicar um mock como aplicação.
 
 - **C#:** projeto e projeto de testes; SDK inicial 10.0.x, executável Sonora.Api. `dotnet test` e publish autocontido para o RID da VM; não precisa de SDK no servidor.
-- **Java:** Maven/Java 21, `mvn verify`, um JAR executável em target/. Fornecer `soa/deploy/migrate.sh`, executável na raiz do release com `app/sonora.jar` disponível. Ele recebe `PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD` e `SONORA_DB_*` e prepara migrations/views/grants/catálogo sem manter HTTP ativo. Conta de runtime não aplica DDL.
-- **Mobile:** Expo gerenciado/TypeScript, package-lock e suporte a prebuild Android. CI executa npm ci, tsc, Expo prebuild e Gradle assembleDebug. APK de demonstração da main fica nos artefatos privados por 1 dia; sem publicação em loja ou assinatura de produção. PRs validam/compilam sem reter binários no GitHub. Somente a URL pública da API entra no build; nenhuma chave privada.
+- **Java:** Maven/Java 21, `mvn verify`, um JAR executável em target/. Migrations não fazem parte do JAR. O módulo database/ recebe PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD e prepara o domínio antes do deploy; conta de runtime Java não aplica DDL.
+- **Mobile:** Expo gerenciado/TypeScript, package-lock e suporte a prebuild Android. CI executa npm ci, tsc, Expo prebuild e Gradle assembleDebug. APK de demonstração da main fica nos artefatos do Actions por 1 dia; sem publicação em loja ou assinatura de produção. PRs validam/compilam sem reter binários no GitHub. Somente a URL pública da API entra no build; nenhuma chave privada.
 
 Backends devem consumir `SONORA_DB_*`, host/porta e `SONORA_KEYS_FILE`. .NET/Spring também recebem suas variáveis convencionais. O arquivo de credenciais contém `keys[]` com `id`, `sha256` hexadecimal, `scopes[]` e `deviceId` quando restrito. Backend implementa validação/hash/autorização/rotação; arquivo configurado não implementa autenticação. As chaves em texto ficam em `/etc/sonora/admin`, root-only, fora de Git, state e logs. Não recuperá-las imprimindo-as pelo Azure Run Command.
 
-CI fornece PostgreSQL 16 descartável e contas distintas de migrador/ingestão/consulta. Senhas `ci-*-only` são fixtures exclusivas desse banco, nunca aceitas no deploy. Testes devem preparar domínio/views/seed usando as migrations comuns do SOA e a conta migradora; o workflow não define tabelas de negócio. Configuração de teste não deve exigir segredos de produção.
+CI fornece PostgreSQL 16 descartável e contas distintas de migrador/ingestão/consulta. Senhas `ci-*-only` são fixtures exclusivas desse banco, nunca aceitas no deploy. Testes devem preparar domínio/views/seed usando as migrations comuns de database/ e a conta migradora; o workflow não define tabelas de negócio. Configuração de teste não deve exigir segredos de produção.
 
 ## Publicação e recuperação
 
-Releases identificam commit/run/attempt, manifesto e SHA-256. GitHub envia ao Blob privado via OIDC; VM baixa por identidade gerenciada, verifica procedência/hash e rejeita traversal/links. SOA faz backup antes de migrations com usuário separado. Migrations precisam preservar consumidores existentes. Deploy troca link simbólico e verifica saúde autenticada; falha tenta restaurar o binário anterior. Não existe rollback automático de schema/dados.
+Releases identificam commit/run/attempt, manifesto e SHA-256. GitHub envia ao Blob privado via OIDC; VM baixa por identidade gerenciada, verifica procedência/hash e rejeita traversal/links. O artefato database faz backup e aplica migrations com usuário separado antes dos serviços. Migrations precisam preservar consumidores existentes. Deploy troca link simbólico e verifica saúde autenticada; falha tenta restaurar o binário anterior. Não existe rollback automático de schema/dados.
 
 VM única não oferece alta disponibilidade. Backups locais não protegem contra perda da VM/disco; exportação protegida para outro armazenamento é necessária antes de uso com dados importantes. Serviços só são ativados com artefatos reais; indisponibilidade anterior é declarada, não uma aplicação fictícia.

@@ -6,7 +6,7 @@ Responsável: **Pedro Visconti Guidotte, RM556630**. [Equipe completa](../README
 
 Reprodução esperada: VM/WSL, PostgreSQL e C# real com setup/seed; sem conta Azure obrigatória.
 
-`provision.sh` prepara Ubuntu 24.04/PostgreSQL/Java/Caddy/systemd e retenção de logs; `network.sh` verifica/configura rede; `monitor.sh` acompanha CPU/RAM/disco com alerta e recuperação por recurso; `verify.sh` verifica a VM e executa testes limitados de falha/carga; `deploy-release.py` instala releases privados e verifica saúde. [Infraestrutura e CI/CD](../deploy/azure/README.md) define execução Azure e contrato de publicação. Schema/views/seed continuam sendo entrega do SOA.
+`provision.sh` prepara Ubuntu 24.04/PostgreSQL/Java/Caddy/systemd e retenção de logs; `network.sh` verifica/configura rede; `monitor.sh` acompanha CPU/RAM/disco com alerta e recuperação por recurso; `verify.sh` verifica a VM e executa testes limitados de falha/carga; `deploy-release.py` instala releases privados e verifica saúde. [Infraestrutura e CI/CD](../deploy/azure/README.md) define execução Azure e contrato de publicação. Schema/views/seed continuam sendo entrega do SOA no [módulo database/](../database/README.md), com artefato independente das aplicações.
 
 ## Reprodução local
 

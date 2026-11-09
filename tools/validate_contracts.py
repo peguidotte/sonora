@@ -64,7 +64,7 @@ def validate_database_contract():
     database = json.loads((CONTRACTS / "database.json").read_text(encoding="utf-8"))
     core, ingestion = load_service("csharp"), load_service("soa")
     assert database["contractVersion"] == core["info"]["version"] == ingestion["info"]["version"]
-    assert database["engine"] == "PostgreSQL" and database["migrationOwner"] == "soa"
+    assert database["engine"] == "PostgreSQL" and database["migrationOwner"] == "database" and database["academicOwner"] == "soa"
     assert core["x-database-access"]["role"] == "sonora_query"
     assert core["x-database-access"]["access"] == "read-only"
     assert ingestion["x-database-access"]["migrationOwner"] == database["migrationOwner"]
