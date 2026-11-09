@@ -1,22 +1,22 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Sonora | Import Service API",
-    "version": "0.3.0",
-    "description": "Private API. Technical identifiers and error messages use English; JSON fields use camelCase. Synthetic examples do not prove implementation. Authentication: X-Api-Key. Authorization: x-required-scopes per operation. See docs/api-security.md."
+    "title": "Sonora | Ingestion API",
+    "version": "0.4.0",
+    "description": "Private Java ingestion API. Validates device observations and public-file imports, deduplicates and commits to PostgreSQL. Owns capture migrations and published read views. Does not call the C# API. Import counts describe database persistence, not HTTP delivery."
   },
   "servers": [
     {
       "url": "http://localhost:8082",
-      "description": "Local implementation (planned)"
+      "description": "Local Java implementation"
     },
     {
       "url": "http://localhost:4011",
-      "description": "Static contract mock; synthetic data only"
+      "description": "Static ingestion contract mock"
     }
   ],
   "paths": {
-    "/health/live": {
+    "/api/ingestion/v1/health/live": {
       "get": {
         "operationId": "soaLive",
         "summary": "Check process liveness",
@@ -39,7 +39,7 @@
         "x-required-scopes": []
       }
     },
-    "/health/ready": {
+    "/api/ingestion/v1/health/ready": {
       "get": {
         "operationId": "soaReady",
         "summary": "Check dependency readiness",
@@ -105,10 +105,10 @@
         ]
       }
     },
-    "/api/v1/batches": {
+    "/api/ingestion/v1/sonora/batches": {
       "get": {
         "operationId": "listBatches",
-        "summary": "List import batches",
+        "summary": "List persisted import jobs",
         "responses": {
           "200": {
             "description": "Successful response.",
@@ -128,8 +128,8 @@
                       "acceptedCount": 1,
                       "duplicateCount": 0,
                       "rejectedCount": 0,
-                      "deliveryStatus": "delivered",
-                      "createdAt": "2026-11-08T15:00:00Z"
+                      "createdAt": "2026-11-08T15:00:00Z",
+                      "completedAt": "2026-11-08T15:00:00Z"
                     }
                   ],
                   "page": 1,
@@ -199,7 +199,7 @@
       },
       "post": {
         "operationId": "createBatch",
-        "summary": "Create an import batch from an allowed file",
+        "summary": "Import an allowed public dataset file into PostgreSQL",
         "responses": {
           "201": {
             "description": "Created.",
@@ -217,8 +217,8 @@
                   "acceptedCount": 1,
                   "duplicateCount": 0,
                   "rejectedCount": 0,
-                  "deliveryStatus": "delivered",
-                  "createdAt": "2026-11-08T15:00:00Z"
+                  "createdAt": "2026-11-08T15:00:00Z",
+                  "completedAt": "2026-11-08T15:00:00Z"
                 }
               }
             }
@@ -292,13 +292,14 @@
         },
         "x-required-scopes": [
           "imports:manage"
-        ]
+        ],
+        "description": "fileId resolves an allowed server-side source, path and location mapping. acceptedCount counts committed observations; duplicates do not create new rows. No HTTP delivery to another application."
       }
     },
-    "/api/v1/batches/{batchId}": {
+    "/api/ingestion/v1/sonora/batches/{batchId}": {
       "get": {
         "operationId": "getBatch",
-        "summary": "Get import batch status and counters",
+        "summary": "Get import state and persistence counters",
         "responses": {
           "200": {
             "description": "Successful response.",
@@ -316,8 +317,8 @@
                   "acceptedCount": 1,
                   "duplicateCount": 0,
                   "rejectedCount": 0,
-                  "deliveryStatus": "delivered",
-                  "createdAt": "2026-11-08T15:00:00Z"
+                  "createdAt": "2026-11-08T15:00:00Z",
+                  "completedAt": "2026-11-08T15:00:00Z"
                 }
               }
             }
@@ -393,6 +394,127 @@
         ],
         "x-required-scopes": [
           "imports:manage"
+        ]
+      }
+    },
+    "/api/ingestion/v1/sonora/observations": {
+      "post": {
+        "operationId": "ingestObservation",
+        "summary": "Validate and persist an authorized simulated device observation",
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResult"
+                },
+                "example": {
+                  "id": "33333333-3333-4333-8333-333333333333",
+                  "duplicate": false,
+                  "origin": "simulated"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Request failed. Sanitized English error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "invalid_request",
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing, invalid, revoked or expired API key.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "unauthorized",
+                  "message": "Missing, invalid, revoked or expired API key."
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authenticated credential lacks the required scope.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "forbidden",
+                  "message": "Authenticated credential lacks the required scope."
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Request failed. Sanitized English error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "invalid_request",
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request failed. Sanitized English error response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                },
+                "example": {
+                  "code": "invalid_request",
+                  "message": "Invalid request."
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Successful response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngestResult"
+                },
+                "example": {
+                  "id": "33333333-3333-4333-8333-333333333333",
+                  "duplicate": true,
+                  "origin": "simulated"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ObservationIngest"
+              }
+            }
+          }
+        },
+        "x-required-scopes": [
+          "observations:write"
         ]
       }
     }
@@ -472,11 +594,10 @@
             "type": "string",
             "enum": [
               "created",
-              "validated",
-              "delivering",
+              "processing",
               "completed",
-              "failed",
-              "completed_with_errors"
+              "completed_with_errors",
+              "failed"
             ]
           },
           "acceptedCount": {
@@ -491,19 +612,17 @@
             "type": "integer",
             "minimum": 0
           },
-          "deliveryStatus": {
-            "type": "string",
-            "enum": [
-              "pending",
-              "delivering",
-              "delivered",
-              "failed"
-            ]
-          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
             "pattern": "Z$"
+          },
+          "completedAt": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           }
         },
         "required": [
@@ -515,8 +634,8 @@
           "acceptedCount",
           "duplicateCount",
           "rejectedCount",
-          "deliveryStatus",
-          "createdAt"
+          "createdAt",
+          "completedAt"
         ],
         "additionalProperties": false
       },
@@ -550,6 +669,71 @@
           "total"
         ],
         "additionalProperties": false
+      },
+      "ObservationIngest": {
+        "type": "object",
+        "properties": {
+          "externalId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "deviceId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionId": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "observedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "Z$"
+          },
+          "durationSeconds": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 3600
+          },
+          "laeqDbA": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 140
+          }
+        },
+        "required": [
+          "externalId",
+          "deviceId",
+          "sessionId",
+          "observedAt",
+          "durationSeconds",
+          "laeqDbA"
+        ],
+        "additionalProperties": false
+      },
+      "IngestResult": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "duplicate": {
+            "type": "boolean"
+          },
+          "origin": {
+            "type": "string",
+            "const": "simulated"
+          }
+        },
+        "required": [
+          "id",
+          "duplicate",
+          "origin"
+        ],
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
@@ -565,5 +749,14 @@
     {
       "ApiKeyAuth": []
     }
-  ]
+  ],
+  "x-api-prefix": "/api/ingestion/v1",
+  "x-database-access": {
+    "contract": "../database.json",
+    "role": "sonora_ingest",
+    "access": "write",
+    "migrationOwner": "soa",
+    "migrationRole": "sonora_migrator",
+    "schema": "sonora"
+  }
 }

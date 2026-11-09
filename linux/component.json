@@ -5,7 +5,7 @@
   "rm": "556630",
   "branch": "pedro/operating-systems",
   "spec": "docs/disciplinas/linux.md",
-  "contract": "docs/03-integracao.md",
+  "contract": "contracts/database.json",
   "standalone": {
     "requiresCloud": false,
     "commands": [],
@@ -14,7 +14,9 @@
   "integrated": {
     "status": "planned",
     "dependencies": [
-      "api"
+      "postgresql",
+      "api",
+      "soa"
     ]
   },
   "validation": {

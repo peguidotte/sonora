@@ -1,6 +1,6 @@
-# IA e ML — perfis de observações acústicas
+# IA/ML — observações acústicas
 
-**Responsável:** Gabriel Figueira Flora, RM556476. **Dependências:** diagnóstico/limpeza dos dados; não depende de API, sensor ou app prontos.
+**Responsável:** Gabriel Figueira Flora, RM556476. Pasta ml/; branch gabriel/ia.
 
 ## Exigência do professor
 
@@ -17,17 +17,11 @@ Entregar ml/ com notebook executado, dados/README.md, requirements.txt, RELATORI
 | Treino/teste | 2,0 | Métricas comparáveis e gráficos reais |
 | Leitura para cidadão | 1,0 | O que os grupos mostram e o que não demonstram |
 
-## Pergunta e dados propostos
+## Experimento
 
-**Pergunta:** sessões de medição reais de São Paulo podem ser agrupadas em padrões acústicos com características interpretáveis, como intensidade e variação durante a coleta?
+Pergunta: sessões reais de São Paulo podem ser agrupadas em padrões acústicos interpretáveis de intensidade/variação? Proposta: KMeans + PCA, uma linha por sessão, sem rótulo inventado de imóvel bom/ruim e sem previsão de amanhã. Um grupo descreve observações, não todo bairro.
 
-Usar KMeans + PCA. **Não prever amanhã, não diagnosticar fonte do som e não inventar classes “bom/ruim” a partir de um limiar.** Um grupo descreve observações; não certifica um endereço ou todo o bairro.
-
-Já baixado em 08/11: [Brazil.zip](https://data.noise-planet.org/dump/Brazil.zip), 45.844.212 bytes, SHA-256 540aef978fd95a0fcb9e09a2a59bf91ba0ee98b2a85d771f3d7f6580181df9aa. Caminho local ignorado pelo Git: ml/dados/raw/noisecapture-brazil-2026-11-08.zip.
-
-Arquivos: Brazil_São Paulo_São Paulo.tracks.geojson e .points.geojson. Contagem inicial: 1.894 sessões e 282.021 pontos; 322 datas distintas, de 2017 a 2025. [Auditoria inicial](../dados/noisecapture-auditoria-inicial.json) não é limpeza nem treino.
-
-O [dicionário oficial](https://noise-planet.org/noisecapture_exploit_data.html) descreve pontos por segundo, relação pk_track e metadados de sessão. Juntar pontos e sessões dentro do mesmo snapshot; pk_track pode mudar entre dumps, track_uuid é estável na fonte. Não publicar identificadores desnecessários de trajetórias; usar IDs derivados quando exportar exemplos.
+Fonte, snapshot/hash e diagnóstico inicial em [dados/README](../../ml/dados/README.md); o dump bruto permanece fora do Git. Usar somente dados reais públicos; simulação do Wokwi e fixtures do contrato não entram no treino.
 
 ## Preparação e divisão
 
@@ -42,6 +36,7 @@ O [dicionário oficial](https://noise-planet.org/noisecapture_exploit_data.html)
 ## Busca, avaliação e interpretação
 
 Grade inicial de **12 combinações** com três hiperparâmetros de KMeans:
+
 - n_clusters: 2, 3, 4;
 - init: k-means++ ou random;
 - n_init: 10 ou 20.
@@ -54,16 +49,8 @@ Mostrar tabela das 12 configurações, média/variação de CV, gráfico PCA, ta
 
 ## Integração e entrega
 
-Exportar ml/output/summary.json conforme [contrato](../03-integracao.md): versão, cidade, fonte/hash, período, sessões válidas, grupos, métricas e limitações. Nenhuma inferência Python online é necessária. O painel mostra resumo da cidade, em seção separada; não aplicar rótulo de uma sessão a todo o entorno.
+Exportar ml/output/summary.json conforme o schema compartilhado, com versão, fonte/hash, período, quantidade, grupos, métricas e limites. Java oferece importação administrativa validada ao PostgreSQL; C# lê o payload publicado. Não há servidor ML contínuo ou escrita direta do notebook no banco de produção.
 
-**Meta 09/11:** diagnóstico e amostra tabular limpa. **Meta 11/11:** divisão e pipeline reproduzíveis. **Meta 14/11:** busca/avaliação e resumo. **Meta 17/11:** relatório, notebook executado e vídeo.
+Sem resultado real, a API apresenta ausência (204); fixtures com NOT-TRAINED não são experimento concluído. A análise da cidade não atribui automaticamente grupo a um endereço. README documenta aquisição/limpeza/divisão e comandos reproduzíveis; notebook executado e relatório mostram resultados efetivos, inclusive limitações e métricas ruins. Vídeo apresenta pergunta/dados, preparação, busca/CV, treino/teste e interpretação, no limite oficial.
 
-Vídeo até 5 min: pergunta/dados; limpeza/divisão; modelo/grade/CV; treino e teste; interpretação e limites. Não usar leituras Wokwi no experimento nem esconder métricas ruins.
-
-## Pendências
-
-Licença/atribuição no artefato redistribuído, filtros e quantidade final de sessões/grupos. Dataset da cidade já foi localizado e baixado, mas a viabilidade estatística final depende da limpeza. Se o recorte falhar, documentar e ajustar o experimento com o professor; não substituir por dados simulados.
-
-## Organização no monorepo
-
-Pasta `ml/`; branch `gabriel/ia`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
+Referências: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md).

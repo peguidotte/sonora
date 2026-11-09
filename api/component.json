@@ -9,11 +9,13 @@
   "standalone": {
     "requiresCloud": false,
     "commands": [],
-    "dataMode": "explicit-seed-or-fixture"
+    "dataMode": "postgresql-with-shared-schema-and-seed"
   },
   "integrated": {
     "status": "planned",
-    "dependencies": []
+    "dependencies": [
+      "postgresql"
+    ]
   },
   "validation": {
     "commands": [],

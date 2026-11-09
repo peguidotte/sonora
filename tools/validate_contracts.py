@@ -31,7 +31,7 @@ def main():
         for path, path_item in document["paths"].items():
             for operation in path_item.values():
                 operation_ids.append(operation["operationId"])
-                if path.startswith("/api/v1/") or path == "/health/ready":
+                if path.startswith(document["x-api-prefix"]) and not path.endswith("/health/live"):
                     assert operation.get("security", document["security"]), f"Rota privada sem autenticação: {path}"
                     assert operation.get("x-required-scopes"), f"Permissão ausente: {path}"
                     assert {"401", "403"}.issubset(operation["responses"]), f"Erros de acesso ausentes: {path}"
@@ -51,15 +51,37 @@ def main():
         schema = document["paths"][item["path"]]["post"]["requestBody"]["content"]["application/json"]["schema"]
         value = json.loads((CONTRACTS / "fixtures" / item["fixture"]).read_text(encoding="utf-8"))
         check_value(document, schema, value)
-        if item["fixture"] == "import-request.json":
-            for row in value["items"]:
-                check_value(document, {"$ref": "#/components/schemas/PublicObservation"}, row)
         count += 1
     ml_schema = json.loads((CONTRACTS / "schemas/ml-summary.schema.json").read_text(encoding="utf-8"))
     Draft202012Validator.check_schema(ml_schema)
     fixture = json.loads((CONTRACTS / "fixtures/ml-summary.mock.json").read_text(encoding="utf-8"))
     Draft202012Validator(ml_schema, format_checker=FormatChecker()).validate(fixture)
-    print(f"OK: 2 contratos OpenAPI, schema ML e {count} exemplos válidos. Não comprova implementação das disciplinas.")
+    validate_database_contract()
+    print(f"OK: 2 contratos OpenAPI, interface de banco, schema ML e {count} exemplos válidos. Não comprova implementação das disciplinas.")
+
+
+def validate_database_contract():
+    database = json.loads((CONTRACTS / "database.json").read_text(encoding="utf-8"))
+    core, ingestion = load_service("csharp"), load_service("soa")
+    assert database["contractVersion"] == core["info"]["version"] == ingestion["info"]["version"]
+    assert database["engine"] == "PostgreSQL" and database["migrationOwner"] == "soa"
+    assert core["x-database-access"]["role"] == "sonora_query"
+    assert core["x-database-access"]["access"] == "read-only"
+    assert ingestion["x-database-access"]["migrationOwner"] == database["migrationOwner"]
+    query_role = database["roles"]["sonora_query"]
+    assert query_role["canReadPublishedViews"] is True
+    assert query_role["canWriteStorage"] is False and query_role["canMigrate"] is False
+    for view in database["readViews"].values():
+        if "payloadSchema" in view:
+            assert (CONTRACTS / view["payloadSchema"]).is_file()
+            continue
+        schema = core["components"]["schemas"][view["responseSchema"]]
+        fields = {column["jsonField"] for column in view["columns"]} | set(view.get("computedFields", []))
+        assert set(schema["required"]).issubset(fields), f"Campos obrigatórios não publicados: {view}"
+        assert fields.issubset(schema["properties"]), f"Campo SQL sem mapeamento JSON: {view}"
+    assert all(set(item) == {"get"} for item in core["paths"].values()), "API C# deve ser somente consulta"
+    for route in ingestion["paths"]:
+        assert route.startswith(ingestion["x-api-prefix"])
 
 
 if __name__ == "__main__":

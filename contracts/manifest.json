@@ -1,442 +1,409 @@
 {
-  "version": "0.3.0",
-  "notice": "ALL examples are synthetic. Contract mocks do not implement the academic components.",
+  "version": "0.4.0",
+  "notice": "All examples are synthetic. Mocks do not implement the services or database migrations.",
   "responses": [
     {
       "service": "csharp",
-      "path": "/health/live",
+      "path": "/api/sonora/v1/health/live",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/health/ready",
+      "path": "/api/sonora/v1/health/ready",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/health/ready",
+      "path": "/api/sonora/v1/health/ready",
       "method": "get",
       "status": "503",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/health/ready",
+      "path": "/api/sonora/v1/health/ready",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/health/ready",
+      "path": "/api/sonora/v1/health/ready",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations",
+      "path": "/api/sonora/v1/locations",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations",
+      "path": "/api/sonora/v1/locations",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations",
+      "path": "/api/sonora/v1/locations",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations",
+      "path": "/api/sonora/v1/locations",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}",
+      "path": "/api/sonora/v1/locations/{locationId}",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}",
+      "path": "/api/sonora/v1/locations/{locationId}",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}",
+      "path": "/api/sonora/v1/locations/{locationId}",
       "method": "get",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}",
+      "path": "/api/sonora/v1/locations/{locationId}",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}",
+      "path": "/api/sonora/v1/locations/{locationId}",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "path": "/api/sonora/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "path": "/api/sonora/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "200",
       "exampleIndex": 1
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "path": "/api/sonora/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "path": "/api/sonora/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "path": "/api/sonora/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/noise-profile",
+      "path": "/api/sonora/v1/locations/{locationId}/noise-profile",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/observations",
+      "path": "/api/sonora/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/observations",
+      "path": "/api/sonora/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/observations",
+      "path": "/api/sonora/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/observations",
+      "path": "/api/sonora/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/locations/{locationId}/observations",
+      "path": "/api/sonora/v1/locations/{locationId}/observations",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/devices",
+      "path": "/api/sonora/v1/devices",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/devices",
+      "path": "/api/sonora/v1/devices",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/devices",
+      "path": "/api/sonora/v1/devices",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/observations",
-      "method": "post",
-      "status": "201",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/observations",
-      "method": "post",
-      "status": "400",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/observations",
-      "method": "post",
-      "status": "401",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/observations",
-      "method": "post",
-      "status": "403",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/observations",
-      "method": "post",
-      "status": "409",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/observations",
-      "method": "post",
-      "status": "422",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/observations",
-      "method": "post",
-      "status": "200",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/imports/observations",
-      "method": "post",
-      "status": "200",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/imports/observations",
-      "method": "post",
-      "status": "400",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/imports/observations",
-      "method": "post",
-      "status": "401",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/imports/observations",
-      "method": "post",
-      "status": "403",
-      "exampleIndex": 0
-    },
-    {
-      "service": "csharp",
-      "path": "/api/v1/analytics/summary",
+      "path": "/api/sonora/v1/analytics/summary",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/analytics/summary",
+      "path": "/api/sonora/v1/analytics/summary",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "csharp",
-      "path": "/api/v1/analytics/summary",
+      "path": "/api/sonora/v1/analytics/summary",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/health/live",
+      "path": "/api/ingestion/v1/health/live",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/health/ready",
+      "path": "/api/ingestion/v1/health/ready",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/health/ready",
+      "path": "/api/ingestion/v1/health/ready",
       "method": "get",
       "status": "503",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/health/ready",
+      "path": "/api/ingestion/v1/health/ready",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/health/ready",
+      "path": "/api/ingestion/v1/health/ready",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "get",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "post",
       "status": "201",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "post",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "post",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "post",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "method": "post",
       "status": "403",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches/{batchId}",
+      "path": "/api/ingestion/v1/sonora/batches/{batchId}",
       "method": "get",
       "status": "200",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches/{batchId}",
+      "path": "/api/ingestion/v1/sonora/batches/{batchId}",
       "method": "get",
       "status": "400",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches/{batchId}",
+      "path": "/api/ingestion/v1/sonora/batches/{batchId}",
       "method": "get",
       "status": "401",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches/{batchId}",
+      "path": "/api/ingestion/v1/sonora/batches/{batchId}",
       "method": "get",
       "status": "404",
       "exampleIndex": 0
     },
     {
       "service": "soa",
-      "path": "/api/v1/batches/{batchId}",
+      "path": "/api/ingestion/v1/sonora/batches/{batchId}",
       "method": "get",
       "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
+      "method": "post",
+      "status": "201",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
+      "method": "post",
+      "status": "400",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
+      "method": "post",
+      "status": "401",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
+      "method": "post",
+      "status": "403",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
+      "method": "post",
+      "status": "409",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
+      "method": "post",
+      "status": "422",
+      "exampleIndex": 0
+    },
+    {
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
+      "method": "post",
+      "status": "200",
       "exampleIndex": 0
     }
   ],
   "requests": [
     {
-      "service": "csharp",
-      "path": "/api/v1/observations",
+      "service": "soa",
+      "path": "/api/ingestion/v1/sonora/observations",
       "fixture": "iot-request.json"
     },
     {
-      "service": "csharp",
-      "path": "/api/v1/imports/observations",
-      "fixture": "import-request.json"
-    },
-    {
       "service": "soa",
-      "path": "/api/v1/batches",
+      "path": "/api/ingestion/v1/sonora/batches",
       "fixture": "soa-create-request.json"
     }
   ]

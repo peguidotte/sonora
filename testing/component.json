@@ -5,7 +5,7 @@
   "rm": "556931",
   "branch": "felipe/testing",
   "spec": "docs/disciplinas/testing.md",
-  "contract": "docs/disciplinas/testing.md",
+  "contract": "contracts/README.md",
   "standalone": {
     "requiresCloud": false,
     "commands": [],
@@ -15,6 +15,7 @@
     "status": "planned",
     "dependencies": [
       "api",
+      "soa",
       "mobile"
     ]
   },

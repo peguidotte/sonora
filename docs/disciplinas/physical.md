@@ -1,62 +1,30 @@
 # Physical Computing — nó acústico simulado
 
-**Responsável:** Leonardo Correa de Mello, RM555573. **Dependências:** contrato de ingestão e conectividade ao backend. Circuito pode começar antes do C#.
+**Responsável:** Leonardo Correa de Mello, RM555573. Pasta `iot/`; branch `leo/iot`.
 
 ## Exigência do professor
 
 PDF p. 38: ESP32 funcional no Wokwi, integrado à CitizenTech; link do projeto, vídeo até 4 minutos apresentando solução/circuito e TXT de integrantes. Pesos não detalhados no material coletado; conferir tarefa atual antes do envio.
 
-## Proposta de circuito
+## Responsabilidade
 
-ESP32 + potenciômetro + display OLED (ou serial legível) + LEDs/resistores. Potenciômetro representa a variação do nível sonoro; não é microfone e não mede decibéis físicos. Não armazenar/transmitir áudio.
+ESP32 no Wokwi com potenciômetro representando nível acústico, display/serial e LEDs. Não é microfone/sonômetro calibrado, não grava áudio e não substitui dados reais de ML. Faixas visuais são didáticas, não limites legais.
 
-- Potenciômetro em entrada ADC adequada ao ESP32, preferindo ADC1 se Wi-Fi estiver ativo.
-- Firmware mapeia o valor lido para uma faixa sintética, proposta 35–95 dB(A), identificada como simulação.
-- A cada 5 segundos, mostrar valor e estado; produzir uma observação de janela de 5 s compatível com o contrato.
-- LEDs indicam faixas **didáticas**, por exemplo <55 / 55–70 / >70, sem afirmar limites legais ou de saúde.
-- Gerar externalId que não colida após reboot; usar identificador de inicialização mais sequência, preservando o mesmo ID ao reenviar.
-- Sincronizar relógio; se não houver data válida, mostrar erro e não enviar timestamp inventado.
-- POST /api/v1/observations com credencial descartável vinculada ao dispositivo. Não colocar chave administrativa no circuito.
+Enviar diretamente à API Java de ingestão, conforme OpenAPI SOA. Credencial descartável com observations:write e vínculo a deviceId; nunca chave comercial, de importação ou migradora. NoiseCapture é fonte externa de arquivos, não este circuito.
 
-O valor “LAeq” sintético é um valor de demonstração para a janela, não uma calibração linear válida de um sonômetro. Explique essa diferença no vídeo/README.
+## Aceite
 
-## Passos e integração
+1. Variar entrada altera leitura e saída visual. Janela de demonstração de 5 s; mapear potenciômetro a valor sintético e documentar a regra.
+2. Emitir externalId, deviceId, sessionId, observedAt, durationSeconds e laeqDbA. SessionId distingue boot; retries preservam o externalId da mesma observação.
+3. Sincronizar relógio e não enviar data inventada; conexão falha sem loop infinito.
+4. Demonstrar envio Java e consulta posterior no C#/painel com origin=simulated. No modo isolado, usar mock Java e declarar que POST é estático.
+5. Tratar 401/403, perda/reconexão e reenvio sem duplicação na implementação real.
 
-1. Montar e validar entradas/saídas sem rede.
-2. Emitir JSON pelo serial com deviceId, sessionId, externalId, observedAt, durationSeconds e laeqDbA.
-3. Configurar Wi-Fi e URL; conferir HTTP/status e reenvio sem duplicidade.
-4. Demonstrar o registro aparecendo no painel/API como simulated.
-5. Interromper conexão e mostrar estado de falha com tentativas limitadas; retomar sem gerar duplicações.
+Wokwi público não acessa automaticamente localhost/rede privada. Validar endpoint/gateway acessível antes de prometer transmissão; se usar replay, identificar a reprodução e confirmar aceitação docente. Nunca chamar serial/replay de ingestão ao vivo.
 
-A [documentação do Wokwi](https://docs.wokwi.com/guides/esp32-wifi) informa que o gateway público acessa a internet, mas não a rede local. Uma API em localhost da VM não fica automaticamente acessível. Validar opção de conectividade com Pedro antes de prometer live; não exigir compra de plano por inferência.
+## Entrega
 
-Preferir transmissão real por endpoint de laboratório acessível e controlado. Se só for viável replay do JSON emitido, declarar a reprodução e confirmar aceitação com o professor; serial isolado não prova integração HTTP. Não abrir a máquina pessoal indiscriminadamente.
+Sketch, diagram.json, bibliotecas quando necessárias, README de circuito/conectividade e evidências; link Wokwi, TXT de integrantes e vídeo no limite oficial. A instalação física de sensores não é requisito deste protótipo.
 
-## Critérios de aceite
 
-- Girar o potenciômetro altera leitura e saída visual.
-- JSON atende tipos, duração, data e identificador definidos.
-- API rejeita chave inválida e aceita credencial do dispositivo correto.
-- Retry usa o mesmo externalId; painel mostra origem simulada.
-- Perda de conexão fica visível sem travar circuito em loop infinito.
-- Nenhum áudio, segredo administrativo ou alegação de medição real.
-
-## Entrega e metas
-
-Pasta iot/ com sketch, diagram.json, libraries.txt quando necessário, README, contrato e evidências de integração; link Wokwi e TXT com nomes/RMs.
-
-**Meta 10/11:** circuito e serial. **Meta 12/11:** conectividade decidida/testada. **Meta 15/11:** fluxo completo e vídeo.
-
-Roteiro até 4 min: problema/uso; função do nó na plataforma; explicar simulação; variar entrada; mostrar API/dashboard; demonstrar falha/limites e repositório.
-
-## Pendências
-
-Acesso de rede entre simulador e API. Instalação física em postes e calibração de hardware real ficam fora da GS. Dados sintéticos do circuito não entram no treino de ML.
-
-## Organização no monorepo
-
-Pasta `iot/`; branch `leo/iot`. [Responsabilidades](../equipe.md), [modos de execução](../modos-de-execucao.md), [contratos v0.3.0](../../contracts/README.md) e [auditoria](../auditoria.md). Componentes devem funcionar em modo standalone e integrado conforme aplicável; documentar comandos reais em README/component.json.
-
-## Credencial do dispositivo
-
-POST /api/v1/observations usa X-Api-Key com observations:write e vínculo ao deviceId. Nunca enviar chave de cliente/importador/operador no sketch. Modo mock usa mock-device-key apenas como fixture; a implantação usa chave descartável provisionada fora do código público. Tratar 401/403 sem retry infinito.
+Referências comuns: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md). Comandos e evidências reais ficam no README/PR da entrega.

@@ -1,35 +1,18 @@
 # Instruções do projeto
 
-- Usar UTF-8 em arquivos PT-BR, preservando acentuação. Usar LF em Bash.
-- Esta é a pasta principal da GS 2026/02 da FIAP, turma 3ESPV-2026.
-- Ler README.md e docs/01-contexto-e-requisitos.md antes de trabalhar.
-- Pedro executa Linux. As outras disciplinas recebem especificações; não implementar todas por inferência.
-- Distinguir exigência do professor, proposta do grupo e pendência.
-- Bairro Fresco foi retirado da lista ativa por orientação do usuário. Os exemplos antigos são históricos.
-- Em 08/11/2026 o usuário escolheu a ideia 1, API de ruído. Esta é a solução ativa. Ler docs/02-proposta-de-solucao.md, docs/03-integracao.md e docs/disciplinas/README.md antes de implementar.
-- Consultar docs/solucoes/README.md para a comparação atual, fontes, dados reais e triagem. Não reativar Bairro Fresco sem solicitação do usuário.
-- As quatro ideias e imagens de 07/11 são histórico de comparação. Não acrescentar inundação, água, gás ou Oásis ao escopo acústico sem nova orientação. Integração futura de ruído/inundação não é decisão de implementação.
-- Propostas técnicas v0.1: C# como API principal com SQLite; SOA importador separado com banco próprio e linguagem de aula a confirmar; Mobile de consulta/comparação; ESP32/Wokwi simulado; ML KMeans + PCA com sessões reais. Não presumir autorização para reutilizar a mesma entrega C#/SOA.
-- Dados NoiseCapture do Brasil foram baixados em 08/11; auditoria inicial de São Paulo em docs/dados/noisecapture-auditoria-inicial.json e ml/dados/README.md. Não confundir inspeção com limpeza/treino ou dados históricos com telemetria atual. ZIP bruto permanece ignorado pelo Git.
-- Preservar separação entre simulated e public_dataset; nunca agregar as duas origens ou fazer média aritmética de dB. Não gravar áudio ou afirmar calibração/limite legal a partir da simulação.
-- Consumo individual medido depende de medição por unidade; não inferir leituras individuais a partir do total do prédio. Síndico pode ter visão agregada; detalhe depende de política explícita. Não presumir medição individual ou acesso à telemetria no prédio do usuário.
-- Ao propor alternativas, identificar usuário, comprador, ação possível, ganho sobre a alternativa atual, dados, dependências físicas e viabilidade para a GS. Não chamar benefício genérico de solução validada.
-- Nunca inventar entrevista, dado real, teste executado, evidência, publicação ou entrega.
-- Manter os prompts de trabalho em prompts.md.
-- Não publicar fontes privadas do Teams, segredos ou dados pessoais no repositório.
-- Não enviar mensagens ou entregas acadêmicas sem instrução explícita do usuário.
-
-## Equipe, monorepo e auditoria (08/11/2026)
-
-- Leonardo (RM555573): api/ e iot/; Felipe (RM556931): soa/ e testing/; Herbert (RM555701): cybersecurity/ e mobile/; Gabriel (RM556476): ml/; Pedro (RM556630): linux/, integração e auditoria. Ver docs/equipe.md.
-- Usuário autorizou repositório GitHub privado, monorepo, branches por entrega, integração via PR/main e planejamento de deploys provavelmente na Azure. Não transformar isso em autorização para implementar todas as matérias dos colegas ou enviar mensagens.
-- Contratos verificáveis v0.3.0 em contracts/; regras em docs/regras-de-negocio.md. Mudanças de interface exigem atualizar consumidores/fixtures e validar contratos.
-- Todos os componentes devem ter modo standalone e integrado conforme docs/modos-de-execucao.md. Mock não é prova de implementação real; ML usa dados reais.
-- Pedro usará o assistente para auditar entregas contra solução, rubrica, código e evidências. Seguir docs/auditoria.md; identificar commit e comandos realmente executados. Não inventar resultado/nota.
-- Não fazer push direto na main após bootstrap; usar branches e PRs. Conferir se proteções realmente estão ativas; políticas documentadas não são proteção técnica.
-- Fontes privadas, prompts locais, output/ e dataset bruto ficam fora do Git. Registro publicável de IA em docs/uso-de-ia.md, sem conversas privadas.
-
-- Produto aprovado pelo usuário: Sonora. Marca ampla da empresa ainda em aberto; LOC não foi aprovado. Repositório privado: peguidotte/sonora. Não ampliar escopo para inundação. Disponibilidade comercial não foi verificada.
-
-- Decisão do usuário: contratos e rotas em inglês, API de dados privada. Versão v0.3.0; Location/locationId, /locations, /noise-profile, /observations, /imports/observations, /analytics/summary e /batches. Campos camelCase e erros técnicos em inglês; explicações PT-BR preservadas.
-- X-Api-Key único com escopos por operação; ver docs/api-security.md. Todas as rotas /api/v1 privadas. Sem segredo embutido em Mobile/SQLite/Git/URLs; app demo recebe chave de leitura em memória. Mock usa chaves públicas fictícias, nunca de produção.
+- Pasta principal: C:/Users/Usuario/Documents/FIAP/GS-2026-02. Usá-la explicitamente; não presumir associação da conversa no aplicativo.
+- Ler README.md, docs/arquitetura.md, contracts/README.md e a especificação da disciplina antes de alterar interfaces.
+- Sonora é o produto escolhido. Marca da empresa em aberto. Inundação é expansão futura, fora do escopo atual.
+- Arquitetura aprovada: Java/SOA recebe IoT e importa NoiseCapture; grava PostgreSQL; C# consulta views somente leitura e calcula regras acústicas. Sem HTTP Java -> C#, sem SQLite entre backends. SQLite apenas no Mobile.
+- SOA possui migrations de captura e publicação das views. Contrato em contracts/database.json; C# não altera o schema nem executa migrations próprias de captura.
+- Namespaces: /api/sonora/v1 e /api/ingestion/v1. Rotas, DTOs, erros e nomes técnicos em inglês; JSON camelCase. Explicações PT-BR em UTF-8, preservando acentuação; Bash em LF.
+- API privada por X-Api-Key e escopo; credenciais fora de Git/URLs/logs/bundle/cache. Mock usa somente credenciais públicas fictícias, nunca de produção.
+- NoiseCapture é fonte de arquivos públicos históricos, distinta do ESP32/Wokwi simulado. Separar public_dataset e simulated; nunca agregar as origens nem fazer média aritmética de dB. Não armazenar áudio.
+- ML usa dados reais públicos, não Wokwi. Fonte e inspeção em ml/dados/README.md; não confundir inspeção com limpeza/treino.
+- Responsáveis: Leonardo api/iot; Felipe soa/testing; Herbert cybersecurity/mobile; Gabriel ml; Pedro linux e coordenação/auditoria. Nomes/RMs no README principal.
+- Implementar somente o trabalho solicitado. Ter especificações das outras matérias não autoriza executá-las integralmente por inferência.
+- Trabalho em branch/PR, sem push direto na main. Mudanças de interface atualizam OpenAPI, banco, fixtures, ferramentas e consumidores juntos.
+- Distinguir requisito do professor, decisão do projeto e implementação real. Nunca inventar entrevista, medição, teste, resultado, nota, deploy ou entrega.
+- Documentação mínima: arquitetura central; contratos verificáveis; rubricas nas oito fichas; comandos reais nos READMEs dos componentes. Não criar cronogramas, snapshots ou documentos duplicados; histórico no Git e resultados de revisão nos PRs.
+- Preservar materiais privados, prompts locais, output e dataset bruto fora do Git. Registrar prompts em prompts.md local e resumo publicável em docs/uso-de-ia.md.
+- Não enviar mensagens a colegas/professores, convites ou submissões sem instrução explícita. Pedro autoriza auditoria de código conforme CONTRIBUTING.md.
