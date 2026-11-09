@@ -1,0 +1,5 @@
+{
+  "interface": "eth0",
+  "mode": "dhcp",
+  "dns": ["168.63.129.16"]
+}

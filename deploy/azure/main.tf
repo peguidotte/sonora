@@ -12,6 +12,8 @@ locals {
   bootstrap_files = {
     "provision.sh"      = file("${path.module}/../../linux/provision.sh")
     "monitor.sh"        = file("${path.module}/../../linux/monitor.sh")
+    "network.sh"        = file("${path.module}/../../linux/network.sh")
+    "verify.sh"         = file("${path.module}/../../linux/verify.sh")
     "deploy-release.py" = file("${path.module}/../../linux/deploy-release.py")
   }
 }

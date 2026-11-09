@@ -14,4 +14,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 | 09/11/2026 | Preparar infraestrutura Azure e CI/CD | Login oficial por código de dispositivo; Terraform/Bash, VM e serviços básicos provisionados, artefatos privados/OIDC e workflows preparados. Aplicações ainda ausentes; execução remota dos workflows e rubrica completa de Linux não são presumidas |
 | 09/11/2026 | Revisar documentação para colaboração e agentes | Roteiro de leitura e fontes de autoridade explícitos, instruções portáveis entre clones, integração/deploy alinhados e distinção entre contrato, mock, job pulado e implementação; revisão nos arquivos existentes, sem novos documentos paralelos |
 
+| 09/11/2026 | Iniciar implementação e auditoria de Operating Systems | Scripts de rede, monitor por recurso, verificações e testes limitados de carga/falha na branch de Pedro; conferência com a rubrica. Aplicações, migrations de domínio e vídeo continuam pendentes; evidências executadas ficam no PR |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

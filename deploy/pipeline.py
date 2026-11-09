@@ -16,7 +16,7 @@ import uuid
 ROOT = Path(__file__).resolve().parents[1]
 CONFIG = ROOT / 'deploy/azure'
 REPOSITORY = 'peguidotte/sonora'
-INFRA_FILES = ('provision.sh', 'monitor.sh', 'deploy-release.py')
+INFRA_FILES = ('provision.sh', 'monitor.sh', 'network.sh', 'verify.sh', 'deploy-release.py')
 
 
 def command(program):
