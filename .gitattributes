@@ -1,0 +1,7 @@
+* text=auto eol=lf
+*.md text eol=lf
+*.sh text eol=lf
+*.service text eol=lf
+*.timer text eol=lf
+*.pdf binary
+*.mp4 binary

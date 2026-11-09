@@ -1,0 +1,28 @@
+{
+  "component": "mobile",
+  "status": "planned",
+  "owner": "Herbert de Sousa Vilela",
+  "rm": "555701",
+  "branch": "herbert/mobile",
+  "spec": "docs/disciplinas/mobile.md",
+  "contract": "contracts/openapi/csharp.openapi.json",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "explicit-seed-or-fixture"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": [
+      "api"
+    ]
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "expo-or-build",
+    "status": "not-deployed"
+  }
+}

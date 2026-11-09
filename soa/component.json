@@ -1,0 +1,28 @@
+{
+  "component": "soa",
+  "status": "planned",
+  "owner": "Felipe Soares Xavier",
+  "rm": "556931",
+  "branch": "felipe/soa",
+  "spec": "docs/disciplinas/soa.md",
+  "contract": "contracts/openapi/soa.openapi.json",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "explicit-seed-or-fixture"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": [
+      "api"
+    ]
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "azure-vm",
+    "status": "not-deployed"
+  }
+}

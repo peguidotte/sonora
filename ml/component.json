@@ -1,0 +1,26 @@
+{
+  "component": "ml",
+  "status": "planned",
+  "owner": "Gabriel Figueira Flora",
+  "rm": "556476",
+  "branch": "gabriel/ia",
+  "spec": "docs/disciplinas/ml.md",
+  "contract": "contracts/schemas/ml-summary.schema.json",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "real-public-data"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": []
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "offline-artifact",
+    "status": "not-deployed"
+  }
+}

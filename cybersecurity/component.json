@@ -1,0 +1,28 @@
+{
+  "component": "cybersecurity",
+  "status": "planned",
+  "owner": "Herbert de Sousa Vilela",
+  "rm": "555701",
+  "branch": "herbert/cybersecurity",
+  "spec": "docs/disciplinas/cybersecurity.md",
+  "contract": "docs/auditoria.md",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "explicit-seed-or-fixture"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": [
+      "api"
+    ]
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "local-audit",
+    "status": "not-deployed"
+  }
+}

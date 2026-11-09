@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:gs:ml-summary",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "integer",
+      "const": 1
+    },
+    "city": {
+      "type": "string"
+    },
+    "modelVersion": {
+      "type": "string"
+    },
+    "sourceUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "datasetSha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "dataPeriod": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        },
+        "to": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "Z$"
+        }
+      },
+      "required": [
+        "from",
+        "to"
+      ],
+      "additionalProperties": false
+    },
+    "sampleCount": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "groups": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "count",
+          "description"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "metrics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "train": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "test": {
+            "type": [
+              "number",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "train",
+          "test"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "city",
+    "modelVersion",
+    "sourceUrl",
+    "datasetSha256",
+    "dataPeriod",
+    "sampleCount",
+    "groups",
+    "metrics",
+    "limitations"
+  ],
+  "additionalProperties": false
+}

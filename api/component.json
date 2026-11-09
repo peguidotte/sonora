@@ -1,0 +1,26 @@
+{
+  "component": "api",
+  "status": "planned",
+  "owner": "Leonardo Correa de Mello",
+  "rm": "555573",
+  "branch": "leo/csharp",
+  "spec": "docs/disciplinas/csharp.md",
+  "contract": "contracts/openapi/csharp.openapi.json",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "explicit-seed-or-fixture"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": []
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "azure-vm",
+    "status": "not-deployed"
+  }
+}

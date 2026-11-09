@@ -1,0 +1,8 @@
+{
+  "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+  "name": "Ponto A — demonstração",
+  "city": "São Paulo",
+  "latitude": -23.56,
+  "longitude": -46.65,
+  "isDemo": true
+}

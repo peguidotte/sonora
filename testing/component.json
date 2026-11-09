@@ -1,0 +1,29 @@
+{
+  "component": "testing",
+  "status": "planned",
+  "owner": "Felipe Soares Xavier",
+  "rm": "556931",
+  "branch": "felipe/testing",
+  "spec": "docs/disciplinas/testing.md",
+  "contract": "docs/disciplinas/testing.md",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "explicit-seed-or-fixture"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": [
+      "api",
+      "mobile"
+    ]
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "azure-boards",
+    "status": "not-deployed"
+  }
+}

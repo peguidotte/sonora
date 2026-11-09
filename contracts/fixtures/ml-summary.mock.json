@@ -1,0 +1,34 @@
+{
+  "schemaVersion": 1,
+  "city": "São Paulo",
+  "modelVersion": "fixture-NOT-TRAINED",
+  "sourceUrl": "https://example.invalid/fixtures",
+  "datasetSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "dataPeriod": {
+    "from": "2025-01-01T00:00:00Z",
+    "to": "2025-01-02T00:00:00Z"
+  },
+  "sampleCount": 2,
+  "groups": [
+    {
+      "id": "fixture-0",
+      "count": 1,
+      "description": "Exemplo sintético de formato; não é resultado de ML."
+    },
+    {
+      "id": "fixture-1",
+      "count": 1,
+      "description": "Não foi treinado."
+    }
+  ],
+  "metrics": [
+    {
+      "name": "silhouette",
+      "train": null,
+      "test": null
+    }
+  ],
+  "limitations": [
+    "FIXTURE SINTÉTICA. Nenhum modelo treinado ou resultado validado."
+  ]
+}

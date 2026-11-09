@@ -1,0 +1,28 @@
+{
+  "component": "iot",
+  "status": "planned",
+  "owner": "Leonardo Correa de Mello",
+  "rm": "555573",
+  "branch": "leo/iot",
+  "spec": "docs/disciplinas/physical.md",
+  "contract": "contracts/openapi/csharp.openapi.json",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "explicit-seed-or-fixture"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": [
+      "api"
+    ]
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "wokwi",
+    "status": "not-deployed"
+  }
+}

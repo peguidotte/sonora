@@ -1,0 +1,28 @@
+{
+  "component": "linux",
+  "status": "planned",
+  "owner": "Pedro Visconti Guidotte",
+  "rm": "556630",
+  "branch": "pedro/operating-systems",
+  "spec": "docs/disciplinas/linux.md",
+  "contract": "docs/03-integracao.md",
+  "standalone": {
+    "requiresCloud": false,
+    "commands": [],
+    "dataMode": "explicit-seed-or-fixture"
+  },
+  "integrated": {
+    "status": "planned",
+    "dependencies": [
+      "api"
+    ]
+  },
+  "validation": {
+    "commands": [],
+    "evidence": []
+  },
+  "deployment": {
+    "target": "azure-vm-and-local-vm",
+    "status": "not-deployed"
+  }
+}

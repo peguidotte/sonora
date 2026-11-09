@@ -1,0 +1,70 @@
+{
+  "description": "Fixtures sintéticas de contrato. Não são dados coletados nem respostas de uma API em execução.",
+  "schemaVersion": "0.1",
+  "pointIds": {
+    "a": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    "b": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    "c": "cccccccc-cccc-4ccc-8ccc-cccccccccccc"
+  },
+  "source": {
+    "origin": "simulated",
+    "method": "wokwi_linear_demo",
+    "calibrationStatus": "simulated"
+  },
+  "query": {
+    "from": "2026-11-08T15:00:00Z",
+    "to": "2026-11-08T15:01:00Z",
+    "origin": "simulated"
+  },
+  "observations": [
+    {
+      "point": "a",
+      "externalId": "fixture-a-1",
+      "observedAt": "2026-11-08T15:00:00Z",
+      "durationSeconds": 5,
+      "laeqDbA": 60,
+      "sessionId": "fixture-a-session-1"
+    },
+    {
+      "point": "a",
+      "externalId": "fixture-a-2",
+      "observedAt": "2026-11-08T15:00:05Z",
+      "durationSeconds": 5,
+      "laeqDbA": 70,
+      "sessionId": "fixture-a-session-1"
+    },
+    {
+      "point": "b",
+      "externalId": "fixture-b-1",
+      "observedAt": "2026-11-08T15:00:00Z",
+      "durationSeconds": 5,
+      "laeqDbA": 65,
+      "sessionId": "fixture-b-session-1"
+    },
+    {
+      "point": "b",
+      "externalId": "fixture-b-2",
+      "observedAt": "2026-11-08T15:00:05Z",
+      "durationSeconds": 5,
+      "laeqDbA": 65,
+      "sessionId": "fixture-b-session-1"
+    }
+  ],
+  "expected": {
+    "a": {
+      "laeqDbA": 67.40362689494243,
+      "observationCount": 2,
+      "observedSeconds": 10
+    },
+    "b": {
+      "laeqDbA": 65,
+      "observationCount": 2,
+      "observedSeconds": 10
+    },
+    "c": {
+      "status": "no_data",
+      "laeqDbA": null
+    }
+  },
+  "note": "Fixtures servem para seed/mock/testes. Dispositivo e sourceId são resolvidos por seed/credencial; não enviar point como se fosse corpo de POST /observacoes. Duas janelas por ponto, sem sobreposição; não representam a hora completa."
+}

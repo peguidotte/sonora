@@ -1,0 +1,12 @@
+{
+  "id": "44444444-4444-4444-8444-444444444444",
+  "fileId": "fixture-sp-v1",
+  "sourceId": "22222222-2222-4222-8222-222222222222",
+  "fileSha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "status": "completed",
+  "acceptedCount": 1,
+  "duplicateCount": 0,
+  "rejectedCount": 0,
+  "deliveryStatus": "delivered",
+  "createdAt": "2026-11-08T15:00:00Z"
+}
