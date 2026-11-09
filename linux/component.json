@@ -1,6 +1,6 @@
 {
   "component": "linux",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Pedro Visconti Guidotte",
   "rm": "556630",
   "branch": "pedro/operating-systems",
@@ -25,6 +25,6 @@
   },
   "deployment": {
     "target": "azure-vm-and-local-vm",
-    "status": "not-deployed"
+    "status": "infrastructure-provisioned-applications-pending"
   }
 }

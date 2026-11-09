@@ -81,7 +81,7 @@ Mock substitui dependência no desenvolvimento, não persistência, autenticidad
 
 Deploy inicial: uma VM Linux, preferencialmente na Azure, com Java 127.0.0.1:8082, C# 127.0.0.1:8080 e PostgreSQL 5432 interno. Proxy expõe HTTPS/443 e encaminha os prefixos completos, sem removê-los. Banco e portas internas não ficam públicos; SSH restrito à administração. systemd mantém aplicações e monitor em serviços independentes. Mobile roda no aparelho, não como backend da VM. NoiseCapture não é implantação nossa.
 
-Migrations executam no provisionamento antes de iniciar apps; artefatos, dados e segredos ficam em diretórios separados. Atualizações preservam dados e têm backup/rollback coerente com migrations. O teste Linux inclui crash do monitor e recuperação, além de boot, logs, recursos e aplicação de outra disciplina. Conta/recursos/custo Azure são configuração operacional a resolver no deploy, sem alterar esta topologia.
+Migrations executam antes de iniciar a nova versão do SOA; artefatos, dados e segredos ficam em diretórios separados. Atualizações preservam dados e fazem backup antes das migrations; retorno ao binário anterior não reverte automaticamente schema/dados. O teste Linux inclui crash do monitor e recuperação, além de boot, logs, recursos e aplicação de outra disciplina. [Terraform e CI/CD](../deploy/azure/README.md) definem provisionamento, autenticação OIDC, artefatos por componente e distribuição do Mobile. Infraestrutura usa somente créditos estudantis com limite de gastos ativo; configuração de ambiente não altera esta topologia.
 
 ## Extensão
 

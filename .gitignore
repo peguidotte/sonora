@@ -32,3 +32,13 @@ ml/dados/raw/
 # Ferramentas locais
 .DS_Store
 Thumbs.db
+# Terraform: estado e planos podem conter dados sensíveis
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+*.tfbackend
+crash.log
