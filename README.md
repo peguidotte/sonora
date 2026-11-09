@@ -1,6 +1,6 @@
-# API de ruído — CitizenTech
+# LOC | Sonora
 
-Monorepo da **Global Solution FIAP 2026.2**, turma **3ESPV-2026**. Produto de contexto acústico para plataformas imobiliárias: ajuda a comparar observações do entorno, com fonte, período e cobertura explícitos. Nome comercial em discussão com o grupo.
+Monorepo da **Global Solution FIAP 2026.2**, turma **3ESPV-2026**. Produto de contexto acústico para plataformas imobiliárias: ajuda a comparar observações do entorno, com fonte, período e cobertura explícitos. **LOC** é o nome de trabalho da plataforma de inteligência de localização. **Sonora** é o produto acústico implementado nesta GS. [Marca e produtos](docs/marca-e-produtos.md).
 
 ## Equipe
 

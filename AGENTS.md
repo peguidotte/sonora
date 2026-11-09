@@ -28,3 +28,5 @@
 - Pedro usará o assistente para auditar entregas contra solução, rubrica, código e evidências. Seguir docs/auditoria.md; identificar commit e comandos realmente executados. Não inventar resultado/nota.
 - Não fazer push direto na main após bootstrap; usar branches e PRs. Conferir se proteções realmente estão ativas; políticas documentadas não são proteção técnica.
 - Fontes privadas, prompts locais, output/ e dataset bruto ficam fora do Git. Registro publicável de IA em docs/uso-de-ia.md, sem conversas privadas.
+
+- Marca de trabalho: LOC (inteligência de localização); Sonora é o produto acústico desta GS. Repositório privado: peguidotte/loc. Não ampliar escopo para inundação por causa da marca ampla. Disponibilidade comercial não foi verificada.
