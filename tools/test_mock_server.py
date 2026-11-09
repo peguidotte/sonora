@@ -6,6 +6,8 @@ import json
 import unittest
 
 from mock_server import create_server
+from smoke_integration import get
+from validate_contracts import load_service
 
 
 class MockTest(unittest.TestCase):
@@ -62,6 +64,30 @@ class MockTest(unittest.TestCase):
         body = {"externalId":"x","deviceId":"11111111-1111-4111-8111-111111111111","sessionId":"x","observedAt":"2026-11-08T15:00:00Z","durationSeconds":5,"laeqDbA":60,"origin":"public_dataset"}
         status, _, _ = self.call("/api/v1/observacoes", json.dumps(body).encode(), {"Content-Type":"application/json","X-Ingest-Key":"not-a-real-secret"})
         self.assertEqual(status, 400)
+
+    def test_integration_smoke_rejects_mock(self):
+        with self.assertRaisesRegex(AssertionError, "Endpoint é mock"):
+            get(self.base, "/health/live", load_service("csharp"), "/health/live")
+
+    def test_soa_mock_requires_operator_header(self):
+        server = create_server("soa", port=0)
+        thread = Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        base = f"http://127.0.0.1:{server.server_port}"
+        try:
+            with self.assertRaises(HTTPError) as error:
+                urlopen(base + "/api/v1/lotes", timeout=3)
+            self.assertEqual(error.exception.code, 401)
+            error.exception.close()
+            request = Request(base + "/api/v1/lotes", headers={"X-Operator-Key":"not-a-real-secret"})
+            with urlopen(request, timeout=3) as response:
+                self.assertEqual(response.status, 200)
+                self.assertEqual(json.load(response)["items"][0]["status"], "completed")
+                self.assertEqual(response.headers["X-Demo-Mode"], "static-contract-mock")
+        finally:
+            server.shutdown()
+            server.server_close()
+            thread.join(timeout=2)
 
 
 if __name__ == "__main__":
