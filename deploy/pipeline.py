@@ -27,7 +27,7 @@ def command(program):
     if program == 'az' and found.lower().endswith('.cmd'):
         interpreter = Path(found).parent.parent / 'python.exe'
         if interpreter.exists():
-            return [str(interpreter), '-IBm', 'azure.cli']
+            return [str(interpreter), '-X', 'utf8', '-IBm', 'azure.cli']
     return [found]
 
 
@@ -216,9 +216,18 @@ def publish(args):
             or not re.fullmatch(r'[a-f0-9]{64}', digest)
             or not re.fullmatch(r'[a-z0-9]{3,24}', account)):
         raise ValueError('Metadados inválidos.')
-    az('storage', 'blob', 'upload', '--account-name', account, '--container-name', 'releases',
-       '--name', f'{component}/{release}.tar.gz', '--file', str(ROOT / f'output/releases/{component}.tar.gz'),
-       '--auth-mode', 'login', '--overwrite', 'false')
+    archive = ROOT / f'output/releases/{component}.tar.gz'
+    if hashlib.sha256(archive.read_bytes()).hexdigest() != digest:
+        raise ValueError('SHA-256 local não confere; não publicar.')
+    blob_args = ['--account-name', account, '--container-name', 'releases',
+                 '--name', f'{component}/{release}.tar.gz', '--auth-mode', 'login']
+    if az('storage', 'blob', 'exists', *blob_args)['exists']:
+        existing = az('storage', 'blob', 'show', *blob_args)
+        if existing.get('metadata', {}).get('sha256') != digest:
+            raise ValueError('Blob existente com conteúdo/proveniência diferente; gerar nova release.')
+    else:
+        az('storage', 'blob', 'upload', *blob_args, '--file', str(archive),
+           '--metadata', 'sha256=' + digest, '--overwrite', 'false')
     script = 'set -eu\ncloud-init status --wait >/dev/null\n'
     script += f'/usr/local/sbin/sonora-deploy {component} {release} {account} {digest}'
     if component == 'infra':
@@ -226,6 +235,8 @@ def publish(args):
         if not re.fullmatch(r'https://[a-z0-9.-]+', origin):
             raise ValueError('Origem HTTPS inválida.')
         script += ' --fqdn ' + origin.removeprefix('https://')
+    marker = f'SONORA_DEPLOY_OK {component} {release}'
+    script += f"\nprintf '\\n{marker}\\n'"
     with tempfile.TemporaryDirectory() as temporary:
         path = Path(temporary) / 'deploy.sh'
         path.write_text(script + '\n', encoding='utf-8')
@@ -238,8 +249,7 @@ def publish(args):
         print(status.get('message', ''))
     # Run Command V1 pode retornar provisioning success apesar de exit não zero do shell.
     stdout = '\n'.join(s.get('message', '') for s in statuses)
-    marker = 'COMPLETE provision' if component == 'infra' else '"status": "healthy"'
-    if marker not in stdout:
+    if marker not in stdout.splitlines():
         raise RuntimeError('Ausência de confirmação de sucesso no deploy. Conferir logs da VM.')
 
 
