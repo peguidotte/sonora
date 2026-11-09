@@ -16,7 +16,7 @@ Pitch geral: YouTube até 4 minutos, identificado como VIDEO PITCH GS na entrega
 | F02 Consultar perfil | Fonte/período/cobertura e agregação energética corretos | Sem dados -> no_data/nulo; intervalo inválido |
 | F03 Comparar locais | Mesma origem/método/período com limitações visíveis | Cobertura incompatível ou insuficiente |
 | F04 Favoritos offline | SQLite mantém favoritos/cache após reabrir | Sem rede, com data e mensagem de cache |
-| F05 Ingestão IoT | Java autoriza/persiste; C# lê a nova observação no banco | Chave/escope/deviceId inválidos, valor inválido, retry/conflito |
+| F05 Ingestão IoT | Java autoriza/persiste; C# lê a nova observação no banco | Chave/escopo/deviceId inválidos, valor inválido, retry/conflito |
 | F06 Importação | Java importa arquivo permitido e informa contagens commitadas | Arquivo desconhecido, dado rejeitado, rollback ou duplicação |
 | F07 Disponibilidade | Estado de sensor usa recebimento IoT; falha é comunicada | Histórico não coloca sensor online; banco indisponível |
 | F08 Resumo ML | C# devolve artefato real validado/versão/limitações | Sem resumo -> 204; fixture não é resultado real |
@@ -38,4 +38,4 @@ Cada Test Case precisa de objetivo, preparação, entradas, passos e saídas esp
 
 Detalhes dos casos, execuções/datas/bugs ficam no Azure; não manter cópia divergente em Markdown. Associar casos às Features, registrar resultados reais e gerar PDF legível com visão geral/detalhes e link. Confirmar identidade do professor antes de conceder Admin. Pitch apresenta problema/público, solução demonstrada, fontes, limites e impacto a medir, sem inventar entrevista/venda/precisão.
 
-Artefatos finais: PDF/links e pitch, conforme rubrica. Mock é preparação de teste, não comprovação de persistência/integracão. Referências: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md).
+Artefatos finais: PDF/links e pitch, conforme rubrica. Mock é preparação de teste, não comprovação de persistência/integração. Referências: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md).

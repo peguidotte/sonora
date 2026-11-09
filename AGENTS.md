@@ -1,7 +1,8 @@
 # Instruções do projeto
 
-- Pasta principal: C:/Users/Usuario/Documents/FIAP/GS-2026-02. Usá-la explicitamente; não presumir associação da conversa no aplicativo.
-- Ler README.md, docs/arquitetura.md, contracts/README.md e a especificação da disciplina antes de alterar interfaces.
+- Trabalhar na raiz deste clone, identificada por AGENTS.md e README.md e pelo remoto peguidotte/sonora. Não assumir caminho de outra máquina nem associação da conversa no aplicativo.
+- Começar pelo roteiro do README.md; ler docs/arquitetura.md, contracts/README.md, a ficha da disciplina e o README do componente antes de implementar. Consultar deploy/azure/README.md e deploy/pipeline.json para build/publicação.
+- Requisitos docentes e pendências ficam em docs/01-contexto-e-requisitos.md e nas fichas; decisões de produto na arquitetura; formatos de interface nos contratos verificáveis. Se houver divergência, apontar e corrigir as fontes afetadas no mesmo PR, sem inventar uma terceira definição.
 - Sonora é o produto escolhido. Marca da empresa em aberto. Inundação é expansão futura, fora do escopo atual.
 - Arquitetura aprovada: Java/SOA recebe IoT e importa NoiseCapture; grava PostgreSQL; C# consulta views somente leitura e calcula regras acústicas. Sem HTTP Java -> C#, sem SQLite entre backends. SQLite apenas no Mobile.
 - SOA possui migrations de captura e publicação das views. Contrato em contracts/database.json; C# não altera o schema nem executa migrations próprias de captura.
@@ -14,6 +15,7 @@
 - Trabalho em branch/PR, sem push direto na main. Mudanças de interface atualizam OpenAPI, banco, fixtures, ferramentas e consumidores juntos.
 - CI/CD fica no GitHub Actions, somente dentro da franquia gratuita e sem cobranças adicionais. Antes de habilitar execuções, confirmar orçamento Actions de US$ 0 com bloqueio de uso ativo. Não elevar orçamento nem desativar o bloqueio para corrigir CI. Azure usa apenas créditos estudantis com spendingLimit=On. Scripts reutilizáveis são preferíveis a pipelines redundantes.
 - Distinguir requisito do professor, decisão do projeto e implementação real. Nunca inventar entrevista, medição, teste, resultado, nota, deploy ou entrega.
+- component.json declara o estado da entrega; conferir código, comandos e evidências. Job pulado ou CI da fundação aprovada não comprova implementação do componente.
 - Documentação mínima: arquitetura central; contratos verificáveis; rubricas nas oito fichas; comandos reais nos READMEs dos componentes. Não criar cronogramas, snapshots ou documentos duplicados; histórico no Git e resultados de revisão nos PRs.
 - Preservar materiais privados, prompts locais, output e dataset bruto fora do Git. Registrar prompts em prompts.md local e resumo publicável em docs/uso-de-ia.md.
 - Não enviar mensagens a colegas/professores, convites ou submissões sem instrução explícita. Pedro autoriza auditoria de código conforme CONTRIBUTING.md.

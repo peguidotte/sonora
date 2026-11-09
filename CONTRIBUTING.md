@@ -4,11 +4,13 @@ Começar pelo [README/equipe](README.md), [arquitetura](docs/arquitetura.md), [c
 
 ## Branch e revisão
 
+Exemplo para a entrega C# de Leonardo; os demais usam a própria branch da tabela de equipe:
+
 ```bash
 git clone https://github.com/peguidotte/sonora.git
 cd sonora
-git switch leo/csharp
 git fetch origin
+git switch leo/csharp
 git merge origin/main
 ```
 
@@ -23,6 +25,8 @@ Usar a branch da própria entrega ou uma branch curta derivada dela. Não fazer 
 - Sem dados pessoais reais, segredos, áudio, arquivos privados do Teams ou dataset bruto no Git.
 
 A CI compartilhada valida a fundação, não comprova as oito matérias. Cada componente adiciona seu build/testes ao ser implementado. Mocks estáticos não são aplicação pronta, integração real ou fonte de treino ML.
+
+Build/testes/publicação de C#, SOA e Mobile seguem o [contrato de CI/CD](deploy/azure/README.md#contrato-das-aplicações) e os caminhos/toolchains em [pipeline.json](deploy/pipeline.json). Mudança desses caminhos deve atualizar a configuração da CI no mesmo PR. Antes de integrar, verificar os jobs efetivamente executados e suas evidências; um job pulado não é um teste aprovado.
 
 ## Auditoria de Pedro com apoio do assistente
 

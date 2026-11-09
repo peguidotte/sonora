@@ -21,9 +21,9 @@ GitHub com scripts/configurações/README/integrantes/evidências e vídeo até 
 
 Provisionar Linux com aplicações Java/C#, PostgreSQL e proxy HTTPS como serviços independentes. A aplicação web de outra disciplina é obrigatória; uma página que só responde 200 não a substitui. Para demonstração mínima de Linux, C# com PostgreSQL/seed pode funcionar sem Java ativo; o objetivo integrado inclui os dois backends.
 
-SOA fornece migrations/views/grants/seed; C# fornece publish/runtime/start. O provisionamento aplica setup comum com conta migradora e inicia runtimes com usuários/credenciais distintos. C# recebe sonora_query, sem poder de escrita/DDL. Banco usa diretório de dados PostgreSQL persistente, fora dos artefatos de aplicação.
+SOA fornece migrations/views/grants/seed; C# fornece publish/runtime/start. O provisionamento prepara PostgreSQL, banco e roles; o deploy do artefato SOA executa o setup comum com a conta migradora antes de iniciar seu serviço HTTP. Runtimes usam usuários/credenciais distintos. C# recebe sonora_query, sem poder de escrita/DDL. Banco usa diretório de dados PostgreSQL persistente, fora dos artefatos de aplicação. Localmente, o setup do SOA também deve executar sem iniciar Java HTTP.
 
-## Automação a implementar
+## Escopo da automação
 
 - Infra: parâmetros de interface/IP/prefixo/rota/DNS/hostname, usuários de serviço, diretórios e permissões. Validar e salvar configuração anterior antes de alterar rede; prever console/recuperação.
 - Banco: instalar/configurar PostgreSQL, aplicar migrations/grants/seed com ferramenta do SOA, sem duplicar schema no Bash.

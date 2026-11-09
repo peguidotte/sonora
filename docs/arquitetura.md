@@ -17,7 +17,7 @@ Sonora oferece contexto acústico a plataformas imobiliárias e pessoas comparan
 | ESP32 / Wokwi | Simula entrada acústica e transmite observações identificadas como simuladas | Chama somente a ingestão Java |
 | NoiseCapture | Fonte externa de arquivos históricos públicos | Java importa; não hospedamos a fonte nem contamos com push automático |
 | ML | Agrupa observações reais em notebook e exporta artefato versionado | Java valida/importa o JSON administrativamente; C# consulta o resultado |
-| Linux | Provisiona serviços/banco/rede, monitora recursos, audita e recupera falhas | Execução local e, posteriormente, nuvem |
+| Linux | Provisiona serviços/banco/rede, monitora recursos, audita e recupera falhas | Reprodução local e deploy Azure |
 
 O fluxo de dados é fontes -> Java -> PostgreSQL -> C# -> clientes. Java não encaminha lotes ao C# por HTTP. C# não grava dados acústicos nem cria migrations de captura. Regras de captura ficam no Java; interpretação acústica fica no C#.
 
@@ -33,7 +33,7 @@ Usar PostgreSQL também nos testes de integração e na reprodução local; não
 
 Não são dois bancos que trocam lotes: os backends acessam o mesmo PostgreSQL com papéis diferentes. Java mantém o schema físico; a interface de leitura é combinada com Leonardo. Mudança incompatível de view exige versão/migração coordenada e ajuste de fixtures/consumidor no mesmo PR. Detalhes internos de armazenamento podem evoluir preservando a interface publicada.
 
-Felipe entrega migrations, publicação/grants das views e seed sintético com comando local reutilizável. Pedro aplica esses artefatos no provisionamento. C# usa o setup comum e não depende do processo HTTP Java estar ativo para consultar. Compartilhar banco cria acoplamento de schema e capacidade: não garante escalabilidade automática.
+Felipe entrega migrations, publicação/grants das views e seed sintético com comando local reutilizável. O provisionamento Linux prepara PostgreSQL, banco e roles; a instalação do artefato SOA aplica suas migrations com a conta migradora antes de iniciar o HTTP. Localmente, o setup comum pode ser executado sem iniciar esse processo HTTP. C# usa o banco preparado e não depende do Java ativo para consultar. Compartilhar banco cria acoplamento de schema e capacidade: não garante escalabilidade automática.
 
 ## HTTP e autenticação
 
@@ -54,7 +54,7 @@ No app/painel demonstrativo, usuário informa URL e chave de leitura, mantida em
 
 ## Regras de dados
 
-- IDs UUID, coordenadas WGS84, timestamps HTTP em UTC/ISO 8601 com Z; PostgreSQL timestamptz. Agrupar por America/Sao_Paulo e informar o fuso.
+- IDs de entidades são UUID; sessionId e externalId são identificadores textuais conforme os contratos, sem exigência de UUID. Coordenadas WGS84, timestamps HTTP em UTC/ISO 8601 com Z; PostgreSQL timestamptz. Agrupar por America/Sao_Paulo e informar o fuso.
 - Origem simulated ou public_dataset é determinada pela ingestão, nunca autodeclarada pelo dispositivo. Calibração unknown, simulated ou documented; não inventar calibração física para Wokwi.
 - Credencial resolve dispositivo/local/fonte. Dispositivo habilitado envia valor finito 0–140 dB(A), duração >0 até 3600 s e data até 5 min no futuro. Esses intervalos são validações técnicas, não limites legais.
 - source_id + external_id é único. Novo registro -> 201; repetição idêntica -> 200 duplicate=true; conteúdo conflitante -> 409. SessionId identifica coleta/boot e permanece nos retries.
@@ -79,7 +79,7 @@ No app/painel demonstrativo, usuário informa URL e chave de leitura, mantida em
 
 Mock substitui dependência no desenvolvimento, não persistência, autenticidade da base ML ou execução acadêmica. Setup/seed local gera credenciais de laboratório sem desativar a proteção. Cada responsável documenta comandos reais no README de seu componente. Configuração API_BASE_URL/SOA_BASE_URL é a origem (scheme/host/porta); o adaptador acrescenta o prefixo do contrato.
 
-Deploy inicial: uma VM Linux, preferencialmente na Azure, com Java 127.0.0.1:8082, C# 127.0.0.1:8080 e PostgreSQL 5432 interno. Proxy expõe HTTPS/443 e encaminha os prefixos completos, sem removê-los. Banco e portas internas não ficam públicos; SSH restrito à administração. systemd mantém aplicações e monitor em serviços independentes. Mobile roda no aparelho, não como backend da VM. NoiseCapture não é implantação nossa.
+Deploy inicial: uma VM Linux na Azure, com Java 127.0.0.1:8082, C# 127.0.0.1:8080 e PostgreSQL 5432 interno. Proxy expõe HTTPS/443 e encaminha os prefixos completos, sem removê-los. Banco e portas internas não ficam públicos; SSH restrito à administração. systemd mantém aplicações e monitor em serviços independentes. Mobile roda no aparelho, não como backend da VM. NoiseCapture não é implantação nossa.
 
 Migrations executam antes de iniciar a nova versão do SOA; artefatos, dados e segredos ficam em diretórios separados. Atualizações preservam dados e fazem backup antes das migrations; retorno ao binário anterior não reverte automaticamente schema/dados. O teste Linux inclui crash do monitor e recuperação, além de boot, logs, recursos e aplicação de outra disciplina. [Terraform e CI/CD](../deploy/azure/README.md) definem provisionamento, autenticação OIDC, artefatos por componente e distribuição do Mobile. Infraestrutura usa somente créditos estudantis com limite de gastos ativo; configuração de ambiente não altera esta topologia.
 
