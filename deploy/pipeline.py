@@ -144,8 +144,14 @@ def inventory():
 
 
 def release_id():
-    commit = os.environ.get('GITHUB_SHA') or execute(command('git') + ['rev-parse', 'HEAD'], capture=True).stdout.strip()
-    value = f"{commit}-{os.environ.get('GITHUB_RUN_ID', '0')}-{os.environ.get('GITHUB_RUN_ATTEMPT', '0')}"
+    commit = (os.environ.get('SONORA_SOURCE_COMMIT') or os.environ.get('GITHUB_SHA')
+              or os.environ.get('BUILD_SOURCEVERSION')
+              or execute(command('git') + ['rev-parse', 'HEAD'], capture=True).stdout.strip())
+    run_id = (os.environ.get('SONORA_RUN_ID') or os.environ.get('GITHUB_RUN_ID')
+              or os.environ.get('BUILD_BUILDID') or str(int(time.time())))
+    attempt = (os.environ.get('SONORA_RUN_ATTEMPT') or os.environ.get('GITHUB_RUN_ATTEMPT')
+               or os.environ.get('SYSTEM_JOBATTEMPT') or '1')
+    value = f'{commit}-{run_id}-{attempt}'
     if not re.fullmatch(r'[a-f0-9]{40}-[0-9]+-[0-9]+', value):
         raise ValueError('Release ID inválido.')
     return value

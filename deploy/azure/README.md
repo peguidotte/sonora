@@ -33,6 +33,8 @@ OIDC aceita somente `repo:peguidotte/sonora:ref:refs/heads/main`; PRs não receb
 
 `configure` registra apenas IDs e parâmetros públicos nas variables do GitHub: tenant/subscription, client IDs, grupo/VM/storage, origem HTTPS, RID .NET e configuração Terraform. Não exporta senhas/chaves. Workflow validado localmente não comprova execução remota; Actions precisa estar disponível para a conta.
 
+Empacotamento e publicação ficam em `deploy/pipeline.py`, separados da orquestração dos workflows. A identidade de release aceita `SONORA_SOURCE_COMMIT/SONORA_RUN_ID/SONORA_RUN_ATTEMPT`, variáveis GitHub ou `BUILD_SOURCEVERSION/BUILD_BUILDID/SYSTEM_JOBATTEMPT` do Azure DevOps. Uma migração futura reutiliza os scripts e exige configurar a federação/identidade da nova plataforma; o trust GitHub atual não autoriza Azure Pipelines. Não manter um segundo pipeline ativo apenas como contingência.
+
 ## Contrato das aplicações
 
 [pipeline.json](../pipeline.json) centraliza caminhos/toolchains; ajustar quando o responsável definir seu projeto. Projeto ausente é declarado como não implementado. Código presente com caminho incompatível falha, sem publicar um mock como aplicação.
