@@ -47,7 +47,12 @@ variable "admin_cidr" {
     error_message = "SSH permite somente um endereço IPv4 /32."
   }
 }
-variable "github_repository" {
-  type    = string
-  default = "peguidotte/sonora"
+variable "github_oidc_subject_prefix" {
+  type        = string
+  default     = "repo:peguidotte@129889380/sonora@1450760711"
+  description = "Prefixo imutável retornado pela configuração OIDC do GitHub; nunca trocar por wildcard."
+  validation {
+    condition     = can(regex("^repo:[A-Za-z0-9-]+@[0-9]+/[A-Za-z0-9_.-]+@[0-9]+$", var.github_oidc_subject_prefix))
+    error_message = "Use o prefixo imutável completo com IDs de proprietário e repositório."
+  }
 }

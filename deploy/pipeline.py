@@ -68,6 +68,10 @@ def bootstrap(args):
     subscription = args.subscription
     az('account', 'set', '--subscription', subscription)
     require_student_limit(subscription)
+    oidc = json.loads(execute(command('gh') + ['api', f'repos/{REPOSITORY}/actions/oidc/customization/sub'], capture=True).stdout)
+    prefix = oidc.get('sub_claim_prefix', '')
+    if not oidc.get('use_default') or not oidc.get('use_immutable_subject') or not re.fullmatch(r'repo:[A-Za-z0-9-]+@[0-9]+/[A-Za-z0-9_.-]+@[0-9]+', prefix):
+        raise RuntimeError('Conferir subject OIDC: bootstrap exige o padrão imutável com IDs e ref main.')
     group = 'sonora-gs-rg'
     suffix = hashlib.sha256(f'{subscription}/{group}'.encode()).hexdigest()[:10]
     state_account = f'sonora{suffix}state'
@@ -101,14 +105,15 @@ def bootstrap(args):
         assign(scope, identity['principalId'], role)
     az('identity', 'federated-credential', 'create', '--name', 'github-main', '--identity-name', identity['name'],
        '--resource-group', group, '--issuer', 'https://token.actions.githubusercontent.com',
-       '--subject', f'repo:{REPOSITORY}:ref:refs/heads/main', '--audiences', 'api://AzureADTokenExchange')
+       '--subject', prefix + ':ref:refs/heads/main', '--audiences', 'api://AzureADTokenExchange')
     key = Path.home() / '.ssh/sonora_azure_ed25519'
     key.parent.mkdir(mode=0o700, exist_ok=True)
     if not key.exists():
         execute(command('ssh-keygen') + ['-t', 'ed25519', '-f', str(key), '-N', '', '-C', 'sonora-gs-admin'])
     variables = {'subscription_id': subscription, 'resource_group_name': group, 'location': args.location,
                  'vm_size': args.vm_size, 'architecture': args.architecture,
-                 'admin_ssh_public_key': key.with_suffix('.pub').read_text().strip()}
+                 'admin_ssh_public_key': key.with_suffix('.pub').read_text().strip(),
+                 'github_oidc_subject_prefix': prefix}
     (CONFIG / 'terraform.tfvars.json').write_text(json.dumps(variables, indent=2) + '\n', encoding='utf-8')
     backend = {'resource_group_name': group, 'storage_account_name': state_account,
                'container_name': 'tfstate', 'key': 'sonora.tfstate', 'use_azuread_auth': True}

@@ -22,6 +22,8 @@ No PowerShell, colocar argumentos com `=` e nome de arquivo entre aspas: `'-back
 
 ## Pipelines e identidade
 
+Usar somente franquia gratuita do GitHub Actions, com orçamento do produto Actions de US$ 0 para a conta e bloqueio ao atingir o limite, confirmado antes de habilitar execuções. Não elevar orçamento nem remover bloqueio para resolver uma falha de CI. Consumo bruto antes de descontos não equivale a valor cobrável. A proteção precisa abranger compute e armazenamento do Actions; assinatura paga de outro produto é uma cobrança separada. Se o plano não permitir executar sem cobrança, avaliar outra plataforma gratuita.
+
 | Workflow | PR | Main |
 | --- | --- | --- |
 | contracts.yml | Contratos/mocks/ferramentas | Mesmas verificações |
@@ -29,7 +31,9 @@ No PowerShell, colocar argumentos com `=` e nome de arquivo entre aspas: `'-back
 | delivery.yml | Contratos, testes e builds dos componentes presentes | Publica SOA/migrations antes de C#; gera APK Mobile |
 | integration-smoke.yml | — | Smoke manual com credenciais configuradas separadamente |
 
-OIDC aceita somente `repo:peguidotte/sonora:ref:refs/heads/main`; PRs não recebem identidade Azure. A identidade de infraestrutura tem Contributor, administração de RBAC e acesso aos blobs no grupo dedicado. A de deploy acessa somente a VM/container de releases; a VM apenas lê esses releases. Não instalar runner de PR no servidor da aplicação.
+OIDC aceita somente a main do repositório identificado pelos IDs imutáveis de proprietário/repositório, obtidos pela API de configuração OIDC. O prefixo fica em `github_oidc_subject_prefix`, sem wildcard. PRs não recebem identidade Azure. A identidade de infraestrutura tem Contributor, administração de RBAC e acesso aos blobs no grupo dedicado. A de deploy acessa somente a VM/container de releases; a VM apenas lê esses releases. Não instalar runner de PR no servidor da aplicação.
+
+O formato imutável passou a ser padrão para repositórios novos em julho de 2026; usar nomes sem IDs quebra a federação nesses repositórios. [Referência GitHub](https://github.blog/changelog/2026-04-23-immutable-subject-claims-for-github-actions-oidc-tokens/).
 
 `configure` registra apenas IDs e parâmetros públicos nas variables do GitHub: tenant/subscription, client IDs, grupo/VM/storage, origem HTTPS, RID .NET e configuração Terraform. Não exporta senhas/chaves. Workflow validado localmente não comprova execução remota; Actions precisa estar disponível para a conta.
 
