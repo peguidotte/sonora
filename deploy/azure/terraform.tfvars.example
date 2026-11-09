@@ -1,0 +1,8 @@
+# Copiar para terraform.tfvars (ignorado). Assinatura estudantil com spendingLimit=On.
+subscription_id      = "00000000-0000-0000-0000-000000000000"
+resource_group_name  = "sonora-gs-rg"
+location             = "centralus"
+vm_size              = "Standard_B2pls_v2"
+architecture         = "arm64"
+admin_ssh_public_key = "ssh-ed25519 SUBSTITUIR"
+# admin_cidr = "203.0.113.10/32" # Opcional. SSH fechado por padrão.

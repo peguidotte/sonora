@@ -1,0 +1,18 @@
+{
+  "api": {
+    "project": "api/Sonora.Api/Sonora.Api.csproj",
+    "tests": "api/Sonora.Api.Tests/Sonora.Api.Tests.csproj",
+    "executable": "Sonora.Api",
+    "dotnetSdk": "10.0.x"
+  },
+  "soa": {
+    "project": "soa/pom.xml",
+    "migrate": "soa/deploy/migrate.sh",
+    "javaVersion": "21"
+  },
+  "mobile": {
+    "project": "mobile/package.json",
+    "nodeVersion": "22",
+    "distribution": "android-debug-apk"
+  }
+}

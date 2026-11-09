@@ -1,0 +1,12 @@
+#cloud-config
+package_update: true
+write_files:
+%{ for name, content in files ~}
+  - path: /opt/sonora/bootstrap/${name}
+    owner: root:root
+    permissions: '0700'
+    encoding: b64
+    content: ${base64encode(content)}
+%{ endfor ~}
+runcmd:
+  - [bash, /opt/sonora/bootstrap/provision.sh, '${fqdn}']

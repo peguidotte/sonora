@@ -1,0 +1,187 @@
+name: Aplicações — CI e deploy
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inventory:
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.inventory.outputs.api }}
+      soa: ${{ steps.inventory.outputs.soa }}
+      mobile: ${{ steps.inventory.outputs.mobile }}
+      backends: ${{ steps.inventory.outputs.backends }}
+      has_backends: ${{ steps.inventory.outputs.has_backends }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validar contratos e ferramentas antes dos builds
+        run: |
+          python -m pip install -r requirements-dev.txt
+          python tools/validate_contracts.py
+          python -m unittest discover -s tools -p 'test_*.py' -v
+      - id: inventory
+        run: python deploy/pipeline.py inventory
+      - name: Registrar componentes ainda sem implementação
+        run: |
+          echo 'Componentes sem projeto real são declarados ausentes e não são publicados como mocks.' >> "$GITHUB_STEP_SUMMARY"
+
+  backends:
+    needs: inventory
+    if: needs.inventory.outputs.has_backends == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.inventory.outputs.backends) }}
+    env:
+      DOTNET_RUNTIME_IDENTIFIER: ${{ vars.DOTNET_RUNTIME_IDENTIFIER || 'linux-arm64' }}
+      PGHOST: 127.0.0.1
+      PGPORT: '5432'
+      PGDATABASE: sonora
+      PGUSER: sonora_migrator
+      PGPASSWORD: ci-migration-only
+      SONORA_DB_HOST: 127.0.0.1
+      SONORA_DB_PORT: '5432'
+      SONORA_DB_NAME: sonora
+      SONORA_DB_USER: ${{ matrix.component == 'api' && 'sonora_query' || 'sonora_ingest' }}
+      SONORA_DB_PASSWORD: ${{ matrix.component == 'api' && 'ci-query-only' || 'ci-ingest-only' }}
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: sonora
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci-admin-only
+        ports: ['127.0.0.1:5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U postgres -d sonora"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-dotnet@v4
+        if: matrix.component == 'api'
+        with:
+          dotnet-version: ${{ matrix.sdk }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+      - name: Preparar contas isoladas no banco descartável de CI
+        env:
+          PGPASSWORD: ci-admin-only
+        run: |
+          psql -h 127.0.0.1 -U postgres -d sonora -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE sonora_migrator LOGIN PASSWORD 'ci-migration-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          CREATE ROLE sonora_ingest LOGIN PASSWORD 'ci-ingest-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          CREATE ROLE sonora_query LOGIN PASSWORD 'ci-query-only' NOSUPERUSER NOCREATEDB NOCREATEROLE;
+          ALTER DATABASE sonora OWNER TO sonora_migrator;
+          REVOKE ALL ON DATABASE sonora FROM PUBLIC;
+          GRANT CONNECT ON DATABASE sonora TO sonora_migrator, sonora_ingest, sonora_query;
+          REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+          SQL
+      - name: Testar, compilar e empacotar
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: python deploy/pipeline.py package "$COMPONENT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-${{ matrix.component }}
+          path: |
+            output/releases/${{ matrix.component }}.tar.gz
+            output/releases/${{ matrix.component }}.json
+          if-no-files-found: error
+          retention-days: 14
+
+  deploy:
+    needs: [inventory, backends]
+    if: >-
+      github.ref == 'refs/heads/main' &&
+      needs.inventory.outputs.has_backends == 'true' && vars.AZURE_CLIENT_ID != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: sonora-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      AZURE_VM_NAME: ${{ vars.AZURE_VM_NAME }}
+      AZURE_RELEASE_STORAGE: ${{ vars.AZURE_RELEASE_STORAGE }}
+      DO_SOA: ${{ needs.inventory.outputs.soa }}
+      DO_API: ${{ needs.inventory.outputs.api }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: backend-*
+          path: output/releases
+          merge-multiple: true
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Publicar SOA/migrations antes da API de consulta
+        run: |
+          set -euo pipefail
+          if [[ "$DO_SOA" == 'true' ]]; then python deploy/pipeline.py publish soa; fi
+          if [[ "$DO_API" == 'true' ]]; then python deploy/pipeline.py publish api; fi
+
+  mobile:
+    needs: inventory
+    if: needs.inventory.outputs.mobile == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: '1'
+      EXPO_PUBLIC_API_BASE_URL: ${{ vars.API_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Instalar e validar TypeScript
+        working-directory: mobile
+        run: |
+          npm ci
+          npx tsc --noEmit
+      - name: Gerar Android com Expo e compilar APK de demonstração
+        working-directory: mobile
+        run: |
+          npx expo prebuild --platform android --clean --no-install
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sonora-android-demo
+          path: mobile/android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 14
+      - name: Explicar distribuição
+        run: echo 'APK de demonstração nos artefatos desta execução; não publica em loja nem contém chave de API.' >> "$GITHUB_STEP_SUMMARY"

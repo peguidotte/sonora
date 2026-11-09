@@ -1,0 +1,95 @@
+name: Azure — Terraform e Linux
+
+on:
+  pull_request:
+    branches: [main]
+    paths: ['deploy/**', 'linux/**', '.github/workflows/infrastructure.yml']
+  push:
+    branches: [main]
+    paths: ['deploy/**', 'linux/**', '.github/workflows/infrastructure.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.17.1'
+      - run: terraform fmt -check -recursive deploy/azure
+      - run: terraform -chdir=deploy/azure init -backend=false -input=false
+      - run: terraform -chdir=deploy/azure validate
+      - name: Validar Bash e Python de deploy
+        run: |
+          for script in linux/*.sh; do bash -n "$script"; done
+          python -m compileall -q deploy linux
+          python -m unittest discover -s tools -p 'test_deployment.py' -v
+
+  apply:
+    needs: validate
+    if: github.ref == 'refs/heads/main' && vars.AZURE_INFRA_CLIENT_ID != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    concurrency:
+      group: sonora-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      ARM_USE_OIDC: 'true'
+      ARM_USE_AZUREAD: 'true'
+      ARM_CLIENT_ID: ${{ vars.AZURE_INFRA_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      AZURE_RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+      AZURE_VM_NAME: ${{ vars.AZURE_VM_NAME }}
+      AZURE_RELEASE_STORAGE: ${{ vars.AZURE_RELEASE_STORAGE }}
+      API_BASE_URL: ${{ vars.API_BASE_URL }}
+      TF_BACKEND: ${{ vars.TF_BACKEND }}
+      TF_VARS: ${{ vars.TF_VARS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.17.1'
+          terraform_wrapper: false
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_INFRA_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Conferir proteção dos créditos
+        run: |
+          python - <<'PY'
+          import os, sys
+          sys.path.insert(0, 'deploy')
+          from pipeline import require_student_limit
+          require_student_limit(os.environ['AZURE_SUBSCRIPTION_ID'])
+          PY
+      - name: Materializar configuração sem credenciais
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path('deploy/azure')
+          (root / 'terraform.tfvars.json').write_text(os.environ['TF_VARS'])
+          backend = json.loads(os.environ['TF_BACKEND'])
+          (root / 'backend.tfbackend').write_text(''.join(f'{k} = {json.dumps(v)}\n' for k,v in backend.items()))
+          PY
+      - run: terraform -chdir=deploy/azure init -input=false -backend-config=backend.tfbackend
+      - run: terraform -chdir=deploy/azure plan -input=false -out=apply.tfplan
+      - run: terraform -chdir=deploy/azure apply -input=false apply.tfplan
+      - name: Atualizar provisionamento sem recriar a VM
+        run: |
+          python deploy/pipeline.py package infra
+          python deploy/pipeline.py publish infra
