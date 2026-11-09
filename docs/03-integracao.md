@@ -99,6 +99,8 @@ Para cada bin devolver início/fim, amostras, sessões, segundos observados, pri
 
 Um “dia medido” significa que existe observação; não que houve coleta por 24 h. Não calcular percentual representativo da semana a partir do número de pontos. Quando faltarem dados comparáveis, resposta e UI dizem “dados insuficientes para comparar”.
 
+O laeqDbA no topo do perfil é resumo apenas quando houver uma única série compatível; com várias séries/produtores, manter esse campo nulo e valores nos bins de cada série, sem inventar um índice único. status=available indica que existe observação, não que os locais são comparáveis. status=no_data exige valor nulo e séries/fontes vazias.
+
 Estado operacional: dispositivo fica stale após 60 s sem recebimento, valor configurável da demonstração. Idade de recebimento é diferente da data observada; importar histórico não põe sensor online.
 
 ## Integração SOA e ML
