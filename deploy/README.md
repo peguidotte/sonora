@@ -1,6 +1,6 @@
 # Deploy integrado
 
-**Destino indicado pelo usuário: Azure.** Plano inicial: uma VM Linux para hospedar C# e SOA, bancos SQLite separados, proxy HTTPS e serviços systemd. A implantação é do mesmo código executável localmente.
+**Destino provável indicado pelo usuário: Azure.** Plano inicial: uma VM Linux para hospedar C# e SOA, bancos SQLite separados, proxy HTTPS e serviços systemd. A implantação é do mesmo código executável localmente.
 
 Leia [plano Azure](azure/README.md), [modos de execução](../docs/modos-de-execucao.md) e [Linux](../docs/disciplinas/linux.md).
 

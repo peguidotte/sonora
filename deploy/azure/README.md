@@ -1,6 +1,6 @@
 # Azure — plano de implantação revisável
 
-Pedro informou que a equipe tem conta Azure e quer realizar os deploys lá. A sessão da CLI nesta máquina lista apenas acesso ao tenant, sem assinatura utilizável. Nenhum recurso foi criado ou contratado.
+Pedro informou que a equipe tem conta Azure e provavelmente realizará os deploys lá; a configuração na máquina ainda será feita. A sessão da CLI nesta máquina lista apenas acesso ao tenant, sem assinatura utilizável. Nenhum recurso foi criado ou contratado.
 
 ## Topologia proposta
 

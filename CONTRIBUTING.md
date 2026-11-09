@@ -7,8 +7,8 @@ Leia [equipe](docs/equipe.md), [sua especificação](docs/disciplinas/README.md)
 Uma branch por entrega/tarefa mantém o escopo revisável. As oito branches iniciais estão na tabela da equipe. Para começar:
 
 ```bash
-git clone https://github.com/peguidotte/loc.git
-cd loc
+git clone https://github.com/peguidotte/sonora.git
+cd sonora
 git switch leo/csharp
 git fetch origin
 git merge origin/main

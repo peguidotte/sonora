@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Sonora — LOC | API principal",
+    "title": "Sonora | API principal",
     "version": "0.2.0",
     "description": "Contrato para C#, Mobile, SOA e IoT. Exemplos sintéticos não comprovam implementação. Regras relacionais em docs/03-integracao.md e docs/regras-de-negocio.md."
   },

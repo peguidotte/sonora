@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Sonora — LOC | Importação SOA",
+    "title": "Sonora | Importação SOA",
     "version": "0.2.0",
     "description": "Banco de lotes próprio. Fixture de entrega não comprova recebimento no C#."
   },

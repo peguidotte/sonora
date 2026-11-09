@@ -1,18 +1,18 @@
-# LOC e Sonora
+# Sonora e a marca da plataforma
 
-**Nome de trabalho em 08/11/2026**, após a preferência de Pedro por uma marca ampla ligada a localização. Não foi feita verificação de registro, domínio ou disponibilidade comercial.
+**Produto aprovado por Pedro em 08/11/2026: Sonora.** A marca ampla da empresa/plataforma continua em discussão. Não adotar LOC, Entorno ou outro nome como definitivo sem decisão do usuário.
 
-## Arquitetura de marca
+## Arquitetura de marca proposta
 
-- **LOC:** plataforma/empresa de inteligência de localização, voltada a apoiar decisões como aluguel e compra de imóvel.
-- **Sonora:** primeiro produto, responsável pelo contexto acústico, API e painel.
-- Apresentação curta: **“Sonora, uma solução LOC”**.
-- Repositório: **peguidotte/loc**, privado. O endereço técnico anterior foi renomeado, preservando histórico e PRs.
+- Empresa/plataforma: marca ampla de inteligência de localização, ainda a definir.
+- Sonora: produto de contexto acústico, com API, painel e app demonstrativo.
+- Apresentação futura: “Sonora, uma solução [marca da empresa]”.
+- Repositório atual: **peguidotte/sonora**, privado. Esse nome independe da marca futura da empresa e preserva o foco desta GS.
 
-Ruído, inundação e outros contextos podem formar produtos distintos no futuro. A marca não presume que eles já existem nem adiciona implementação de inundação à GS.
+As oito disciplinas entregam partes do Sonora. Inundação e outros contextos podem tornar-se produtos no futuro, mas não são implementação autorizada no escopo atual.
 
-## Escopo acadêmico
+## Nomes sugeridos, sem escolha
 
-As oito disciplinas entregam partes do Sonora: API C#, importação SOA, Mobile, IoT simulado, ML real, Linux, Cybersecurity e Testing. Continuam no mesmo monorepo para auditoria e integração, com execução independente de cada parte.
+Terriva, Vizora, Habiora, Vértice, Terralis e Nexo Urbano foram sugeridos como direções criativas. LOC/Entorno e as opções anteriores não foram aprovados. Disponibilidade de marca, domínio ou registro não foi verificada. Não constituir empresa, comprar domínio ou registrar marca por inferência.
 
-Não é necessário constituir empresa, registrar marca, comprar domínio ou estabelecer cobrança para demonstrar a GS. A proposta de negócio e a evidência técnica devem distinguir produto futuro e protótipo efetivamente entregue.
+Azure é o destino provável para deploy, com configuração posterior. Produto local e contratos não dependem de marca ampla ou conta de nuvem pronta.
