@@ -97,13 +97,14 @@ jobs:
           COMPONENT: ${{ matrix.component }}
         run: python deploy/pipeline.py package "$COMPONENT"
       - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
         with:
           name: backend-${{ matrix.component }}
           path: |
             output/releases/${{ matrix.component }}.tar.gz
             output/releases/${{ matrix.component }}.json
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1
 
   deploy:
     needs: [inventory, backends]
@@ -178,10 +179,11 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon
       - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main'
         with:
           name: sonora-android-demo
           path: mobile/android/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 1
       - name: Explicar distribuição
         run: echo 'APK de demonstração nos artefatos desta execução; não publica em loja nem contém chave de API.' >> "$GITHUB_STEP_SUMMARY"
