@@ -10,7 +10,7 @@ PDF p. 30 e tarefa coletada em 06/11: Web API/Minimal API .NET, POO, interfaces,
 | --- | --- | --- |
 | POO | 3,0 | Entidades encapsuladas, regras de observação e serviços com responsabilidade clara |
 | Web API | 2,5 | Rotas documentadas, DTOs, status e tratamento de erros |
-| EF Core + LINQ | 1,5 | Persistência, filtros, paginação, relações e restrição de unicidade |
+| EF Core + LINQ | 1,5 | Mapeamento das views e consultas ao PostgreSQL com filtros, projeções e paginação via LINQ |
 | Async/await | 1,0 | I/O assíncrono com cancelamento e sem bloqueio desnecessário |
 | Qualidade | 2,0 | DI, interfaces úteis, organização, testes e ausência de segredos |
 

@@ -10,5 +10,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 | 08/11/2026 | Organizar monorepo, equipe, integração, mocks e deploys | Repositório/estrutura, contratos verificáveis e testes da fundação; componentes das matérias ainda planejados; deploy Azure pendente |
 | 08/11/2026 | Padronizar contratos em inglês e API privada | Contratos v0.3.0, rotas/DTOs em inglês, X-Api-Key por escopo, mocks e 17 testes locais; implementação real continua pendente |
 | 08/11/2026 | Consolidar arquitetura aprovada e documentação mínima | Referência única de arquitetura, contratos v0.4.0 com Java gravando/PostgreSQL compartilhado/C# lendo; fichas alinhadas, duplicações removidas e verificações da fundação executadas; aplicações reais ainda a implementar |
+| 09/11/2026 | Revisar criticamente arquitetura e aderência às oito disciplinas | Confronto com enunciado e fichas; identificadas pendências de Cybersecurity, jornada Mobile e validade/cobertura dos dados; corrigidos termos antigos nas fichas SOA/C#, sem alterar interfaces nem validar execução das aplicações |
 
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

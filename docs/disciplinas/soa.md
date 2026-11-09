@@ -8,11 +8,11 @@ PDF p. 27: backend em qualquer linguagem, domínio estruturado, banco, migration
 
 | Critério | Pontos | Aplicação proposta |
 | --- | --- | --- |
-| Domínio | 3,0 | Lote, fonte, validação e estados de entrega |
+| Domínio | 3,0 | Fonte, dispositivo, observação, validação e estados da importação |
 | Banco | 3,0 | Histórico de importações e resultados persistidos |
 | Migrations | 1,5 | Preparar schema a partir de banco vazio |
 | Documentação | 1,5 | OpenAPI automática dos endpoints de lote |
-| Testes | 1,0 | Regras e integração com persistência/receptor |
+| Testes | 1,0 | Regras, endpoints REST, idempotência e integração com PostgreSQL |
 
 ## Responsabilidade
 
