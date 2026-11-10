@@ -10,7 +10,7 @@ Sonora oferece contexto acústico a plataformas imobiliárias e pessoas comparan
 
 | Componente | Faz | Integração |
 | --- | --- | --- |
-| Java / SOA | Recebe IoT, importa arquivos públicos, valida, normaliza, deduplica e persiste; administra importações | Escreve no PostgreSQL; publica views de leitura |
+| Java / SOA | Recebe IoT, importa arquivos públicos, valida, normaliza, deduplica e persiste; administra importações | Escreve no PostgreSQL; mantém a evolução SQL no módulo database/ |
 | PostgreSQL | Mantém observações, fontes, locais, dispositivos, importações e resumo ML | Contrato entre ingestão e consulta |
 | C# Sonora | Consulta com EF Core/LINQ, calcula perfis/comparações, aplica acesso privado e serve dados/painel | Somente leitura no banco; sem ingestão ou chamada ao Java |
 | Mobile | Consulta C#, compara locais, mantém favoritos/cache | API privada; SQLite local |
@@ -26,14 +26,14 @@ O fluxo de dados é fontes -> Java -> PostgreSQL -> C# -> clientes. Java não en
 Usar PostgreSQL também nos testes de integração e na reprodução local; não compartilhar arquivo SQLite entre serviços. [database.json](../contracts/database.json) define ownership, schemas, roles, nomes/tipos das views e mapeamento JSON.
 
 - Schema sonora: armazenamento e histórico de captura, sob responsabilidade do SOA.
-- Schema sonora_read: views versionadas publicadas pelas migrations do SOA para consumo do C#.
+- Schema sonora_read: views versionadas publicadas pelo módulo database/, mantido na entrega de SOA para consumo do C#.
 - sonora_migrator: conta de setup/deploy, autorizada a aplicar migrations e GRANTs; não é credencial do runtime.
 - sonora_ingest: runtime Java com escrita necessária no armazenamento, sem administração de roles/DDL.
 - sonora_query: runtime C# com SELECT nas views publicadas; sem gravação, DDL ou acesso a credenciais.
 
-Não são dois bancos que trocam lotes: os backends acessam o mesmo PostgreSQL com papéis diferentes. Java mantém o schema físico; a interface de leitura é combinada com Leonardo. Mudança incompatível de view exige versão/migração coordenada e ajuste de fixtures/consumidor no mesmo PR. Detalhes internos de armazenamento podem evoluir preservando a interface publicada.
+Não são dois bancos que trocam lotes: os backends acessam o mesmo PostgreSQL com papéis diferentes. Felipe mantém a evolução do schema no módulo independente database/; a interface de leitura é combinada com Leonardo. Mudança incompatível de view exige versão/migração coordenada e ajuste de fixtures/consumidor no mesmo PR. Detalhes internos de armazenamento podem evoluir preservando a interface publicada.
 
-Felipe entrega migrations, publicação/grants das views e seed sintético com comando local reutilizável. O provisionamento Linux prepara PostgreSQL, banco e roles; a instalação do artefato SOA aplica suas migrations com a conta migradora antes de iniciar o HTTP. Localmente, o setup comum pode ser executado sem iniciar esse processo HTTP. C# usa o banco preparado e não depende do Java ativo para consultar. Compartilhar banco cria acoplamento de schema e capacidade: não garante escalabilidade automática.
+Felipe entrega migrations, publicação/grants das views e seed sintético no [módulo database/](../database/README.md), como parte de SOA. O provisionamento Linux prepara PostgreSQL, banco e roles. Um artefato próprio de banco executa Flyway CLI com a conta migradora antes dos deployments dos serviços; seu build/execução não dependem de JAR ou runtime de nenhuma aplicação. O comando é reutilizado localmente e nos testes. C# usa o banco preparado e não depende do Java ativo para consultar. Compartilhar banco cria acoplamento de schema e capacidade: não garante escalabilidade automática.
 
 ## HTTP e autenticação
 
@@ -81,7 +81,7 @@ Mock substitui dependência no desenvolvimento, não persistência, autenticidad
 
 Deploy inicial: uma VM Linux na Azure, com Java 127.0.0.1:8082, C# 127.0.0.1:8080 e PostgreSQL 5432 interno. Proxy expõe HTTPS/443 e encaminha os prefixos completos, sem removê-los. Banco e portas internas não ficam públicos; SSH restrito à administração. systemd mantém aplicações e monitor em serviços independentes. Mobile roda no aparelho, não como backend da VM. NoiseCapture não é implantação nossa.
 
-Migrations executam antes de iniciar a nova versão do SOA; artefatos, dados e segredos ficam em diretórios separados. Atualizações preservam dados e fazem backup antes das migrations; retorno ao binário anterior não reverte automaticamente schema/dados. O teste Linux inclui crash do monitor e recuperação, além de boot, logs, recursos e aplicação de outra disciplina. [Terraform e CI/CD](../deploy/azure/README.md) definem provisionamento, autenticação OIDC, artefatos por componente e distribuição do Mobile. Infraestrutura usa somente créditos estudantis com limite de gastos ativo; configuração de ambiente não altera esta topologia.
+Migrations executam numa etapa única antes dos deployments de SOA/C#; artefatos, dados e segredos ficam em diretórios separados. Atualizações preservam dados e fazem backup antes das migrations; retorno ao binário anterior não reverte automaticamente schema/dados. O teste Linux inclui crash do monitor e recuperação, além de boot, logs, recursos e aplicação de outra disciplina. [Terraform e CI/CD](../deploy/azure/README.md) definem provisionamento, autenticação OIDC, artefatos por componente e distribuição do Mobile. Infraestrutura usa somente créditos estudantis com limite de gastos ativo; configuração de ambiente não altera esta topologia.
 
 ## Extensão
 

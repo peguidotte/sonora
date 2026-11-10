@@ -1,0 +1,10 @@
+[flyway]
+defaultSchema = "sonora_meta"
+createSchemas = true
+cleanDisabled = true
+baselineOnMigrate = false
+validateOnMigrate = true
+validateMigrationNaming = true
+
+[environments.default]
+schemas = ["sonora_meta"]

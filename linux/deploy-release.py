@@ -43,12 +43,14 @@ def validate_manifest(target, component, release):
     manifest = json.loads((target / 'release.json').read_text())
     if manifest != {'component': component, 'releaseId': release, 'commit': release[:40]}:
         raise ValueError('Proveniência do artefato não confere.')
-    required = ['provision.sh', 'monitor.sh', 'network.sh', 'verify.sh', 'deploy-release.py'] if component == 'infra' else ['bin/start.sh']
-    if component == 'soa':
-        required.append('bin/migrate.sh')
+    required = (['provision.sh', 'monitor.sh', 'network.sh', 'verify.sh', 'deploy-release.py'] if component == 'infra'
+                else ['database/migrate.sh', 'database/flyway.toml', 'database/toolchain.json', 'flyway/flyway']
+                if component == 'database' else ['bin/start.sh'])
     for name in required:
         if not (target / name).is_file():
             raise ValueError(f'Arquivo obrigatório ausente: {name}')
+    if component == 'database' and not any((target / 'database/migrations').glob('V*__*.sql')):
+        raise ValueError('Database artifact contains no versioned SQL migrations.')
 
 
 def fetch_archive(account, component, release, destination, expected_hash):
@@ -123,6 +125,7 @@ def deploy(args):
                 run('/bin/bash', '/opt/sonora/bootstrap/provision.sh', args.fqdn)
                 return
             root = Path('/opt/sonora') / args.component
+            (root / 'releases').mkdir(parents=True, exist_ok=True)
             release = root / 'releases' / args.release
             if release.exists():
                 if (release / '.sha256').read_text().strip() != args.sha256:
@@ -131,7 +134,7 @@ def deploy(args):
                 shutil.move(str(extracted), release)
                 (release / '.sha256').write_text(args.sha256 + '\n')
             previous = (root / 'current').resolve() if (root / 'current').is_symlink() else None
-            if args.component == 'soa':
+            if args.component == 'database':
                 # Backup antes de migrations. Nunca fazer rollback automático do banco.
                 backup = f'/var/backups/sonora/{args.release}.dump'
                 if not Path(backup).exists():
@@ -140,7 +143,12 @@ def deploy(args):
                     '--unit=sonora-migrate-' + args.release, '--uid=sonora-migrator', '--gid=sonora-migrator',
                     '-p', 'EnvironmentFile=/etc/sonora/migrator.env',
                     '-p', 'WorkingDirectory=' + str(release), '-p', 'NoNewPrivileges=true',
-                    '/bin/bash', str(release / 'bin/migrate.sh'))
+                    '-p', 'Environment=FLYWAY_HOME=' + str(release / 'flyway'),
+                    '-p', 'Environment=JAVA_ARGS=-Xmx128m',
+                    '/bin/bash', str(release / 'database/migrate.sh'))
+                switch_link(root / 'current', release)
+                print(json.dumps({'component': 'database', 'releaseId': args.release, 'status': 'migrated'}))
+                return
             switch_link(root / 'current', release)
             try:
                 run('systemctl', 'enable', 'sonora-' + args.component)
@@ -159,7 +167,7 @@ def deploy(args):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('component', choices=['api', 'soa', 'infra'])
+    parser.add_argument('component', choices=['api', 'soa', 'infra', 'database'])
     parser.add_argument('release')
     parser.add_argument('account')
     parser.add_argument('sha256')

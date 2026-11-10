@@ -10,7 +10,7 @@ Versão verificável: **0.4.0**. Decisões de negócio/execução estão na [arq
 | [Schema ML](schemas/ml-summary.schema.json) | Artefato summary.json, importado administrativamente pelo Java |
 | [fixtures/](fixtures/) | Exemplos sintéticos de formatos; nunca dado real/resultado de treino |
 
-OpenAPI contém requests/responses, validações estruturais, escopos e erros. SQL usa nomes snake_case em inglês, HTTP usa camelCase. database.json define interface e permissões esperadas, **não** implementa migrations/GRANTs: Felipe fornece esses artefatos; Pedro os aplica. C# não tem rota de ingestão, migração ou entrega HTTP de lotes. Importações contam dados commitados no PostgreSQL.
+OpenAPI contém requests/responses, validações estruturais, escopos e erros. SQL usa nomes snake_case em inglês, HTTP usa camelCase. database.json define interface e permissões esperadas, **não** implementa migrations/GRANTs: Felipe mantém esses artefatos em database/ como parte de SOA; Pedro os aplica em etapa independente das aplicações. A base inicial de schemas está implementada; domínio/views/seed continuam pendentes. C# não tem rota de ingestão, migração ou entrega HTTP de lotes. Importações contam dados commitados no PostgreSQL.
 
 ## Mocks de desenvolvimento
 
@@ -41,6 +41,26 @@ Header X-Api-Key. Valores **públicos somente do mock**, definidos em mock-crede
 
 Sem chave/valor desconhecido -> 401; chave válida sem escopo/dispositivo -> 403. Os serviços reais nunca aceitam essas fixtures. Mock não grava, aplica migrations, autentica em produção ou comprova idempotência; POST tem resposta estática e não altera GET. Com origin=public_dataset, os mocks não fabricam dados reais e respondem ausência. Não implantar o mock como produto.
 
+## Credenciais locais dos starters
+
+Somente para desenvolvimento com PostgreSQL descartável. Na raiz, executar este Python uma vez (salvar temporariamente em `output/` ou colar no interpretador). Gera uma chave operacional **diferente para cada serviço**, fora do Git, sem imprimir o segredo:
+
+```python
+from pathlib import Path
+import hashlib, json, secrets
+folder = Path("output/dev")
+folder.mkdir(parents=True, exist_ok=True)
+for service in ("api", "soa"):
+    key = secrets.token_urlsafe(32)
+    (folder / f"{service}.key").write_text(key, encoding="utf-8")
+    (folder / f"{service}-keys.json").write_text(json.dumps({"keys": [{
+        "id": "local-operations", "sha256": hashlib.sha256(key.encode()).hexdigest(),
+        "scopes": ["operations:read"]
+    }]}), encoding="utf-8")
+```
+
+Apontar `SONORA_KEYS_FILE` para o JSON do respectivo serviço. Para consultar o ready local no PowerShell, por exemplo: `Invoke-RestMethod http://127.0.0.1:8080/api/sonora/v1/health/ready -Headers @{"X-Api-Key"=(Get-Content output/dev/api.key -Raw)}`. Não copiar essas credenciais para Azure, bundle ou exemplos públicos. Os starters leem o arquivo a cada requisição: remover/rotacionar o hash revoga/troca o acesso. Eles implementam apenas acesso operacional; os responsáveis ainda devem implementar autorização das rotas de negócio. O provisionamento Linux gera credenciais próprias fora do Git.
+
 ## Validação e evolução
 
 ```bash
@@ -50,4 +70,6 @@ python -m unittest discover -s tools -p "test_*.py" -v
 
 Verificações cobrem formas OpenAPI/exemplos, schema ML, mapeamento das views/roles e consistência da divisão Java/C#. Aplicar PostgreSQL/GRANTs e executar os serviços/testes de integração reais continuam responsabilidade das entregas. O read model expõe deviceId ausente quando o banco for nulo; estado do dispositivo e distância são calculados pelo C#, não campos obrigatórios da view. Resumo ML devolve o payload validado, sem achatar colunas internas.
 
-Mudança incompatível de HTTP ou view atualiza a versão, fixtures e consumidores no mesmo PR; não criar documentos paralelos de contrato. O histórico anterior está no Git. Migrations/seed locais do SOA devem permitir C# standalone sem manter o Java ativo.
+Mudança incompatível de HTTP ou view atualiza a versão, fixtures e consumidores no mesmo PR; não criar documentos paralelos de contrato. O histórico anterior está no Git. Migrations/seed locais de database/ devem permitir C# standalone sem manter o Java ativo.
+
+`writeModels` em database.json vincula requests às colunas persistidas, com colunas preenchidas pelo servidor explícitas. O [checker de compatibilidade](../database/README.md#compatibilidade-apibanco) compara esses vínculos e as views com o PostgreSQL real e o contrato anterior; a validação estática acima também exige cobertura de todas as propriedades dos requests. Testes HTTP das implementações continuam necessários para comprovar que DTOs e respostas obedecem ao OpenAPI.

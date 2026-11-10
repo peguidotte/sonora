@@ -7,12 +7,16 @@
   },
   "soa": {
     "project": "soa/pom.xml",
-    "migrate": "soa/deploy/migrate.sh",
     "javaVersion": "21"
   },
   "mobile": {
     "project": "mobile/package.json",
     "nodeVersion": "22",
     "distribution": "android-debug-apk"
+  },
+  "database": {
+    "module": "database",
+    "migrate": "database/migrate.sh",
+    "runtime": "output/tools/flyway"
   }
 }

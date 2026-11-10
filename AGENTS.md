@@ -5,7 +5,7 @@
 - Requisitos docentes e pendências ficam em docs/01-contexto-e-requisitos.md e nas fichas; decisões de produto na arquitetura; formatos de interface nos contratos verificáveis. Se houver divergência, apontar e corrigir as fontes afetadas no mesmo PR, sem inventar uma terceira definição.
 - Sonora é o produto escolhido. Marca da empresa em aberto. Inundação é expansão futura, fora do escopo atual.
 - Arquitetura aprovada: Java/SOA recebe IoT e importa NoiseCapture; grava PostgreSQL; C# consulta views somente leitura e calcula regras acústicas. Sem HTTP Java -> C#, sem SQLite entre backends. SQLite apenas no Mobile.
-- SOA possui migrations de captura e publicação das views. Contrato em contracts/database.json; C# não altera o schema nem executa migrations próprias de captura.
+- Migrations e publicação das views ficam no módulo independente database/, sob responsabilidade acadêmica de SOA; execução via Flyway CLI, sem JAR/HTTP das aplicações. Contrato em contracts/database.json; C# não altera o schema nem executa migrations próprias de captura.
 - Namespaces: /api/sonora/v1 e /api/ingestion/v1. Rotas, DTOs, erros e nomes técnicos em inglês; JSON camelCase. Explicações PT-BR em UTF-8, preservando acentuação; Bash em LF.
 - API privada por X-Api-Key e escopo; credenciais fora de Git/URLs/logs/bundle/cache. Mock usa somente credenciais públicas fictícias, nunca de produção.
 - NoiseCapture é fonte de arquivos públicos históricos, distinta do ESP32/Wokwi simulado. Separar public_dataset e simulated; nunca agregar as origens nem fazer média aritmética de dB. Não armazenar áudio.

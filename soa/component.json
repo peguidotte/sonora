@@ -1,6 +1,6 @@
 {
   "component": "soa",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Felipe Soares Xavier",
   "rm": "556931",
   "branch": "felipe/soa",
@@ -8,7 +8,9 @@
   "contract": "contracts/openapi/soa.openapi.json",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
+    "commands": [
+      "mvn -f soa/pom.xml spring-boot:run"
+    ],
     "dataMode": "postgresql-and-local-inputs"
   },
   "integrated": {
@@ -18,7 +20,9 @@
     ]
   },
   "validation": {
-    "commands": [],
+    "commands": [
+      "mvn -B -f soa/pom.xml verify"
+    ],
     "evidence": []
   },
   "deployment": {

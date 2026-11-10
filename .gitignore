@@ -42,3 +42,6 @@ Thumbs.db
 !*.tfvars.example
 *.tfbackend
 crash.log
+
+# Build Java
+soa/target/
