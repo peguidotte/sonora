@@ -22,6 +22,7 @@ from urllib.request import urlopen
 ROOT = Path(__file__).resolve().parents[1]
 IMAGE_URL = 'https://cloud-images.ubuntu.com/noble/20261017/noble-server-cloudimg-amd64.vmdk'
 IMAGE_SHA256 = '9a1e3959c9f4ad9d4752101fd4ff9a43191fb7d72e61fa20e033f9fd235ce794'
+APT_MIRROR = 'https://azure.archive.ubuntu.com/ubuntu'
 FILES = ['provision.sh', 'network.sh', 'monitor.sh', 'verify.sh', 'deploy-release.py', 'lab.sh']
 PHASES = ['baseline', 'provision', 'verify', 'reprovision', 'network-static', 'network-timeout',
           'network-dhcp', 'before-reboot', 'after-reboot', 'delivery-pending', 'collect']
@@ -40,7 +41,7 @@ def save(path, value):
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
 
 
-def prepare(folder, vbox):
+def prepare(folder, vbox, apt_mirror):
     import pycdlib  # Dependência somente do criador da ISO, não do provisionamento/CI.
     if folder.exists():
         raise ValueError('Diretório já existe: use outro para uma VM nova; não sobrescrever laboratório.')
@@ -58,7 +59,7 @@ def prepare(folder, vbox):
         raise ValueError('Imagem Ubuntu não corresponde ao SHA-256 fixado.')
     name = 'sonora-linux-lab-' + identifier
     pipe = '\\\\.\\pipe\\' + name
-    state = {'name': name, 'pipe': pipe, 'evidence': str(evidence), 'vbox': str(vbox),
+    state = {'name': name, 'pipe': pipe, 'evidence': str(evidence), 'vbox': str(vbox), 'aptMirror': apt_mirror,
              'imageUrl': IMAGE_URL, 'imageSha256': IMAGE_SHA256,
              'sourceCommit': execute('git', '-C', ROOT, 'rev-parse', 'HEAD'),
              'sourceWorktreeDirty': bool(execute('git', '-C', ROOT, 'status', '--porcelain', '--', 'linux')),
@@ -73,13 +74,13 @@ def prepare(folder, vbox):
         {'path': '/etc/systemd/system/serial-getty@ttyS0.service.d/lab.conf',
          'content': '[Service]\nExecStart=\nExecStart=-/sbin/agetty --autologin root --noclear %I 115200 vt100\n'},
         {'path': '/etc/apt/apt.conf.d/99-sonora-lab-network',
-         'content': 'Acquire::ForceIPv4 "true";\nAcquire::Retries "1";\nAcquire::http::Timeout "20";\nAcquire::https::Timeout "20";\n'},
+         'content': 'Acquire::ForceIPv4 "true";\nAcquire::Retries "0";\nAcquire::Languages "none";\nAcquire::http::Timeout "20";\nAcquire::https::Timeout "20";\n'},
     ]
     # Autologin restrito ao console por named pipe local. Não habilita senha/SSH de root.
     config = {'ssh_pwauth': False, 'disable_root': True, 'write_files': write_files,
               'apt': {'preserve_sources_list': False,
-                      'primary': [{'arches': ['default'], 'uri': 'https://archive.ubuntu.com/ubuntu'}],
-                      'security': [{'arches': ['default'], 'uri': 'https://security.ubuntu.com/ubuntu'}]},
+                      'primary': [{'arches': ['default'], 'uri': apt_mirror}],
+                      'security': [{'arches': ['default'], 'uri': apt_mirror}]},
               'runcmd': [['systemctl', 'daemon-reload'], ['systemctl', 'restart', 'serial-getty@ttyS0']],
               'final_message': 'SONORA_LAB_CLOUD_INIT_COMPLETE'}
     seed = pycdlib.PyCdlib()
@@ -281,6 +282,7 @@ def main():
     parser.add_argument('action', choices=['prepare', 'run'])
     parser.add_argument('--directory', default='output/lab/linux-repro')
     parser.add_argument('--vbox', default=r'C:\Program Files\Oracle\VirtualBox\VBoxManage.exe')
+    parser.add_argument('--apt-mirror', default=APT_MIRROR, help='Espelho Ubuntu HTTPS usado somente ao preparar a VM.')
     args = parser.parse_args()
     if os.name != 'nt':
         parser.error('Este controlador usa named pipe do Windows; scripts convidados são Bash Ubuntu.')
@@ -288,7 +290,9 @@ def main():
     if not folder.is_relative_to((ROOT / 'output/lab').resolve()):
         parser.error('Diretório deve ficar em output/lab/ deste clone.')
     if args.action == 'prepare':
-        prepare(folder, Path(args.vbox))
+        if not re.fullmatch(r'https://[a-zA-Z0-9.-]+(?::[0-9]+)?/[a-zA-Z0-9/_-]+', args.apt_mirror):
+            parser.error('Espelho APT deve ser URL HTTPS de arquivo Ubuntu, sem credenciais/query/fragmento.')
+        prepare(folder, Path(args.vbox), args.apt_mirror)
     else:
         state = json.loads((folder / 'lab.local.json').read_text(encoding='utf-8'))
         info = execute(state['vbox'], 'showvminfo', state['uuid'], '--machinereadable')
