@@ -90,6 +90,15 @@ jobs:
         run: |
           python database/prepare.py
           python -m unittest discover -s tools -p 'test_database*.py' -v
+      - name: Testar e empacotar aplicações presentes
+        run: |
+          set -euo pipefail
+          if [[ "$DO_SOA" == 'true' ]]; then
+            SONORA_DB_USER=sonora_ingest SONORA_DB_PASSWORD=ci-ingest-only python deploy/pipeline.py package soa
+          fi
+          if [[ "$DO_API" == 'true' ]]; then
+            SONORA_DB_USER=sonora_query SONORA_DB_PASSWORD=ci-query-only python deploy/pipeline.py package api
+          fi
       - name: Conferir contratos contra PostgreSQL real e versão anterior
         env:
           BASELINE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
@@ -100,15 +109,6 @@ jobs:
           if [[ -n "$BASELINE_REF" && ! "$BASELINE_REF" =~ ^0+$ ]]; then options+=(--baseline-ref "$BASELINE_REF"); fi
           python tools/check_database_compatibility.py "${options[@]}"
           python deploy/pipeline.py package database
-      - name: Testar e empacotar aplicações presentes
-        run: |
-          set -euo pipefail
-          if [[ "$DO_SOA" == 'true' ]]; then
-            SONORA_DB_USER=sonora_ingest SONORA_DB_PASSWORD=ci-ingest-only python deploy/pipeline.py package soa
-          fi
-          if [[ "$DO_API" == 'true' ]]; then
-            SONORA_DB_USER=sonora_query SONORA_DB_PASSWORD=ci-query-only python deploy/pipeline.py package api
-          fi
       - uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:
