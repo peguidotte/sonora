@@ -41,6 +41,26 @@ Header X-Api-Key. Valores **públicos somente do mock**, definidos em mock-crede
 
 Sem chave/valor desconhecido -> 401; chave válida sem escopo/dispositivo -> 403. Os serviços reais nunca aceitam essas fixtures. Mock não grava, aplica migrations, autentica em produção ou comprova idempotência; POST tem resposta estática e não altera GET. Com origin=public_dataset, os mocks não fabricam dados reais e respondem ausência. Não implantar o mock como produto.
 
+## Credenciais locais dos starters
+
+Somente para desenvolvimento com PostgreSQL descartável. Na raiz, executar este Python uma vez (salvar temporariamente em `output/` ou colar no interpretador). Gera uma chave operacional **diferente para cada serviço**, fora do Git, sem imprimir o segredo:
+
+```python
+from pathlib import Path
+import hashlib, json, secrets
+folder = Path("output/dev")
+folder.mkdir(parents=True, exist_ok=True)
+for service in ("api", "soa"):
+    key = secrets.token_urlsafe(32)
+    (folder / f"{service}.key").write_text(key, encoding="utf-8")
+    (folder / f"{service}-keys.json").write_text(json.dumps({"keys": [{
+        "id": "local-operations", "sha256": hashlib.sha256(key.encode()).hexdigest(),
+        "scopes": ["operations:read"]
+    }]}), encoding="utf-8")
+```
+
+Apontar `SONORA_KEYS_FILE` para o JSON do respectivo serviço. Para consultar o ready local no PowerShell, por exemplo: `Invoke-RestMethod http://127.0.0.1:8080/api/sonora/v1/health/ready -Headers @{"X-Api-Key"=(Get-Content output/dev/api.key -Raw)}`. Não copiar essas credenciais para Azure, bundle ou exemplos públicos. Os starters leem o arquivo a cada requisição: remover/rotacionar o hash revoga/troca o acesso. Eles implementam apenas acesso operacional; os responsáveis ainda devem implementar autorização das rotas de negócio. O provisionamento Linux gera credenciais próprias fora do Git.
+
 ## Validação e evolução
 
 ```bash

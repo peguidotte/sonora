@@ -20,4 +20,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09/11/2026 | Validar compatibilidade API/PostgreSQL no PR de migrations | Checker de contratos contra catálogo real, vínculos de escrita explícitos, baseline anterior e histórico versionado imutável; testes de incompatibilidades em PostgreSQL descartável. DTOs/HTTP, CHECKs e regras de negócio continuam exigindo testes das aplicações |
 
+| 09/11/2026 | Preparar starters mínimos após integrar o PR de banco | Projetos C#/Java compiláveis, configuração PostgreSQL, healthchecks, acesso operacional e documentação automática. Sem domínio, rotas de negócio ou SQL adicional: implementação acadêmica permanece com Leonardo/Felipe; CI mantém a barreira de compatibilidade antes do deploy |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

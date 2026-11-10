@@ -1,6 +1,6 @@
 {
   "component": "api",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Leonardo Correa de Mello",
   "rm": "555573",
   "branch": "leo/csharp",
@@ -8,7 +8,9 @@
   "contract": "contracts/openapi/csharp.openapi.json",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
+    "commands": [
+      "dotnet run --project api/Sonora.Api"
+    ],
     "dataMode": "postgresql-with-shared-schema-and-seed"
   },
   "integrated": {
@@ -18,7 +20,9 @@
     ]
   },
   "validation": {
-    "commands": [],
+    "commands": [
+      "dotnet test api/Sonora.Api.Tests -c Release"
+    ],
     "evidence": []
   },
   "deployment": {
