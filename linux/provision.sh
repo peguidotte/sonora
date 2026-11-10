@@ -13,7 +13,7 @@ exec > >(tee -a /var/log/sonora-provision.log) 2>&1
 trap 'rc=$?; echo "$(date -Is) ERROR provision line=$LINENO exit=$rc"; exit "$rc"' ERR
 echo "$(date -Is) START provision"
 export DEBIAN_FRONTEND=noninteractive
-apt-get update -qq
+apt-get -o APT::Update::Error-Mode=any update -qq
 apt-get install -y -qq ca-certificates curl gnupg postgresql postgresql-client openjdk-21-jre-headless python3 libicu74 libssl3t64 libgssapi-krb5-2 netplan.io logrotate
 desired_hostname=${SONORA_HOSTNAME:-sonora}
 [[ $desired_hostname =~ ^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$ ]] || exit 2
@@ -120,7 +120,7 @@ if ! command -v caddy >/dev/null; then
   gpg --batch --yes --dearmor -o /usr/share/keyrings/caddy-stable-archive-keyring.gpg /tmp/sonora-caddy.gpg
   curl -fsSL https://dl.cloudsmith.io/public/caddy/stable/debian.deb.txt -o /etc/apt/sources.list.d/caddy-stable.list
   chmod 0644 /usr/share/keyrings/caddy-stable-archive-keyring.gpg /etc/apt/sources.list.d/caddy-stable.list
-  apt-get update -qq
+  apt-get -o APT::Update::Error-Mode=any update -qq
   apt-get install -y -qq caddy
 fi
 cat > /etc/caddy/Caddyfile <<EOF

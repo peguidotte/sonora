@@ -12,6 +12,41 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @unittest.skipUnless(sys.platform.startswith('linux'), 'Requer ferramentas Linux; executado no CI Ubuntu.')
 class LinuxScriptsTests(unittest.TestCase):
+    def test_network_check_fails_inside_conditional_when_address_route_or_dns_is_missing(self):
+        # O laço de convergência chama check em um if: Bash desativa errexit nesse contexto.
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            commands = {
+                'ip': '''#!/bin/bash
+case "$*" in
+  '-4 address show dev eth0 scope global')
+    [[ $LAB_NETWORK_FAIL != address ]] || exit 1
+    echo '2: eth0 inet 192.0.2.10/24';;
+  '-4 route show default dev eth0')
+    [[ $LAB_NETWORK_FAIL != route ]] || exit 1
+    echo 'default via 192.0.2.1 dev eth0';;
+  *) echo 'fixture network output';;
+esac
+''',
+                'getent': '#!/bin/bash\n[[ $LAB_NETWORK_FAIL != dns ]] || exit 1\necho "192.0.2.1 fixture"\n',
+                'resolvectl': '#!/bin/bash\necho "fixture DNS configuration"\n',
+            }
+            for name, content in commands.items():
+                command = base / name
+                command.write_text(content)
+                command.chmod(0o755)
+            for missing in ('none', 'address', 'route', 'dns'):
+                with self.subTest(missing=missing):
+                    env = os.environ | {'PATH': str(base) + os.pathsep + os.environ['PATH'],
+                                       'LAB_NETWORK_FAIL': missing}
+                    result = subprocess.run(['bash', '-c',
+                        'if source "$1" check eth0; then exit 0; else exit 1; fi',
+                        'network-test', str(ROOT / 'linux/network.sh')],
+                        env=env, capture_output=True, text=True, timeout=5)
+                    self.assertEqual(result.returncode, 0 if missing == 'none' else 1, result.stderr)
+                    if missing != 'none':
+                        self.assertNotIn('PASS network', result.stdout)
+
     def render_network(self, config):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / 'network.json'
