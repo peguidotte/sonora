@@ -3,7 +3,7 @@
   "info": {
     "title": "Sonora | Ingestion API",
     "version": "0.4.0",
-    "description": "Private Java ingestion API. Validates device observations and public-file imports, deduplicates and commits to PostgreSQL. Owns capture migrations and published read views. Does not call the C# API. Import counts describe database persistence, not HTTP delivery."
+    "description": "Private Java ingestion API. Validates device observations and public-file imports, deduplicates and commits to PostgreSQL. Maintains capture migrations and read views in the independently executed database module. Does not call the C# API. Import counts describe database persistence, not HTTP delivery."
   },
   "servers": [
     {
@@ -755,7 +755,7 @@
     "contract": "../database.json",
     "role": "sonora_ingest",
     "access": "write",
-    "migrationOwner": "soa",
+    "migrationOwner": "database",
     "migrationRole": "sonora_migrator",
     "schema": "sonora"
   }

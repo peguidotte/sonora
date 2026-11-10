@@ -10,7 +10,7 @@ Versão verificável: **0.4.0**. Decisões de negócio/execução estão na [arq
 | [Schema ML](schemas/ml-summary.schema.json) | Artefato summary.json, importado administrativamente pelo Java |
 | [fixtures/](fixtures/) | Exemplos sintéticos de formatos; nunca dado real/resultado de treino |
 
-OpenAPI contém requests/responses, validações estruturais, escopos e erros. SQL usa nomes snake_case em inglês, HTTP usa camelCase. database.json define interface e permissões esperadas, **não** implementa migrations/GRANTs: Felipe fornece esses artefatos; Pedro os aplica. C# não tem rota de ingestão, migração ou entrega HTTP de lotes. Importações contam dados commitados no PostgreSQL.
+OpenAPI contém requests/responses, validações estruturais, escopos e erros. SQL usa nomes snake_case em inglês, HTTP usa camelCase. database.json define interface e permissões esperadas, **não** implementa migrations/GRANTs: Felipe mantém esses artefatos em database/ como parte de SOA; Pedro os aplica em etapa independente das aplicações. A base inicial de schemas está implementada; domínio/views/seed continuam pendentes. C# não tem rota de ingestão, migração ou entrega HTTP de lotes. Importações contam dados commitados no PostgreSQL.
 
 ## Mocks de desenvolvimento
 
@@ -50,4 +50,6 @@ python -m unittest discover -s tools -p "test_*.py" -v
 
 Verificações cobrem formas OpenAPI/exemplos, schema ML, mapeamento das views/roles e consistência da divisão Java/C#. Aplicar PostgreSQL/GRANTs e executar os serviços/testes de integração reais continuam responsabilidade das entregas. O read model expõe deviceId ausente quando o banco for nulo; estado do dispositivo e distância são calculados pelo C#, não campos obrigatórios da view. Resumo ML devolve o payload validado, sem achatar colunas internas.
 
-Mudança incompatível de HTTP ou view atualiza a versão, fixtures e consumidores no mesmo PR; não criar documentos paralelos de contrato. O histórico anterior está no Git. Migrations/seed locais do SOA devem permitir C# standalone sem manter o Java ativo.
+Mudança incompatível de HTTP ou view atualiza a versão, fixtures e consumidores no mesmo PR; não criar documentos paralelos de contrato. O histórico anterior está no Git. Migrations/seed locais de database/ devem permitir C# standalone sem manter o Java ativo.
+
+`writeModels` em database.json vincula requests às colunas persistidas, com colunas preenchidas pelo servidor explícitas. O [checker de compatibilidade](../database/README.md#compatibilidade-apibanco) compara esses vínculos e as views com o PostgreSQL real e o contrato anterior; a validação estática acima também exige cobertura de todas as propriedades dos requests. Testes HTTP das implementações continuam necessários para comprovar que DTOs e respostas obedecem ao OpenAPI.

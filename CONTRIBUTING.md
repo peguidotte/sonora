@@ -34,8 +34,8 @@ Identificar autor, branch/commit e ambiente; ler rubrica/ficha; confrontar arqui
 
 Registrar resultado no PR: atendido/parcial/ausente/não verificável, reprodução, comandos executados, achados com arquivo/evidência e prioridade. Concluir pronto para integrar, pronto com limites, precisa de correção ou não verificável. Não inventar nota, teste passado ou correção. Revalidar os pontos afetados em novos commits. Resultados datados e cronogramas ficam nos PRs/Azure Boards, não em arquivos de documentação permanentes.
 
-Mudanças de interface atualizam contratos, fixtures, consumidores e testes juntos. SOA é dono das migrations e views; C# não cria uma migração concorrente. Detalhes de implementação ficam no código e comandos no README do componente; não duplicar arquitetura/rubricas em vários arquivos.
+Mudanças de interface atualizam contratos, fixtures, consumidores e testes juntos. SOA mantém migrations/views no módulo independente database/; C# não cria uma sequência concorrente. Revisar SQL publicado com os dois consumidores. Detalhes de implementação ficam no código e comandos no README do componente; não duplicar arquitetura/rubricas em vários arquivos.
 
 ## Comunicação e privacidade
 
-Não enviar mensagens, convites ou submissões sem solicitação explícita. PII de Cyber é sintética. Conversas locais/fontes privadas/dados brutos ficam ignorados; registrar uso publicável de IA em docs/uso-de-ia.md. Repositório privado exige acesso correto para colegas/professores; isso não substitui o Admin no Azure Boards de Testing.
+Não enviar mensagens, convites ou submissões sem solicitação explícita. PII de Cyber é sintética. Conversas locais/fontes privadas/dados brutos ficam ignorados; registrar uso publicável de IA em docs/uso-de-ia.md. O repositório tem leitura pública; escrita exige colaboração autorizada. Isso não substitui o Admin no Azure Boards de Testing.

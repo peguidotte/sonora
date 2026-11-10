@@ -5,6 +5,7 @@ import json
 from jsonschema import Draft202012Validator, FormatChecker
 from openapi_spec_validator import validate
 from referencing import Registry, Resource
+from check_database_compatibility import validate as validate_storage_mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS = ROOT / "contracts"
@@ -64,10 +65,12 @@ def validate_database_contract():
     database = json.loads((CONTRACTS / "database.json").read_text(encoding="utf-8"))
     core, ingestion = load_service("csharp"), load_service("soa")
     assert database["contractVersion"] == core["info"]["version"] == ingestion["info"]["version"]
-    assert database["engine"] == "PostgreSQL" and database["migrationOwner"] == "soa"
+    assert database["engine"] == "PostgreSQL" and database["migrationOwner"] == "database" and database["academicOwner"] == "soa"
     assert core["x-database-access"]["role"] == "sonora_query"
     assert core["x-database-access"]["access"] == "read-only"
     assert ingestion["x-database-access"]["migrationOwner"] == database["migrationOwner"]
+    mapping = validate_storage_mapping(database, {"soa": ingestion, "csharp": core}, {}, allow_unimplemented=True)
+    assert not mapping["errors"], mapping["errors"]
     query_role = database["roles"]["sonora_query"]
     assert query_role["canReadPublishedViews"] is True
     assert query_role["canWriteStorage"] is False and query_role["canMigrate"] is False

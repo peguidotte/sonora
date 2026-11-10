@@ -83,6 +83,35 @@ class ArtifactSecurityTests(unittest.TestCase):
 
 
 class ReleaseIdentityTests(unittest.TestCase):
+    def test_database_controller_is_self_contained_for_existing_vms(self):
+        script = pipeline.deployment_script('database', RELEASE, 'sonorareleases', 'b' * 64)
+        source = script.split("<<'SONORA_CONTROLLER'\n", 1)[1].rsplit('\nSONORA_CONTROLLER', 1)[0]
+        compile(source, '<remote-controller>', 'exec')
+        self.assertIn("sys.argv = ['sonora-deploy', 'database'", source)
+        self.assertNotIn('app/sonora.jar', source)
+
+    def test_soa_manifest_does_not_require_migration_script(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / 'bin').mkdir()
+            (root / 'bin/start.sh').write_text('#!/bin/bash\n')
+            (root / 'release.json').write_text(json.dumps({'component': 'soa', 'releaseId': RELEASE, 'commit': RELEASE[:40]}))
+            release.validate_manifest(root, 'soa', RELEASE)
+
+    def test_database_artifact_requires_runtime_and_sql_but_no_application(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            for name in ('database/migrate.sh', 'database/flyway.toml', 'database/toolchain.json', 'flyway/flyway'):
+                p = root / name
+                p.parent.mkdir(exist_ok=True)
+                p.write_text('fixture')
+            (root / 'release.json').write_text(json.dumps({'component': 'database', 'releaseId': RELEASE, 'commit': RELEASE[:40]}))
+            with self.assertRaises(ValueError):
+                release.validate_manifest(root, 'database', RELEASE)
+            (root / 'database/migrations').mkdir()
+            (root / 'database/migrations/V1__test.sql').write_text('SELECT 1;')
+            release.validate_manifest(root, 'database', RELEASE)
+
     def test_github_identity(self):
         with patch.dict(os.environ, {'GITHUB_SHA': 'a' * 40, 'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '2'}, clear=True):
             self.assertEqual(pipeline.release_id(), 'a' * 40 + '-123-2')

@@ -39,9 +39,9 @@ ESP32 / Wokwi ──HTTP─────┘                            ▲
 Mobile / clientes ──HTTPS──> C# Sonora ────────────────┘
 ```
 
-Java possui a captura e as migrations; C# lê views publicadas e calcula perfis. A integração é pelo banco, sem repasse HTTP Java -> C#. PostgreSQL é compartilhado entre os backends; SQLite é usado somente no Mobile para favoritos/cache. Deploy inicial: serviços independentes numa VM Linux na Azure, com proxy HTTPS e banco interno.
+Java possui a captura; [database/](database/README.md) executa migrations independentes, mantidas na entrega de SOA; C# lê views publicadas e calcula perfis. A integração é pelo banco, sem repasse HTTP Java -> C#. PostgreSQL é compartilhado entre os backends; SQLite é usado somente no Mobile para favoritos/cache. Deploy inicial: serviços independentes numa VM Linux na Azure, com proxy HTTPS e banco interno.
 
-Pastas: api/ (C#), soa/ (Java), mobile/, iot/, ml/, linux/, cybersecurity/, testing/, contracts/ e tools/. Backends e app devem ser implementados pelos responsáveis. [Infraestrutura e CI/CD](deploy/azure/README.md) define Terraform, provisionamento e publicação; Linux continua em desenvolvimento para cumprir toda a rubrica. Os mocks são apenas ferramentas de desenvolvimento, sem persistência ou autenticação de produção.
+Pastas: api/ (C#), soa/ (Java), mobile/, iot/, ml/, linux/, cybersecurity/, testing/, contracts/, database/ e tools/. Backends e app devem ser implementados pelos responsáveis. [Infraestrutura e CI/CD](deploy/azure/README.md) define Terraform, provisionamento e publicação; Linux continua em desenvolvimento para cumprir toda a rubrica. Os mocks são apenas ferramentas de desenvolvimento, sem persistência ou autenticação de produção.
 
 ## Conferir a fundação
 
