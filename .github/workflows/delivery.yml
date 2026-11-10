@@ -66,6 +66,8 @@ jobs:
           --health-interval 5s --health-timeout 3s --health-retries 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -87,7 +89,16 @@ jobs:
           SONORA_DATABASE_TESTS: '1'
         run: |
           python database/prepare.py
-          python -m unittest discover -s tools -p 'test_database.py' -v
+          python -m unittest discover -s tools -p 'test_database*.py' -v
+      - name: Conferir contratos contra PostgreSQL real e versão anterior
+        env:
+          BASELINE_REF: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          set -euo pipefail
+          options=()
+          if [[ "$DO_API" != 'true' && "$DO_SOA" != 'true' ]]; then options+=(--allow-unimplemented); fi
+          if [[ -n "$BASELINE_REF" && ! "$BASELINE_REF" =~ ^0+$ ]]; then options+=(--baseline-ref "$BASELINE_REF"); fi
+          python tools/check_database_compatibility.py "${options[@]}"
           python deploy/pipeline.py package database
       - name: Testar e empacotar aplicações presentes
         run: |

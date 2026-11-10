@@ -27,6 +27,7 @@ Domínio com objetos de janela, procedência e perfil; interfaces e DI nos limit
 3. Implementar cálculo energético, separação de séries/origens, no_data, intervalos/fuso e cobertura; não representar falta de amostra como silêncio.
 4. Proteger consultas e operação por escopo; servir somente shell vazio sem autenticação. Painel busca dados privados.
 5. Testar regras de cálculo e validação; integração HTTP/EF em PostgreSQL verifica filtros, paginação, persistência do seed e impossibilidade de escrita com sonora_query.
+   Validar respostas reais contra o OpenAPI e conferir limites/null/transformações; o checker de database/ verifica tipos/colunas, mas não substitui esses testes HTTP.
 6. Documentar build/publish/entrypoint, configuração sem segredo, porta e healthchecks para Pedro; API deve executar fora da IDE.
 
 Aceite mínimo: 60/70 dB em janelas iguais -> aproximadamente 67,40; fonte/origem explícitas; no_data nulo; chave ausente/inválida 401, escopo errado 403; consulta funciona com Java parado e dados persistidos; ready acusa indisponibilidade do banco. Resumo ML é leitura de payload validado ou 204.

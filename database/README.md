@@ -34,6 +34,24 @@ SONORA_DATABASE_TESTS=1 python -m unittest discover -s tools -p 'test_database.p
 
 Essa opção cria objetos temporários e provoca falha controlada em cópias das migrations; usar exclusivamente banco de testes. A CI prepara as mesmas contas em PostgreSQL 16 e executa estes testes antes dos builds. Testes sem a opção declaram a integração como pulada, sem presumir aprovação.
 
+## Compatibilidade API/banco
+
+`contracts/database.json` também define `writeModels`: vínculo explícito entre propriedades de requests OpenAPI e colunas de armazenamento, além das colunas preenchidas pelo servidor. As views de leitura continuam em `readViews`. Atualizar esse mapeamento e os contratos no mesmo PR que altera API/SQL; não inferir vínculos automaticamente a partir dos nomes.
+
+Depois de migrar um PostgreSQL descartável, executar com as variáveis PG do usuário `sonora_migrator`:
+
+```bash
+python tools/check_database_compatibility.py --baseline-ref origin/main
+```
+
+O script consulta o catálogo real em modo somente leitura, com timeout. Bloqueia incompatibilidade de tipos suportados, API que aceita texto maior que `varchar(n)`, API sem limite para coluna limitada, null/opcional incompatível com `NOT NULL`, coluna obrigatória nova sem origem/default e remoção/renomeação/exposição de colunas nas views. Na leitura, a direção se inverte: a capacidade de saída do banco deve caber no limite declarado da resposta. O contrato anterior também é conferido para preservar consumidores ainda rodando; reduzir os dois limites no mesmo PR não elimina essa verificação. SQL de migrations já publicado na baseline não pode ser editado/removido: criar uma nova versão, preservando o histórico do Flyway.
+
+Saídas: `0` sem incompatibilidade detectada no escopo, `1` incompatível e `2` verificação incompleta/erro. O relatório inclui `checkedFields` e pendências. Durante o bootstrap, `--allow-unimplemented` permite relações inteiras ainda ausentes, mas não ignora incompatibilidades de relações existentes nem campos HTTP sem mapeamento. A CI usa essa opção somente enquanto não houver projeto de aplicação; com C# ou SOA presentes, todas as relações contratadas são exigidas. Sem baseline configurada, não há verificação da versão anterior.
+
+O checker compara **contratos e catálogo**, não as classes/validações efetivas dos serviços. Expressões `CHECK`, transformações, nullabilidade de expressões/joins em views, valores JSON e regras de negócio precisam de testes de integração/HTTP. As APIs devem testar valor no limite e acima dele, respostas e validação efetiva, inclusive strings Unicode. Não corrigir divergência truncando dados silenciosamente nem tratar `checkedFields=0` com pendências como banco integrado aprovado.
+
+Regressões unitárias e PostgreSQL reais ficam em `tools/test_database_compatibility.py`. A CI executa `test_database*.py`; testes que alteram SQL usam apenas schemas de laboratório gerados e descartados no banco de testes.
+
 ## Deploy
 
 O [pipeline](../deploy/azure/README.md) publica um artefato `database` com SQL/configuração/CLI, independente de SOA/C#. Na VM: backup, aplicação como usuário migrador e confirmação de sucesso; depois são publicados os serviços. Falha de migration interrompe o deploy. O retorno de um binário não desfaz alterações de schema/dados; backup é preservado. O provisionamento Linux continua responsável por instalar PostgreSQL e criar banco/roles; as tabelas e views ficam neste módulo.

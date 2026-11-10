@@ -32,6 +32,7 @@ POST de observação resolve origem/local/fonte pela credencial e dispositivo; p
 2. Implementar ingestão privada, validação, unicidade source_id + external_id e idempotência.
 3. Implementar criação/consulta de batches. acceptedCount conta linhas commitadas; erro/rejeição parcial e completedAt são visíveis. Não existe deliveryStatus.
 4. Publicar OpenAPI real e testar regras, autenticação e persistência usando PostgreSQL.
+   Validar limites/obrigatoriedade reais via HTTP (no limite, acima dele e Unicode) e manter writeModels conforme o armazenamento; executar o checker API/banco de database/ contra as migrations. Declarar transformação de dados e cobri-la por teste, sem truncamento silencioso.
 5. Fornecer importação administrativa de summary.json validado pelo schema ML para armazenamento/publicação na view; não executar pickle/modelo Python.
 
 Aceite: retry idêntico não duplica e conflito é 409; dispositivo alheio é 403; 401 sem chave válida; origem não pode ser escolhida por dispositivo; arquivo desconhecido/falho não é sucesso silencioso; erro/rollback não incrementa acceptedCount; reinício preserva dados; view e grants correspondem ao contrato; C# não precisa estar ativo para concluir a importação.
