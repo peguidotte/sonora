@@ -20,6 +20,24 @@ sudo bash /opt/sonora/bootstrap/provision.sh sonora.localhost --local
 
 Modo local usa HTTP; no Azure o cloud-init passa FQDN real e HTTPS. `SONORA_HOSTNAME` permite escolher o hostname, padrão `sonora`. Backends/migrations precisam ser fornecidos pelos responsáveis. Não executar provisionamento no host pessoal ou em servidor com dados/serviços de outros projetos.
 
+### Laboratório isolado no Windows
+
+`lab.py` cria uma VM nova no VirtualBox 7.2, a partir de uma imagem oficial Ubuntu 24.04 amd64 com SHA-256 fixado. Requer Python 3.12+, VirtualBox com virtualização disponível, aproximadamente 1,5 GB de RAM livre para a VM e espaço para o disco dinâmico de até 16 GB. Na raiz do clone:
+
+```powershell
+.venv/Scripts/python.exe -m pip install pycdlib==1.14.0
+.venv/Scripts/python.exe linux/lab.py prepare
+.venv/Scripts/python.exe linux/lab.py run
+```
+
+O padrão é `output/lab/linux-repro`; usar `--directory output/lab/outro-ensaio` nos dois comandos para uma reprodução nova. O controlador recusa sobrescrever um laboratório existente. A imagem fica no cache do usuário; disco/ISO/identidade da VM ficam em `output/lab/`, fora do Git. `pycdlib` serve apenas para criar a ISO NoCloud e não é dependência da aplicação, do servidor ou da CI.
+
+A VM usa um vCPU e uma única interface NAT, sem encaminhar portas; o proxy DNS usa o resolvedor do host. O laboratório configura APT via HTTPS/IPv4 com timeouts e sem traduções; padrão `https://azure.archive.ubuntu.com/ubuntu`, substituível por `--apt-mirror` no prepare. Esse espelho público não cria recursos nem usa a conta Azure. O console serial por named pipe local permite aplicar/restaurar a rede sem depender de SSH. O autologin de root existe somente nesse console de laboratório; senha e login SSH de root não são habilitados. Os scripts de laboratório não integram o artefato Azure.
+
+`lab.sh` comprova a ausência inicial do Sonora/PostgreSQL, executa o provisionamento real e seus testes, confere reexecução preservando credenciais/OID do banco/arquivo, aplica IP estático, deixa uma tentativa expirar para conferir rollback em disco e runtime, retorna a DHCP e verifica reboot real. IPs `10.0.2.15/24`, `10.0.2.20/24`, gateway `10.0.2.2` e DNS `10.0.2.3` são exclusivos do NAT padrão desse laboratório VirtualBox.
+
+Cada execução gera um diretório próprio em `output/evidence/linux/lab-<id>/`: abrir `index.html` para localizar ambiente, hashes dos fontes/imagem, logs por etapa, gravação `terminal.cast`, resultados e seleção sugerida para o vídeo. O ZIP ao lado desse diretório contém somente as evidências, sem discos/ISO/segredos. `sourceCommit` é a base Git; `sourceWorktreeDirty`, hashes dos arquivos copiados e `execution.json` identificam o código efetivamente ensaiado. O controlador solicita desligamento ao terminar e registra se a VM desligou; mantém VM/disco para consulta posterior. Uma execução incompleta não comprova as etapas restantes. Resultado `infrastructure-only-passed` continua sendo validação parcial: aplicações/migrations de domínio e a demonstração final permanecem pendentes.
+
 ## Rede
 
 Na Azure, manter o DHCP e a configuração de rede fornecidos pela plataforma; o provisionamento configura o hostname e verifica endereço IPv4, rota e resolução DNS. `network.sh check [interface]` é somente leitura. O DNS de verificação pode ser definido por `DNS_CHECK_NAME`.
@@ -32,6 +50,8 @@ sudo bash linux/network.sh configure network.local.json
 ```
 
 O script valida os parâmetros e o Netplan, salva a configuração anterior em `/var/backups/sonora/network/` e usa `netplan try` com confirmação em até 60 s. Essa operação assume o controle dos arquivos Netplan da VM de uma interface. Em falha, restaura os arquivos anteriores e tenta reaplicá-los; conferir a recuperação pelo console. `configure` recusa execução sem terminal e não é chamado automaticamente no deploy Azure. [Netplan try](https://netplan.readthedocs.io/en/stable/cli/) não dispensa verificação da rede após rollback.
+
+O código zero de `netplan try` não comprova aceitação: o script também exige a mensagem explícita `Configuration accepted.` em locale C. Sem essa confirmação, retorna erro e restaura o backup. A saída Python não é bufferizada para que o prompt continue visível durante a auditoria por `tee`; o ensaio verifica arquivo e estado real da interface após o timeout.
 
 ## Verificação e falhas
 

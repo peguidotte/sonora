@@ -22,4 +22,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09/11/2026 | Preparar starters mínimos após integrar o PR de banco | Projetos C#/Java compiláveis, configuração PostgreSQL, healthchecks, acesso operacional e documentação automática. Sem domínio, rotas de negócio ou SQL adicional: implementação acadêmica permanece com Leonardo/Felipe; CI mantém a barreira de compatibilidade antes do deploy |
 
+| 09–10/11/2026 | Preparar laboratório Linux isolado e evidências para vídeo | Controlador VirtualBox/NoCloud, ensaio de provisionamento/reexecução/rede/rollback/reboot e coleta de logs/terminal/hashes. Corrigida aceitação indevida do retorno zero de netplan try; resultados executados ficam no PR e nas evidências locais, sem concluir a aplicação acadêmica |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

@@ -42,9 +42,9 @@ check() {
   [[ $dns_name =~ ^[a-zA-Z0-9.-]+$ ]] || return 2
   if [[ -z $interface ]]; then interface=$(ip -4 route show default | awk 'NR==1 {for(i=1;i<NF;i++) if($i=="dev") {print $(i+1); exit}}'); fi
   [[ $interface =~ ^[a-zA-Z0-9_.-]+$ && $interface != lo ]] || return 1
-  ip -4 address show dev "$interface" scope global | grep -q 'inet '
-  ip -4 route show default dev "$interface" | grep -q '^default '
-  getent ahostsv4 "$dns_name" >/dev/null
+  ip -4 address show dev "$interface" scope global | grep -q 'inet ' || return 1
+  ip -4 route show default dev "$interface" | grep -q '^default ' || return 1
+  getent ahostsv4 "$dns_name" >/dev/null || return 1
   printf '%s PASS network interface=%s hostname=%s dns=%s\n' "$(date -Is)" "$interface" "$(hostname)" "$dns_name"
   ip -brief address show dev "$interface"
   ip -4 route show default dev "$interface"
@@ -87,8 +87,19 @@ case $action in
     trap rollback EXIT
     for file in "${originals[@]}"; do rm -- "$file"; done
     install -m 0600 "$backup/stage/etc/netplan/99-sonora.yaml" /etc/netplan/99-sonora.yaml
-    netplan try --timeout 60
-    check "$interface"
+    # netplan try pode sair com 0 após rejeição/timeout. Com stdout em tee, Python
+    # também bufferiza o prompt: exigir a confirmação explícita em saída não bufferizada.
+    PYTHONUNBUFFERED=1 netplan try --timeout 60 | tee "$backup/try.log"
+    grep -Fxq 'Configuration accepted.' "$backup/try.log" || {
+      echo 'ERROR network_change_not_confirmed' >&2; exit 1;
+    }
+    # Endereço/rota/DNS podem convergir depois da confirmação imediata no console.
+    network_ready=false
+    for _ in {1..15}; do
+      if check "$interface"; then network_ready=true; break; fi
+      sleep 1
+    done
+    $network_ready || { echo 'ERROR network_did_not_converge' >&2; exit 1; }
     printf '%s COMPLETE network backup=%s\n' "$(date -Is)" "$backup"
     trap - EXIT
     ;;
