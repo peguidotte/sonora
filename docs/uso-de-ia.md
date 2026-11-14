@@ -24,4 +24,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09–10/11/2026 | Preparar laboratório Linux isolado e evidências para vídeo | Controlador VirtualBox/NoCloud, ensaio de provisionamento/reexecução/rede/rollback/reboot e coleta de logs/terminal/hashes. Corrigida aceitação indevida do retorno zero de netplan try; resultados executados ficam no PR e nas evidências locais, sem concluir a aplicação acadêmica |
 
+| 14/11/2026 | Preparar ambiente IoT/Wokwi (Leonardo) | Circuito ESP32, firmware PlatformIO com janela LAeq de 5 s, NTP, fila de reenvio idempotente e tratamento 401/403; build do firmware, testes da lógica no computador e payload aceito pelo mock da ingestão. Simulação no Wokwi, envio ao Java real, link e vídeo continuam pendentes |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
