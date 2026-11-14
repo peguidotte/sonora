@@ -9,7 +9,7 @@
   "standalone": {
     "requiresCloud": false,
     "commands": [
-      "dotnet run --project api/Sonora.Api"
+      "dotnet run --project api/Sonora.Api -c Release"
     ],
     "dataMode": "postgresql-with-shared-schema-and-seed"
   },
@@ -21,7 +21,8 @@
   },
   "validation": {
     "commands": [
-      "dotnet test api/Sonora.Api.Tests -c Release"
+      "dotnet test api/Sonora.Api.Tests -c Release",
+      "SONORA_DB_INTEGRATION=1 dotnet test api/Sonora.Api.Tests -c Release"
     ],
     "evidence": []
   },

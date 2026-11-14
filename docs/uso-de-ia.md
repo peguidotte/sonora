@@ -24,4 +24,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09–10/11/2026 | Preparar laboratório Linux isolado e evidências para vídeo | Controlador VirtualBox/NoCloud, ensaio de provisionamento/reexecução/rede/rollback/reboot e coleta de logs/terminal/hashes. Corrigida aceitação indevida do retorno zero de netplan try; resultados executados ficam no PR e nas evidências locais, sem concluir a aplicação acadêmica |
 
+| 14/11/2026 | Implementar a API C# de consulta (Leonardo) | Domínio acústico, EF Core sobre as views do contrato, rotas, segurança por escopo, painel e Scalar; testes de domínio/HTTP/segurança/EF e integração em PostgreSQL de laboratório com views equivalentes ao contrato. Integração com as migrations oficiais de SOA ainda pendente |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
