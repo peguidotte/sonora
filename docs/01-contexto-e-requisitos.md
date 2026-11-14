@@ -47,7 +47,7 @@ O título da p. 26 diz “Sete disciplinas”, mas a tabela lista **oito**. Fora
 - Organização escolhida pelo usuário em 08/11: monorepo com aplicações/entregas C# e SOA separadas e evidências por rubrica. A eventual reutilização da mesma implementação nas duas matérias seria outra decisão e depende de confirmação docente; compartilhar o repositório não significa compartilhar a entrega.
 - Mobile admite mock, mas manter contrato compatível com a API para a integração.
 - A simulação ESP32 atende Physical Computing; **não** atende a exigência de dados reais de ML.
-- Cybersecurity pede evolução de um motor de parsing e dashboard. A base utilizada em aula ainda precisa ser identificada; não substituir essa exigência por um checklist genérico.
+- Cybersecurity pede um motor de parsing/taint/LLM e dashboard. Esclarecimento do Prof. Vitor Lasse ("Explicação: Global Solutions", Teams): não há ferramenta pronta a localizar, a implementação é do zero, em qualquer linguagem; não substituir essa exigência por um checklist genérico.
 - Testing pede Azure Boards e Test Cases completos, além do PDF de contingência. Uma lista de testes local não conclui a entrega.
 
 ## Diferenças e pendências dos enunciados
@@ -56,7 +56,7 @@ O título da p. 26 diz “Sete disciplinas”, mas a tabela lista **oito**. Fora
 | --- | --- | --- |
 | Relatório de ML | p. 31: duas a quatro páginas; p. 33: duas páginas | Planejar duas páginas |
 | Rubrica de Mobile | PDF remete à tarefa; tarefa estava sem instruções | Seis critérios conhecidos, pesos ainda pendentes |
-| Tarefas não localizadas | IA, Cybersecurity e Physical não apareceram na lista Em breve | Requisitos extraídos do PDF; conferir Teams/Portal antes do envio |
+| Tarefas não localizadas | IA e Physical não apareceram na lista Em breve | Requisitos extraídos do PDF; conferir Teams/Portal antes do envio |
 | Linux detalhado | Tarefa especifica Bash, rede, serviços, logs e testes | Usar os requisitos adicionais na especificação de Linux |
 | Vídeo de Testing | Apoio à criação de casos manuais no Azure DevOps | Arquivo baixado; não é um novo entregável |
 

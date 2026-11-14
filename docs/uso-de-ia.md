@@ -24,4 +24,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09–10/11/2026 | Preparar laboratório Linux isolado e evidências para vídeo | Controlador VirtualBox/NoCloud, ensaio de provisionamento/reexecução/rede/rollback/reboot e coleta de logs/terminal/hashes. Corrigida aceitação indevida do retorno zero de netplan try; resultados executados ficam no PR e nas evidências locais, sem concluir a aplicação acadêmica |
 
+| 13/11/2026 | Esclarecer e implementar a base de Cybersecurity (Herbert) | Identificada divergência: docs presumiam uma "base de aula" a localizar; doc do professor (Teams) confirma implementação do zero. Corrigidas as fichas afetadas e implementado middleware Node/TypeScript standalone (parsing de PII com regras/checksum, taint analysis com sinks guardados, tradução via LLM com fallback declarado, cálculo e render do dashboard Risco Cidadão), com fixtures sintéticas e 23 testes locais passando. Vídeo, print do painel e integração real com API/SOA continuam pendentes com o responsável. |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
