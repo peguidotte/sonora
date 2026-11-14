@@ -36,6 +36,16 @@ function isPlainObject(value: unknown): value is Record<string, JsonValue> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
+// `source` é um identificador de proveniência (nome da fonte), não dado do payload: ele entra
+// direto no prompt da IA e no log de eventos sem passar pelo motor de PII. Por isso precisa
+// ser um identificador curto e previsível — nunca texto livre onde alguém poderia embutir um
+// segredo (ex: source: "password=segredo-real") para fazê-lo vazar pro prompt/eventos.
+const SAFE_SOURCE = /^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,63}$/;
+
+function isSafeSource(value: string): boolean {
+  return SAFE_SOURCE.test(value);
+}
+
 async function listFixtureSources(fixturesDir: string): Promise<string[]> {
   try {
     const files = await readdir(fixturesDir);
@@ -80,6 +90,13 @@ export function createApp(options: AppOptions = {}): App {
       sendJson(res, 400, { code: "invalid_request", message: "esperado { source: string, payload: object }" });
       return;
     }
+    if (!isSafeSource(body.source)) {
+      sendJson(res, 400, {
+        code: "invalid_source",
+        message: "source deve ser um identificador curto (letras, números, '.', '_', ':' ou '-'), não texto livre",
+      });
+      return;
+    }
 
     const { findings, events } = await interceptRequest(body.payload, body.source, log);
     const sanitizedPayload = maskPayload(body.payload);
@@ -98,6 +115,13 @@ export function createApp(options: AppOptions = {}): App {
     const form = await readFormBody(req);
     const source = (form.get("source") ?? "").trim() || "manual-test";
     const rawPayload = form.get("payload") ?? "";
+
+    if (!isSafeSource(source)) {
+      await renderDashboard(res, {
+        error: "Fonte inválida: use um identificador curto (letras, números, '.', '_', ':' ou '-'), sem espaços nem símbolos.",
+      });
+      return;
+    }
 
     let payload: unknown;
     try {

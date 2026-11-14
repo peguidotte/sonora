@@ -31,6 +31,18 @@ function isValidCpfChecksum(digits: string): boolean {
   return dv1 === Number(digits[9]) && dv2 === Number(digits[10]);
 }
 
+function maskCpfDigits(digits: string): string {
+  return `***.${digits.slice(3, 6)}.***-${digits.slice(9, 11)}`;
+}
+
+// Casa um CPF formatado embutido em texto livre (ex: "O CPF informado foi 529.982.247-25").
+const CPF_OCCURRENCE = /\d{3}\.\d{3}\.\d{3}-\d{2}/g;
+
+function findCpfOccurrences(value: string): string[] {
+  const matches = value.match(CPF_OCCURRENCE) ?? [];
+  return matches.filter((occurrence) => isValidCpfChecksum(occurrence.replace(/\D/g, "")));
+}
+
 const RG_FORMATTED = /^\d{1,2}\.\d{3}\.\d{3}-[\dXx]$/;
 
 const HEALTH_KEYWORDS = [
@@ -59,29 +71,45 @@ function maskKeepEdges(value: string, visibleStart: number, visibleEnd: number):
   return value.slice(0, visibleStart) + "*".repeat(value.length - visibleStart - visibleEnd) + value.slice(-visibleEnd);
 }
 
+const CPF_MASKED = /^\*{3}\.\d{3}\.\*{3}-\d{2}$/;
+const RG_MASKED = /^\*+-[\dXx]$/;
+const HEALTH_MASKED_SUFFIX = "(conteúdo sensível omitido)";
+const CREDENTIAL_MASKED = "********";
+
 /**
- * Um valor que já passou pela máscara deste próprio motor (contém "***" ou o marcador de
- * texto omitido, ou é só asteriscos) não deve ser marcado de novo. Sem isso, reenviar um
- * payload já sanitizado dispararia PII "fantasma" — e é exatamente o que diferencia os
- * exemplos de demonstração "vazamento" dos exemplos "já mascarado".
+ * Um valor que já tem o formato EXATO da máscara produzida por uma das regras abaixo não
+ * deve ser marcado de novo. Isso precisa reconhecer o formato canônico de cada categoria,
+ * não uma pista solta como "contém ***" — um valor real pode ter "***" por acaso (ex: uma
+ * senha de verdade), e isso desligaria a detecção inteira se bastasse esse sinal fraco.
  */
 function isAlreadyMasked(value: string): boolean {
-  return value.includes("***") || value.includes("sensível omitido") || /^\*+$/.test(value.trim());
+  return (
+    value === CREDENTIAL_MASKED ||
+    value.endsWith(HEALTH_MASKED_SUFFIX) ||
+    CPF_MASKED.test(value) ||
+    RG_MASKED.test(value)
+  );
 }
 
 export const PII_RULES: PiiRule[] = [
   {
     category: "cpf",
-    description: "CPF formatado (000.000.000-00) ou 11 dígitos, com checksum válido. Falso positivo evitado: número de 11 dígitos sem checksum válido (ex: contador sequencial) não é marcado. Caso negativo: valor já mascarado não dispara de novo.",
+    description: "CPF formatado (000.000.000-00) ou 11 dígitos, com checksum válido — no campo inteiro ou embutido numa mensagem (ex: log/texto livre). Falso positivo evitado: número de 11 dígitos sem checksum válido (ex: contador sequencial) não é marcado. Caso negativo: valor já mascarado não dispara de novo.",
     matches({ value }) {
       if (isAlreadyMasked(value)) return false;
-      const digits = value.replace(/\D/g, "");
-      if (!(CPF_FORMATTED.test(value) || CPF_DIGITS.test(value))) return false;
-      return isValidCpfChecksum(digits);
+      if (CPF_FORMATTED.test(value) || CPF_DIGITS.test(value)) {
+        return isValidCpfChecksum(value.replace(/\D/g, ""));
+      }
+      return findCpfOccurrences(value).length > 0;
     },
     mask(value) {
-      const digits = value.replace(/\D/g, "");
-      return `***.${digits.slice(3, 6)}.***-${digits.slice(9, 11)}`;
+      if (CPF_FORMATTED.test(value) || CPF_DIGITS.test(value)) {
+        return maskCpfDigits(value.replace(/\D/g, ""));
+      }
+      return value.replace(CPF_OCCURRENCE, (occurrence) => {
+        const digits = occurrence.replace(/\D/g, "");
+        return isValidCpfChecksum(digits) ? maskCpfDigits(digits) : occurrence;
+      });
     },
   },
   {

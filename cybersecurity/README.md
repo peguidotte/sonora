@@ -32,7 +32,7 @@ npm install
 
 ```bash
 npm run build   # compila TypeScript para dist/
-npm test        # roda os testes (node:test) sobre dist/test/**/*.test.js — 39 casos
+npm test        # roda os testes (node:test) sobre dist/test/**/*.test.js — 48 casos
 npm run demo    # processa as fixtures via chamada direta às regras, imprime evidência
                  # antes/depois no terminal e gera output/cybersecurity-dashboard.html (fora do Git)
 npm start       # sobe o microserviço em http://127.0.0.1:8090 (porta via CYBERSECURITY_PORT)
@@ -44,7 +44,7 @@ Para demonstrar a tradução via LLM real em vez do fallback, exportar `ANTHROPI
 
 | Rota | Método | Descrição |
 | --- | --- | --- |
-| `/api/cybersecurity/v1/analyze` | POST | Corpo `{ "source": string, "payload": object }`. Roda pii → taint → llm sobre o payload, registra os eventos no log em memória e devolve `{ findings, sanitizedPayload, events, risk }`. `findings` nunca inclui o valor bruto, só a máscara. |
+| `/api/cybersecurity/v1/analyze` | POST | Corpo `{ "source": string, "payload": object }`. `source` é um identificador curto (letras, números, `.`, `_`, `:` ou `-`, até 64 chars) — não é dado do payload, não passa pelo motor de PII, e vai direto pro prompt da IA e pros eventos; por isso precisa ser previsível, não texto livre. `source` fora desse formato -> 400. Roda pii → taint → llm sobre o payload, registra os eventos no log em memória e devolve `{ findings, sanitizedPayload, events, risk }`. `findings` nunca inclui o valor bruto, só a máscara. |
 | `/api/cybersecurity/v1/events` | GET | Lista completa dos eventos (bloqueados e permitidos) acumulados desde que o processo subiu. |
 | `/api/cybersecurity/v1/risk` | GET | Snapshot atual do farol Risco Cidadão (`calculateRisk` sobre o log inteiro). |
 | `/api/cybersecurity/v1/reset` | POST | Limpa o log em memória (uso de demonstração/teste). |
@@ -78,12 +78,13 @@ Os botões só preenchem o formulário (`fillPreset()` em `src/dashboard/render.
 
 ## Casos positivos/negativos e discussão de falsos positivos
 
-- **CPF**: `529.982.247-25` (checksum correto) é marcado; um telefone de 11 dígitos como `11987654321` **não** é marcado, porque falha o checksum de CPF — evita o falso positivo óbvio de confundir qualquer sequência de 11 dígitos com CPF.
+- **CPF**: `529.982.247-25` (checksum correto) é marcado, tanto quando é o campo inteiro quanto quando aparece embutido numa mensagem (ex: `"O CPF informado foi 529.982.247-25"`, comum em log/texto livre) — só a ocorrência válida é mascarada, o resto do texto fica intacto. Um telefone de 11 dígitos como `11987654321`, ou uma sequência no formato de CPF sem checksum válido como `123.456.789-10`, **não** é marcado — evita o falso positivo óbvio de confundir qualquer sequência de dígitos com CPF.
 - **Saúde**: o texto `"...laudo de manutenção do operador, sem relação com saúde do cidadão"` **é** marcado como categoria saúde pela regra de palavra-chave (`laudo`), mesmo não sendo sobre saúde do cidadão. Isso é um falso positivo real e aceito nesta heurística baseada em palavra-chave: o custo de um falso positivo (mascarar texto administrativo) é considerado menor que o de um falso negativo (deixar passar um laudo médico real). Documentado também em `src/pii/rules.ts`.
 - **Saudação vs. saúde**: `"Tenha uma boa saudação ao abrir o app"` não é marcado — a regra verifica substring exata (`saude`/`saúde`), que não ocorre em "saudação".
 - **Credencial**: `apiKey` com valor não vazio é marcado; uma chave de credencial com valor vazio (`""`) não é marcada, evitando falso positivo em campos de formulário ainda não preenchidos.
 - **RG**: qualquer valor no formato `00.000.000-0` é marcado, mesmo que seja outro identificador com o mesmo formato (ex: matrícula). Falso positivo aceito nesta heurística por regex simples; não há checksum de RG.
-- **Valor já mascarado** (qualquer categoria): um valor que contém `***`, o marcador "sensível omitido" ou é só asteriscos não é marcado de novo, mesmo que a chave do campo ainda sugira PII (ex: `healthNotes` com o texto já mascarado). Sem essa regra, reenviar um payload já sanitizado por outra camada geraria PII "fantasma" — é o que diferencia os pares vazado/mascarado acima.
+- **Valor já mascarado** (qualquer categoria): um valor no formato EXATO da máscara de uma regra (ex: `***.982.***-25` para CPF, `********` para credencial, texto terminado em "(conteúdo sensível omitido)" para saúde) não é marcado de novo, mesmo que a chave do campo ainda sugira PII (ex: `healthNotes` com o texto já mascarado). Essa checagem usa o formato canônico de cada categoria, não uma pista solta como "contém `***`" — uma senha de verdade pode ter esses caracteres por acaso (ex: `SYNTHETIC***CREDENTIAL-NOT-MASKED`), e um sinal fraco desligaria a detecção inteira. Sem essa guarda bem calibrada, reenviar um payload já sanitizado por outra camada geraria PII "fantasma" — é o que diferencia os pares vazado/mascarado acima.
+- **PII dentro de arrays**: `{"password": ["segredo"]}` é detectado e mascarado como `{"password": ["********"]}` — a regra usa a chave do array (`password`) como contexto pra cada string primitiva dentro dele, não só para objetos aninhados.
 
 ## Fluxo inseguro vs. fluxo seguro (taint analysis)
 

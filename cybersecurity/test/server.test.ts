@@ -44,6 +44,35 @@ test("POST /api/cybersecurity/v1/analyze detecta PII, mascara o payload e atuali
   });
 });
 
+// Regressão: achado de auditoria (Pedro, PR #13) — `source` era texto livre interpolado sem
+// validação no prompt da IA e nos eventos; alguém podia embutir um segredo nesse campo (ex:
+// source: "password=segredo-real") e fazê-lo vazar pro prompt/eventos sem passar pelo motor de PII.
+test("POST /api/cybersecurity/v1/analyze rejeita source com formato de texto livre (regressão: fonte não validada)", async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/cybersecurity/v1/analyze`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ source: "password=SYNTHETIC-SOURCE-SECRET", payload: { password: "demo" } }),
+    });
+    assert.equal(response.status, 400);
+    const body = (await response.json()) as any;
+    assert.equal(body.code, "invalid_source");
+    const events = await (await fetch(`${baseUrl}/api/cybersecurity/v1/events`)).json();
+    assert.equal(events.events.length, 0); // nada foi registrado, o segredo não chegou a lugar nenhum
+  });
+});
+
+test("POST /api/cybersecurity/v1/analyze aceita source no formato de identificador (caso positivo)", async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/api/cybersecurity/v1/analyze`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ source: "java-ingestion:operatorCpf", payload: { note: "sem pii aqui" } }),
+    });
+    assert.equal(response.status, 200);
+  });
+});
+
 test("POST /api/cybersecurity/v1/analyze rejeita corpo sem source/payload", async () => {
   await withServer(async (baseUrl) => {
     const response = await fetch(`${baseUrl}/api/cybersecurity/v1/analyze`, {
@@ -144,6 +173,21 @@ test("POST /dashboard/run-custom com JSON inválido mostra erro no painel em vez
     assert.equal(response.status, 200);
     const html = await response.text();
     assert.match(html, /não é um JSON válido/);
+  });
+});
+
+test("POST /dashboard/run-custom rejeita fonte em texto livre (regressão: fonte não validada)", async () => {
+  await withServer(async (baseUrl) => {
+    const response = await fetch(`${baseUrl}/dashboard/run-custom`, {
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ source: "password=SYNTHETIC-SOURCE-SECRET", payload: JSON.stringify({ password: "demo" }) }).toString(),
+    });
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.match(html, /[Ff]onte inválida/);
+    const events = await (await fetch(`${baseUrl}/api/cybersecurity/v1/events`)).json();
+    assert.equal(events.events.length, 0);
   });
 });
 

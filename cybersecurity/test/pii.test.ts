@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { scanPayload } from "../src/pii/parser.js";
+import { scanPayload, maskPayload } from "../src/pii/parser.js";
 
 test("detecta CPF formatado válido (caso positivo)", () => {
   const findings = scanPayload({ operatorCpf: "529.982.247-25" });
@@ -82,4 +82,50 @@ test("credencial no meio de um log estruturado é detectada", () => {
 test("credencial já mascarada no mesmo log não é marcada de novo (caso negativo central da demo)", () => {
   const findings = scanPayload({ timestamp: "2026-11-13T10:00:00Z", level: "INFO", password: "********", requestId: "req-88213" });
   assert.equal(findings.length, 0);
+});
+
+// Regressão: achado de auditoria (Pedro, PR #13) — "***" solto numa senha real desligava
+// a guarda de "já mascarado" e deixava o valor cru passar sem achado.
+test("senha crua contendo '***' por acaso ainda é detectada (regressão: guarda de máscara frouxa)", () => {
+  const findings = scanPayload({ password: "SYNTHETIC***CREDENTIAL-NOT-MASKED" });
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].category, "credential");
+  assert.equal(findings[0].maskedValue, "********");
+});
+
+// Regressão: achado de auditoria — strings primitivas dentro de arrays nunca passavam pelas
+// regras (só objetos aninhados eram testados), então documentos/senhas em lista vazavam.
+test("detecta PII em strings primitivas dentro de arrays (regressão: folhas de array ignoradas)", () => {
+  const findings = scanPayload({
+    documents: ["529.982.247-25"],
+    password: ["SYNTHETIC-ARRAY-SECRET"],
+  });
+  assert.equal(findings.length, 2);
+  assert.deepEqual(
+    findings.map((finding) => finding.category).sort(),
+    ["cpf", "credential"],
+  );
+});
+
+// Regressão: o CPF só era achado se o campo inteiro fosse exatamente o documento; um CPF
+// embutido numa mensagem de log/texto livre passava direto.
+test("detecta CPF embutido dentro de uma mensagem de texto livre (regressão: só campo inteiro)", () => {
+  const findings = scanPayload({ message: "O CPF informado foi 529.982.247-25 durante o cadastro" });
+  assert.equal(findings.length, 1);
+  assert.equal(findings[0].category, "cpf");
+  assert.equal(findings[0].maskedValue, "O CPF informado foi ***.982.***-25 durante o cadastro");
+});
+
+test("não marca uma sequência de 11 dígitos sem checksum válido embutida em texto (caso negativo)", () => {
+  const findings = scanPayload({ message: "Protocolo gerado: 123.456.789-10 para acompanhamento" });
+  assert.equal(findings.length, 0);
+});
+
+test("maskPayload também mascara strings primitivas dentro de arrays (regressão)", () => {
+  const masked = maskPayload({ password: ["SYNTHETIC-ARRAY-SECRET"], documents: ["529.982.247-25"] }) as {
+    password: string[];
+    documents: string[];
+  };
+  assert.equal(masked.password[0], "********");
+  assert.equal(masked.documents[0], "***.982.***-25");
 });
