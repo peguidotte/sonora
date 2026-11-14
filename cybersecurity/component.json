@@ -1,6 +1,6 @@
 {
   "component": "cybersecurity",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Herbert de Sousa Vilela",
   "rm": "555701",
   "branch": "herbert/cybersecurity",
@@ -8,7 +8,13 @@
   "contract": "contracts/README.md",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
+    "commands": [
+      "cd cybersecurity && npm install",
+      "cd cybersecurity && npm run build",
+      "cd cybersecurity && npm test",
+      "cd cybersecurity && npm run demo",
+      "cd cybersecurity && npm start"
+    ],
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
@@ -19,7 +25,9 @@
     ]
   },
   "validation": {
-    "commands": [],
+    "commands": [
+      "cd cybersecurity && npm test"
+    ],
     "evidence": []
   },
   "deployment": {
