@@ -24,4 +24,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09–10/11/2026 | Preparar laboratório Linux isolado e evidências para vídeo | Controlador VirtualBox/NoCloud, ensaio de provisionamento/reexecução/rede/rollback/reboot e coleta de logs/terminal/hashes. Corrigida aceitação indevida do retorno zero de netplan try; resultados executados ficam no PR e nas evidências locais, sem concluir a aplicação acadêmica |
 
+| 14/11/2026 | Implementar o app Mobile (Expo Router/TypeScript) após a entrega de Cybersecurity | Navegação completa (locais, perfil acústico, comparação, favoritos, settings), adaptador mock/HTTP único, SQLite para favoritos/cache offline com data, chave de API só em memória e acessibilidade (fonte/contraste/alvos de toque). `npm ci`, `tsc --noEmit`, `jest` (7/7) e `expo prebuild` android executados nesta máquina; execução integrada contra a API C# real, prints, vídeo e ficha CitizenTech continuam pendentes |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

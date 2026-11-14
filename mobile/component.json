@@ -1,6 +1,6 @@
 {
   "component": "mobile",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Herbert de Sousa Vilela",
   "rm": "555701",
   "branch": "herbert/mobile",
@@ -8,7 +8,12 @@
   "contract": "contracts/openapi/csharp.openapi.json",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
+    "commands": [
+      "npm ci",
+      "npx tsc --noEmit",
+      "npx jest",
+      "npx expo start"
+    ],
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
@@ -18,11 +23,14 @@
     ]
   },
   "validation": {
-    "commands": [],
+    "commands": [
+      "npx tsc --noEmit",
+      "npx jest"
+    ],
     "evidence": []
   },
   "deployment": {
-    "target": "expo-or-build",
+    "target": "expo-prebuild-android-debug-apk",
     "status": "not-deployed"
   }
 }
