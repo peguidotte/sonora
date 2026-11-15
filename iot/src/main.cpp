@@ -106,7 +106,7 @@ void updateClock() {
 
 void enqueue(const char* observedAt, double laeq) {
   if (queueSize == kQueueCapacity) {
-    Serial.printf("[fila] cheia, descartando %s\n", queue[queueHead].externalId);
+    Serial.printf("[fila] cheia, descartando %s\r\n", queue[queueHead].externalId);
     queueHead = (queueHead + 1) % kQueueCapacity;
     --queueSize;
   }
@@ -152,7 +152,7 @@ int post(const Pending& item) {
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-Api-Key", SONORA_DEVICE_KEY);
   const int status = http.POST(reinterpret_cast<uint8_t*>(body), strlen(body));
-  Serial.printf("[http] %s laeq=%.1f -> %d\n", item.externalId, item.laeqDbA, status);
+  Serial.printf("[http] %s laeq=%.1f -> %d\r\n", item.externalId, item.laeqDbA, status);
   http.end();
   return status;
 }
@@ -179,7 +179,7 @@ void flushOne() {
       break;
     case sonora::SendOutcome::Drop:
       lastStatus = "rejeit.";
-      Serial.printf("[http] %s rejeitada (%d), descartada\n", item.externalId, status);
+      Serial.printf("[http] %s rejeitada (%d), descartada\r\n", item.externalId, status);
       dropHead();
       break;
     case sonora::SendOutcome::AuthBlocked:
@@ -201,10 +201,10 @@ void closeWindow() {
   char observedAt[24];
   if (clockReady && sonora::formatIsoUtc(windowStart, observedAt, sizeof observedAt)) {
     enqueue(observedAt, lastLaeq);
-    Serial.printf("[janela] %s LAeq=%.1f dB(A) amostras=%d fila=%u\n", observedAt, lastLaeq, window.count(),
+    Serial.printf("[janela] %s LAeq=%.1f dB(A) amostras=%d fila=%u\r\n", observedAt, lastLaeq, window.count(),
                   static_cast<unsigned>(queueSize));
   } else {
-    Serial.printf("[janela] LAeq=%.1f dB(A) sem relógio NTP: não enviada\n", lastLaeq);
+    Serial.printf("[janela] LAeq=%.1f dB(A) sem relógio NTP: não enviada\r\n", lastLaeq);
     lastStatus = "sem NTP";
   }
   window.reset();
@@ -221,7 +221,7 @@ void setup() {
   lcd.init();
   lcd.backlight();
   newSession();
-  Serial.printf("[boot] Sonora nó simulado, deviceId=%s sessionId=%s\n", SONORA_DEVICE_ID, sessionId);
+  Serial.printf("[boot] Sonora nó simulado, deviceId=%s sessionId=%s\r\n", SONORA_DEVICE_ID, sessionId);
   WiFi.mode(WIFI_STA);
   connectWifi();
   configTime(0, 0, "pool.ntp.org", "time.google.com");  // UTC; o C# agrupa em America/Sao_Paulo
