@@ -30,7 +30,45 @@ function describeError(result) {
 }
 
 function formatDb(value) {
-  return value === null || value === undefined ? "sem dado" : `${value.toFixed(1)} dB(A)`;
+  return value === null || value === undefined ? "sem dado" : `${value.toFixed(1).replace(".", ",")} dB(A)`;
+}
+
+// A API mantém os textos do contrato em inglês (fixtures compartilhadas); o painel apenas os apresenta em PT-BR.
+// Texto desconhecido (por exemplo, limitações gravadas pelas fontes) é exibido como veio.
+const LIMITATIONS = [
+  [/^No observations in the requested period\.$/, () => "Nenhuma observação no período consultado."],
+  [/^Multiple producers or methods are reported as separate series; no combined level is given\.$/,
+    () => "Há mais de um produtor ou método: cada série é mostrada separadamente e não há nível combinado."],
+  [/^Only ([\d.]+) seconds observed; this does not represent the entire (hour|day|requested period)\.$/,
+    (m) => `Apenas ${formatDuration(Number(m[1]))} observados; isso não representa ${
+      { hour: "a hora inteira", day: "o dia inteiro", "requested period": "todo o período consultado" }[m[2]]}.`],
+  [/^Synthetic values\.$/, () => "Valores sintéticos (simulação, não medição real)."],
+  [/^Not a physical sound measurement\.$/, () => "Não é uma medição sonora física."],
+];
+
+function translate(text) {
+  for (const [pattern, render] of LIMITATIONS) {
+    const match = pattern.exec(text);
+    if (match) return render(match);
+  }
+  return text;
+}
+
+const METHODS = { wokwi_linear_demo: "simulação linear Wokwi", noisecapture_1s: "NoiseCapture (1 s)" };
+const CALIBRATION = { unknown: "desconhecida", simulated: "simulada", documented: "documentada" };
+
+function formatDuration(totalSeconds) {
+  const seconds = Math.round(totalSeconds);
+  if (seconds < 60) return `${seconds} s`;
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  const parts = [];
+  if (days) parts.push(`${days} d`);
+  if (hours) parts.push(`${hours} h`);
+  if (minutes) parts.push(`${minutes} min`);
+  if (!days && seconds % 60) parts.push(`${seconds % 60} s`);
+  return parts.join(" ");
 }
 
 function localLabel(isoUtc, aggregation, short) {
@@ -123,50 +161,84 @@ function renderProfile(profile) {
   const observed = profile.series.flatMap((s) => s.bins).reduce((sum, bin) => sum + bin.observedSeconds, 0);
   $("profile-summary").append(
     metric("Nível equivalente (LAeq)", profile.status === "no_data" ? "sem dados" : formatDb(profile.laeqDbA)),
-    metric("Tempo observado", `${Math.round(observed)} s`),
+    metric("Tempo observado", formatDuration(observed)),
     metric("Séries", profile.series.length),
     metric("Origem", profile.origin === "simulated" ? "simulada" : "dados públicos"),
   );
 
   for (const series of profile.series) {
     const block = el("div", null, "series");
-    block.append(el("p", `Produtor ${series.producerId} · método ${series.method} · calibração ${series.calibrationStatus}`));
-    const chart = el("div", null, "chart");
-    chart.setAttribute("role", "img");
-    chart.setAttribute("aria-label", `Gráfico de ${series.bins.length} intervalo(s) com nível em dB(A)`);
-    const labels = el("div", null, "labels");
-    labels.setAttribute("aria-hidden", "true");
-    for (const bin of series.bins) {
-      const bar = el("div", null, "bar");
-      const fill = el("span", null, "fill");
-      // Escala visual 20–100 dB(A) para evidenciar a variação; o valor exato fica no rótulo e na tabela.
-      fill.style.height = `${Math.max(2, Math.min(100, ((bin.laeqDbA - 20) / 80) * 100))}%`;
-      fill.title = `${localLabel(bin.from, profile.aggregation)}: ${formatDb(bin.laeqDbA)}, ${bin.observedSeconds} s`;
-      bar.append(el("span", bin.laeqDbA.toFixed(0), "value"), fill);
-      chart.append(bar);
-      labels.append(el("span", localLabel(bin.from, profile.aggregation, true)));
-    }
+    block.append(el("p", `Produtor ${series.producerId} · método ${METHODS[series.method] || series.method}`
+      + ` · calibração ${CALIBRATION[series.calibrationStatus] || series.calibrationStatus}`));
+    block.append(renderChart(series, profile.aggregation));
+    const details = el("details");
+    details.append(el("summary", `Ver tabela (${series.bins.length} intervalo(s))`));
     const table = el("table");
     const head = el("tr");
-    for (const title of ["Início (São Paulo)", "LAeq", "Observações", "Sessões", "Segundos"]) head.append(el("th", title));
+    for (const title of ["Início (São Paulo)", "LAeq", "Observações", "Sessões", "Tempo observado"]) head.append(el("th", title));
     table.append(head);
     for (const bin of series.bins) {
       const row = el("tr");
       row.append(el("td", localLabel(bin.from, profile.aggregation)), el("td", formatDb(bin.laeqDbA)),
-        el("td", bin.observationCount), el("td", bin.sessionCount), el("td", bin.observedSeconds));
+        el("td", bin.observationCount), el("td", bin.sessionCount), el("td", formatDuration(bin.observedSeconds)));
       table.append(row);
     }
-    block.append(chart, labels, table);
+    details.append(table);
+    block.append(details);
     $("profile-series").append(block);
   }
 
-  for (const limitation of profile.limitations) $("profile-limitations").append(el("li", limitation));
+  for (const limitation of profile.limitations) $("profile-limitations").append(el("li", translate(limitation)));
   if (profile.sources.length === 0) $("profile-sources").append(el("li", "Nenhuma fonte no período.", "muted"));
   for (const source of profile.sources) {
-    const item = el("li", `${source.name} — ${source.license}, snapshot ${source.snapshotDate}. `);
-    item.append(el("span", source.limitations.join(" "), "muted"));
+    const item = el("li", `${source.name} — licença: ${source.license}; recorte de ${formatDate(source.snapshotDate)}. `);
+    item.append(el("span", source.limitations.map(translate).join(" "), "muted"));
     $("profile-sources").append(item);
   }
+}
+
+function formatDate(isoDate) {
+  const [year, month, day] = String(isoDate).split("-");
+  return day && month && year ? `${day}/${month}/${year}` : isoDate;
+}
+
+// Cada coluna leva barra e rótulo juntos, então rolar o gráfico nunca desalinha horário e valor.
+// A régua de 20–100 dB(A) fica fixa à esquerda, fora da área que rola.
+function renderChart(series, aggregation) {
+  const wrapper = el("div", null, "chart-wrapper");
+  wrapper.setAttribute("role", "img");
+  wrapper.setAttribute("aria-label", `Gráfico de ${series.bins.length} intervalo(s) com nível em dB(A); valores na tabela abaixo`);
+
+  const axis = el("div", null, "axis");
+  axis.setAttribute("aria-hidden", "true");
+  for (const tick of [100, 80, 60, 40, 20]) axis.append(el("span", tick));
+  axis.append(el("span", "dB(A)", "unit"));
+
+  const scroller = el("div", null, "chart-scroll");
+  scroller.tabIndex = 0;
+  const chart = el("div", null, "chart");
+  chart.setAttribute("aria-hidden", "true");
+  let previousDay = null;
+  for (const bin of series.bins) {
+    const day = localLabel(bin.from, "day");
+    const column = el("div", null, "column");
+    if (aggregation === "hour" && day !== previousDay && previousDay !== null) column.classList.add("new-day");
+    const plot = el("div", null, "plot");
+    const fill = el("span", null, "fill");
+    // Escala visual 20–100 dB(A) para evidenciar a variação; o valor exato fica no rótulo e na tabela.
+    fill.style.height = `${Math.round(Math.max(1, Math.min(100, ((bin.laeqDbA - 20) / 80) * 100)) * 2)}px`; // 100% = 200px
+    plot.append(el("span", bin.laeqDbA.toFixed(0), "value"), fill);
+    column.title = `${localLabel(bin.from, aggregation)}: ${formatDb(bin.laeqDbA)}, ${formatDuration(bin.observedSeconds)} observados`;
+    const tick = el("div", null, "tick");
+    tick.append(el("span", localLabel(bin.from, aggregation, true)));
+    if (aggregation === "hour") tick.append(el("span", day !== previousDay ? day : "", "day"));
+    column.append(plot, tick);
+    chart.append(column);
+    previousDay = day;
+  }
+  scroller.append(chart);
+  wrapper.append(axis, scroller);
+  return wrapper;
 }
 
 async function loadDevices() {
