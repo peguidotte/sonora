@@ -1,4 +1,5 @@
 using System.Data.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi;
@@ -48,7 +49,13 @@ builder.Services.AddSingleton<IDeviceStatePolicy>(services => new DeviceStatePol
 builder.Services.AddScoped<IAcousticQueryService, AcousticQueryService>();
 builder.Services.AddSingleton<IApiKeyStore, FileApiKeyStore>();
 
-builder.Services.AddOpenApi(options => options.AddDocumentTransformer((document, _, _) =>
+builder.Services.AddOpenApi(options => options.AddOperationTransformer((operation, context, _) =>
+{
+    // Rotas anônimas (liveness e shells do painel) sobrescrevem a exigência global com "security": [], como no contrato.
+    if (context.Description.ActionDescriptor.EndpointMetadata.OfType<IAllowAnonymous>().Any())
+        operation.Security = [];
+    return Task.CompletedTask;
+}).AddDocumentTransformer((document, _, _) =>
 {
     document.Info = new OpenApiInfo
     {

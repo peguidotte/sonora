@@ -121,4 +121,20 @@ public sealed class SecurityTests : IClassFixture<SonoraApiFactory>
         Assert.Equal("X-Api-Key", document.RootElement.GetProperty("components").GetProperty("securitySchemes")
             .GetProperty("ApiKeyAuth").GetProperty("name").GetString());
     }
+
+    [Fact]
+    public async Task RuntimeDocumentationMarksOnlyContractAnonymousRoutesWithoutSecurity()
+    {
+        var response = await Get("/api/sonora/v1/openapi.json", SonoraApiFactory.OperatorKey);
+        using var document = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        var paths = document.RootElement.GetProperty("paths");
+        var contract = Repository.Contract("openapi/csharp.openapi.json")["paths"]!.AsObject();
+        foreach (var (path, item) in contract)
+        {
+            var contractAnonymous = item!["get"]!["security"] is System.Text.Json.Nodes.JsonArray { Count: 0 };
+            var runtime = paths.GetProperty(path).GetProperty("get");
+            var runtimeAnonymous = runtime.TryGetProperty("security", out var security) && security.GetArrayLength() == 0;
+            Assert.True(contractAnonymous == runtimeAnonymous, $"{path}: anonymous in contract={contractAnonymous}, runtime={runtimeAnonymous}");
+        }
+    }
 }

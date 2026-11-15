@@ -1,6 +1,8 @@
 # Sonora — API de consulta acústica (.NET) e painel
 
-Responsável: **Leonardo Correa de Mello, RM555573** (C# Software Development). [Equipe completa](../README.md#equipe).
+Responsável: **Leonardo Correa de Mello, RM555573** (C# Software Development).
+
+Equipe: Leonardo Correa de Mello (RM555573), Felipe Soares Xavier (RM556931), Pedro Visconti Guidotte (RM556630), Herbert de Sousa Vilela (RM555701) e Gabriel Figueira Flora (RM556476). Responsabilidades e branches no [README principal](../README.md#equipe).
 
 [Especificação da matéria](../docs/disciplinas/csharp.md) · [Arquitetura](../docs/arquitetura.md) · [Contratos](../contracts/README.md) · [OpenAPI alvo](../contracts/openapi/csharp.openapi.json)
 
@@ -31,6 +33,20 @@ Imobiliárias e pessoas escolhendo onde morar não conseguem perceber, numa visi
 Fora do prefixo: `GET /dashboard` (painel) e `GET /dashboard/docs` (Scalar), ambos shells anônimos que pedem a chave e a mantêm apenas na memória da aba.
 
 Erros seguem o schema `Error` do contrato: `400 invalid_parameter|missing_parameter|invalid_window|invalid_coordinates`, `401 unauthorized`, `403 forbidden`, `404 not_found`, `503 service_unavailable`, `500 internal_error` (sem detalhes internos).
+
+## Integração com as outras matérias
+
+A API não chama nenhum outro serviço: tudo passa pelo PostgreSQL (escrito pelo Java) ou pelo HTTP de leitura (consumido pelos clientes). Formatos oficiais em [contracts/](../contracts/README.md); abaixo, só o que cada integração precisa saber do lado C#.
+
+| Matéria | Como se conecta | O que precisa do C# |
+| --- | --- | --- |
+| SOA (Felipe) | Publica as views `sonora_read`, os grants de `sonora_query` e o seed no [módulo database/](../database/README.md); o Java grava, o C# só lê | Views, colunas e nulabilidade de [database.json](../contracts/database.json), conferidas por `DatabaseContractTests`. Pedido em aberto: expor `producer_id` em `observations` |
+| Mobile (Herbert) | Consome só esta API por HTTPS; desenvolve contra o mock (`tools/mock_server.py --service csharp`) e troca a URL base para integrar | Chave com `acoustics:read` digitada pelo usuário e mantida em memória; rotas `locations`, `locations/{id}` e `noise-profile`. Comparar dois locais = dois perfis com a mesma origem e o mesmo período, exibindo as limitações de cada um. App nativo não depende de CORS; a API não habilita CORS para navegador |
+| Cybersecurity (Herbert) | Audita a versão identificada desta pasta | Chaves por hash SHA-256 em arquivo fora do Git, escopos, `expiresAt`/`revoked`, 401 antes de 403, papel de banco sem escrita, cabeçalhos `nosniff`/`no-store` e CSP do painel; código em [Security/](Sonora.Api/Security) |
+| ML (Gabriel) | Exporta `ml/output/summary.json`; o Java importa para `ml_summaries` | `GET /analytics/summary` devolve o payload mais recente sem alterá-lo, ou 204 se não houver artefato real |
+| Testing (Felipe) | Casos no Azure contra as URLs e status do OpenAPI | F01 `locations`; F02 `noise-profile` (60/70 dB → ≈ 67,40; vazio → `no_data`); F03 dois `noise-profile`; F05 observação gravada pelo Java aparece em `observations`/`noise-profile`; F07 `devices` e `health/ready`; F08 `analytics/summary` |
+| Linux (Pedro) | Publica o binário e o executa como serviço atrás do proxy HTTPS | Seção [Deploy](#deploy-handoff-para-linux): publish, variáveis, porta, healthcheck e permissões |
+| Physical Computing (Leonardo) | ESP32/Wokwi envia ao Java, nunca ao C# | Observações `simulated` com método `wokwi_linear_demo` aparecem nos perfis com a limitação "valores sintéticos" |
 
 ## Organização e rubrica
 
@@ -113,6 +129,23 @@ dotnet publish api/Sonora.Api -c Release -r linux-arm64 --self-contained true -o
 ```
 
 Executável `output/api/Sonora.Api`, sem SDK no servidor; painel e Scalar ficam embutidos no binário. Escuta em `127.0.0.1:8080` atrás do proxy HTTPS, que deve encaminhar `/api/sonora/v1` e `/dashboard` sem remover prefixos. Requer as variáveis da tabela, papel `sonora_query` com `SELECT` nas views e as migrations aplicadas antes do serviço. Verificação pós-deploy: `GET /api/sonora/v1/health/ready` com chave `operations:read`.
+
+## Evidências
+
+Capturas de 15/11/2026 no macOS, sobre o commit `517466f` da branch `leo/csharp` (o teste de OpenAPI anônimo veio depois, por isso a contagem atual é 87 + 2). Os dados vêm de um PostgreSQL 16 local com **views de laboratório equivalentes ao contrato** (2 locais, 1 fonte sintética, 1 dispositivo, as 2 observações das fixtures e 864 observações sintéticas de 5 min a partir de 10/11/2026), porque as views e o seed oficiais do módulo `database/` ainda não existem. Não há dado real de medição.
+
+| # | O que comprova | Captura |
+| --- | --- | --- |
+| 1 | Testes unitários, de contrato HTTP e de segurança: 86 aprovados, 2 de integração pulados sem banco | ![Testes](docs/evidencias/01-testes.png) |
+| 2 | Com `SONORA_DB_INTEGRATION=1`: 88 aprovados, incluindo leitura das views via EF Core e `sonora_query` sem permissão de escrita | ![Testes de integração](docs/evidencias/02-testes-integracao.png) |
+| 3 | Sem chave e chave inválida → 401; escopo errado → 403; chave e escopo certos → 200 | ![Segurança](docs/evidencias/03-seguranca.png) |
+| 4 | Painel conectado com a chave mantida só na memória da aba | ![Painel conectado](docs/evidencias/04-painel-acesso.png) |
+| 5 | Perfil por hora no fuso de São Paulo, média energética, cobertura e limitações | ![Perfil por hora](docs/evidencias/05-perfil-hora.png) |
+| 6 | Mesmo período agrupado por dia | ![Perfil por dia](docs/evidencias/06-perfil-dia.png) |
+| 7 | Origem sem observações → `no_data` com nível nulo, não 0 dB | ![Sem dados](docs/evidencias/07-sem-dados.png) |
+| 8 | Estado do dispositivo calculado do último recebimento; resumo ML sem artefato real → 204 | ![Dispositivos e ML](docs/evidencias/08-dispositivos-ml.png) |
+| 9 | Scalar executando `noise-profile` com chave: 60 e 70 dB → 67,40 dB(A) | ![Scalar](docs/evidencias/09-scalar.png) |
+| 10 | Banco parado → `health/ready` responde 503 `unavailable` sem detalhes internos | ![Banco indisponível](docs/evidencias/10-banco-indisponivel.png) |
 
 ## Limites conhecidos
 
