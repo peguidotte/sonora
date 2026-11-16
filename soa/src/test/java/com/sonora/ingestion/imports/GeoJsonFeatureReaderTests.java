@@ -39,6 +39,20 @@ class GeoJsonFeatureReaderTests {
     }
 
     @Test
+    void requiresFeatureCollectionTypeAndNothingAfterTheDocument() {
+        assertEquals(List.of(), read("{\"type\":\"FeatureCollection\",\"features\":[]}  \n"));
+        assertThrows(GeoJsonFeatureReader.MalformedFileException.class,
+                () -> read("{\"type\":\"FeatureCollection\",\"features\":[]} garbage"));
+        assertThrows(GeoJsonFeatureReader.MalformedFileException.class,
+                () -> read("{\"type\":\"FeatureCollection\",\"features\":[]}{}"));
+        assertThrows(GeoJsonFeatureReader.MalformedFileException.class,
+                () -> read("{\"type\":\"NotAFeatureCollection\",\"features\":[]}"));
+        assertThrows(GeoJsonFeatureReader.MalformedFileException.class, () -> read("{\"features\":[]}"));
+        assertThrows(GeoJsonFeatureReader.MalformedFileException.class,
+                () -> read("{\"type\":{\"x\":1},\"features\":[]}"));
+    }
+
+    @Test
     void consumerFailureIsNotReportedAsMalformedFile() {
         var failure = new IllegalStateException("database down");
         var thrown = assertThrows(IllegalStateException.class, () -> reader.read(

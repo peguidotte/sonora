@@ -32,11 +32,17 @@ public final class GeoJsonFeatureReader {
     public long read(InputStream input, ObjLongConsumer<JsonNode> consumer) {
         long index = 0;
         boolean sawFeatures = false;
+        boolean featureCollection = false;
         try (JsonParser parser = json.createParser(input)) {
             if (parser.nextToken() != JsonToken.START_OBJECT) throw new MalformedFileException("GeoJSON root must be an object.");
             while (parser.nextToken() == JsonToken.PROPERTY_NAME) {
                 String name = parser.currentName();
                 JsonToken value = parser.nextToken();
+                if ("type".equals(name)) {
+                    featureCollection = value == JsonToken.VALUE_STRING && "FeatureCollection".equals(parser.getString());
+                    if (!featureCollection) throw new MalformedFileException("GeoJSON root type must be FeatureCollection.");
+                    continue;
+                }
                 if (!"features".equals(name)) {
                     parser.skipChildren();
                     continue;
@@ -53,6 +59,8 @@ public final class GeoJsonFeatureReader {
                 }
             }
             if (parser.currentToken() != JsonToken.END_OBJECT) throw new MalformedFileException("Truncated GeoJSON.");
+            // Nada além de espaços depois do documento: conteúdo extra indica arquivo corrompido/concatenado.
+            if (parser.nextToken() != null) throw new MalformedFileException("Unexpected content after GeoJSON document.");
         } catch (MalformedFileException malformed) {
             throw malformed;
         } catch (ConsumerFailure failure) {
@@ -61,6 +69,7 @@ public final class GeoJsonFeatureReader {
         } catch (RuntimeException invalidJson) {
             throw new MalformedFileException("Invalid JSON at feature " + index + ".", invalidJson);
         }
+        if (!featureCollection) throw new MalformedFileException("GeoJSON root type must be FeatureCollection.");
         if (!sawFeatures) throw new MalformedFileException("FeatureCollection without features.");
         return index;
     }

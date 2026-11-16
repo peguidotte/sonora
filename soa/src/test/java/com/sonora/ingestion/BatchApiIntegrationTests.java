@@ -17,6 +17,8 @@ class BatchApiIntegrationTests extends IntegrationTestBase {
     static final String VALID = "it-valid-" + RUN;
     static final String MISSING = "it-missing-" + RUN;
     static final String TRUNCATED = "it-truncated-" + RUN;
+    static final String TRAILING = "it-trailing-" + RUN;
+    static final String WRONG_TYPE = "it-wrongtype-" + RUN;
     static final long TRACK = Math.abs(UUID.randomUUID().getMostSignificantBits() % 1_000_000_000L);
 
     /** 1 grau de latitude ≈ 111 km; 0,0001 ≈ 11 m. */
@@ -43,12 +45,17 @@ class BatchApiIntegrationTests extends IntegrationTestBase {
         Files.writeString(WORK.resolve("valid.points.geojson"), collection);
         Files.writeString(WORK.resolve("truncated.points.geojson"), "{\"type\":\"FeatureCollection\",\"features\":[\n"
                 + feature(TRACK + 1, epoch, LAT, LON, "55.0", "3.0") + ",\n{\"type\":");
+        Files.writeString(WORK.resolve("trailing.points.geojson"), "{\"type\":\"FeatureCollection\",\"features\":[]} garbage");
+        Files.writeString(WORK.resolve("wrongtype.points.geojson"), "{\"type\":\"NotAFeatureCollection\",\"features\":[]}");
         Files.writeString(WORK.resolve("imports.json"), """
                 {"files":[
                  {"fileId":"%s","sourceId":"%s","path":"valid.points.geojson","format":"noisecapture_points_geojson","maxDistanceMeters":50},
                  {"fileId":"%s","sourceId":"%s","path":"absent.points.geojson","format":"noisecapture_points_geojson"},
-                 {"fileId":"%s","sourceId":"%s","path":"truncated.points.geojson","format":"noisecapture_points_geojson"}]}
-                """.formatted(VALID, PUBLIC_SOURCE, MISSING, PUBLIC_SOURCE, TRUNCATED, PUBLIC_SOURCE));
+                 {"fileId":"%s","sourceId":"%s","path":"truncated.points.geojson","format":"noisecapture_points_geojson"},
+                 {"fileId":"%s","sourceId":"%s","path":"trailing.points.geojson","format":"noisecapture_points_geojson"},
+                 {"fileId":"%s","sourceId":"%s","path":"wrongtype.points.geojson","format":"noisecapture_points_geojson"}]}
+                """.formatted(VALID, PUBLIC_SOURCE, MISSING, PUBLIC_SOURCE, TRUNCATED, PUBLIC_SOURCE,
+                TRAILING, PUBLIC_SOURCE, WRONG_TYPE, PUBLIC_SOURCE));
     }
 
     private Response create(String fileId) throws Exception {
@@ -116,6 +123,8 @@ class BatchApiIntegrationTests extends IntegrationTestBase {
         assertEquals("failed", truncated.get("status").asString());
         assertEquals(committed(truncated.get("id").asString()), truncated.get("acceptedCount").asInt(),
                 "o que foi commitado antes da falha continua contado");
+        assertEquals("failed", create(TRAILING).body().get("status").asString(), "conteúdo após o JSON");
+        assertEquals("failed", create(WRONG_TYPE).body().get("status").asString(), "raiz não é FeatureCollection");
 
         assertEquals(400, request("POST", "/sonora/batches", OPERATOR_KEY, "{\"fileId\":\"x\",\"path\":\"/etc/passwd\"}").status(),
                 "caminho arbitrário não é aceito");

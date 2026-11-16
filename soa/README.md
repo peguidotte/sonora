@@ -23,7 +23,7 @@ summary.json do ML ──comando local import-ml-summary──┘
 | Conexão com banco (3,0) | Spring Data JPA + PostgreSQL com a conta `sonora_ingest` (sem DDL); `ddl-auto=validate` confere as entidades contra o schema real na inicialização; transações explícitas por trecho de importação |
 | Migrations (1,5) | [`database/migrations`](../database/migrations): V2 (tabelas, CHECKs, chaves compostas de origem, menor privilégio) e V3 (views `sonora_read` para o C#), aplicadas pelo Flyway CLI independente do JAR; seed sintético separado em `database/seeds/dev` |
 | Documentação automática (1,5) | springdoc gera `/api/ingestion/v1/openapi.json` a partir do código (rotas, DTOs, limites, erros e `x-required-scopes`); um teste confronta o documento gerado com [`soa.openapi.json`](../contracts/openapi/soa.openapi.json) |
-| Testes automatizados (1,0) | 30 testes JUnit: 15 unitários e 15 de integração HTTP + PostgreSQL real (ver [Testes](#testes)) |
+| Testes automatizados (1,0) | 31 testes JUnit: 16 unitários e 15 de integração HTTP + PostgreSQL real (ver [Testes](#testes)) |
 
 ## Requisitos
 
@@ -137,17 +137,41 @@ Valida o arquivo pelo [schema compartilhado](../contracts/schemas/ml-summary.sch
 
 ## Testes
 
-`mvn -B -f soa/pom.xml verify` executa 30 testes. Os 15 de integração rodam quando `SONORA_DB_PASSWORD` está definida e o banco foi migrado; sem banco aparecem como **pulados**, nunca aprovados. Usam IDs e coordenadas aleatórios, mas gravam dados que o runtime não pode apagar: usar somente banco descartável.
+`mvn -B -f soa/pom.xml verify` executa 31 testes. Os 15 de integração rodam quando `SONORA_DB_PASSWORD` está definida e o banco foi migrado; sem banco aparecem como **pulados**, nunca aprovados. Usam IDs e coordenadas aleatórios, mas gravam dados que o runtime não pode apagar: usar somente banco descartável.
 
 | Classe | Verifica |
 | --- | --- |
 | `ObservationApiIntegrationTests` | 401/403 antes do corpo, 201→200→409, campos resolvidos no servidor, limites no valor exato e acima, tipos estritos, campo `origin` recusado, UTC/futuro/microssegundos, Unicode no limite sem truncamento, vínculo/cadastro do dispositivo |
-| `BatchApiIntegrationTests` | Contadores = linhas commitadas, cada motivo de rejeição, reimportação idempotente, 404/422 sem lote, arquivo truncado → `failed`, caminho no corpo recusado, paginação |
+| `BatchApiIntegrationTests` | Contadores = linhas commitadas, cada motivo de rejeição, reimportação idempotente, 404/422 sem lote, arquivo truncado, com conteúdo após o JSON ou de outro tipo → `failed`, caminho no corpo recusado, paginação |
 | `OpenApiContractIntegrationTests` | Documento gerado x contrato: rotas, operationIds, escopos, códigos de resposta, campos obrigatórios e `maxLength` |
 | `DatabaseIntegrationTests` | Privilégios reais de `sonora_ingest`, CHECKs/chaves compostas, importação ML idempotente |
-| Unitários | Leitor GeoJSON em streaming, regras de ponto e associação a 50 m, Unicode, chaves (hash, revogação, expiração, mock), estados do lote |
+| Unitários | Leitor GeoJSON em streaming (tipo FeatureCollection e nada após o documento), regras de ponto e associação a 50 m, Unicode, chaves (hash, revogação, expiração, mock), estados do lote |
 
 Na CI, `deploy/pipeline.py package soa` executa o mesmo `mvn verify` contra o PostgreSQL migrado e `tools/check_database_compatibility.py` confere contratos x catálogo real (41 campos, sem relações pendentes). Resultados de execução e prints ficam no PR.
+
+## Implantação (handoff para Linux/deploy)
+
+O provisionamento (`linux/`, Pedro) deve gerar de forma reprodutível, além de `SONORA_DB_*` e `SONORA_KEYS_FILE`:
+
+1. **`SONORA_IMPORTS_FILE`** no `soa.env`, apontando para um catálogo fora do Git (ex.: `/etc/sonora/soa-imports.json`), no formato de [`imports.example.json`](imports.example.json) com `path` **absoluto** do dataset (ex.: `/var/lib/sonora/imports/sao-paulo.points.geojson`). Sem essa variável o serviço sobe, mas todo `fileId` responde 404 (falha fechada).
+2. **Dataset legível pelo usuário do serviço Java** (arquivo regular, sem link simbólico; somente leitura basta). Baixar de `https://data.noise-planet.org/dump/Brazil.zip`, conferir o SHA-256 e extrair o arquivo `Brazil_São Paulo_São Paulo.points.geojson`.
+3. **Chaves**: uma de operador (`imports:manage`, `operations:read`) e uma por dispositivo Wokwi (`observations:write` + `deviceId`), só com hash no arquivo do serviço.
+4. **Dados de referência** (locais, fontes e dispositivos): as migrations não os cadastram e o seed de laboratório **não** vai para a Azure. Inserir com a conta `sonora_migrator`, depois das migrations, com os valores escolhidos pela equipe:
+
+```sql
+INSERT INTO sonora.sources (id, name, source_url, snapshot_date, license, origin, limitations)
+VALUES ('<uuid>', 'NoiseCapture Brazil dump', 'https://data.noise-planet.org/dump/Brazil.zip', DATE '<data do download>',
+        'ODbL 1.0 (NoiseCapture / Noise-Planet)', 'public_dataset', '["Crowdsourced smartphone measurements; calibration unknown."]')
+ON CONFLICT (id) DO NOTHING;
+INSERT INTO sonora.locations (id, name, city, latitude, longitude, is_demo)
+VALUES ('<uuid>', '<nome do local>', 'São Paulo', <lat>, <lon>, <true|false>) ON CONFLICT (id) DO NOTHING;
+-- Dispositivo Wokwi: exige uma fonte com origin='simulated' para o mesmo source_id.
+INSERT INTO sonora.devices (id, location_id, source_id, name, method, calibration_status)
+VALUES ('<uuid do deviceId da chave>', '<uuid do local>', '<uuid da fonte simulada>', '<nome>', 'wokwi_linear_demo', 'simulated')
+ON CONFLICT (id) DO NOTHING;
+```
+
+`ON CONFLICT DO NOTHING` torna o bootstrap reexecutável no reprovisionamento. Não há rota HTTP de cadastro (fora do contrato).
 
 ## Evidências
 
@@ -162,7 +186,7 @@ Capturas geradas pelo roteiro [`evidencias/gerar-evidencias.sh`](evidencias/gera
 | 5 | Banco | Linha gravada com origem/método resolvidos no servidor; view lida pelo C#; escrita negada à conta do C# |
 | 6 | Documentação | OpenAPI 3.1 gerado: rotas, escopos e respostas; 401 sem chave |
 | 7 | Domínio / Banco | Importação real do NoiseCapture: 838 aceitos, reimportação com 838 duplicatas, motivos das rejeições |
-| 8 | Testes | `mvn verify`: 30 testes, 0 falhas |
+| 8 | Testes | `mvn verify` sem falhas (captura feita com 30 testes; o teste de raiz GeoJSON veio depois da revisão) |
 
 ![1 - Migrations](evidencias/01-migrations.png)
 ![2 - Seed](evidencias/02-seed.png)

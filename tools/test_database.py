@@ -12,8 +12,10 @@ ROOT = Path(__file__).resolve().parents[1]
 @unittest.skipUnless(os.environ.get('SONORA_DATABASE_TESTS') == '1', 'Requer PostgreSQL descartável e SONORA_DATABASE_TESTS=1.')
 class DatabaseMigrationTests(unittest.TestCase):
     def migrate(self, root=ROOT / 'database', action='migrate'):
+        # Cópias temporárias de database/ não têm ../output: usar o Flyway preparado no clone.
+        env = os.environ | {'FLYWAY_HOME': os.environ.get('FLYWAY_HOME') or str(ROOT / 'output/tools/flyway')}
         return subprocess.run(['bash', str(root / 'migrate.sh'), action],
-                              capture_output=True, text=True, timeout=60)
+                              capture_output=True, text=True, timeout=60, env=env)
 
     def sql(self, query):
         return subprocess.check_output(['psql', '-X', '-v', 'ON_ERROR_STOP=1', '-At', '-c', query], text=True).strip()
