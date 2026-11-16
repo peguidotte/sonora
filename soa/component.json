@@ -9,7 +9,10 @@
   "standalone": {
     "requiresCloud": false,
     "commands": [
-      "mvn -f soa/pom.xml spring-boot:run"
+      "docker compose -p sonora-local -f database/compose.yaml up -d --wait postgres",
+      "docker compose -p sonora-local -f database/compose.yaml run --rm migrate",
+      "mvn -B -f soa/pom.xml verify",
+      "java -jar soa/target/sonora-ingestion-0.1.0-SNAPSHOT.jar"
     ],
     "dataMode": "postgresql-and-local-inputs"
   },
@@ -21,7 +24,8 @@
   },
   "validation": {
     "commands": [
-      "mvn -B -f soa/pom.xml verify"
+      "mvn -B -f soa/pom.xml verify",
+      "python tools/check_database_compatibility.py --baseline-ref origin/main"
     ],
     "evidence": []
   },

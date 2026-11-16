@@ -24,4 +24,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09–10/11/2026 | Preparar laboratório Linux isolado e evidências para vídeo | Controlador VirtualBox/NoCloud, ensaio de provisionamento/reexecução/rede/rollback/reboot e coleta de logs/terminal/hashes. Corrigida aceitação indevida do retorno zero de netplan try; resultados executados ficam no PR e nas evidências locais, sem concluir a aplicação acadêmica |
 
+| 16/11/2026 | Implementar a entrega de SOA (Felipe) com assistente de IA | Migrations V2/V3, seed de laboratório e serviço Java (domínio, ingestão IoT, importação NoiseCapture, comando ML, OpenAPI gerado). Executados localmente em PostgreSQL 16 descartável: 30 testes Maven, testes de `tools/` e checker API/banco sem erros; importação do dump real conferida contra o banco. Revisão humana, PR, CI no GitHub e deploy ainda pendentes |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
