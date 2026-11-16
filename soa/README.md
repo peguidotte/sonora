@@ -149,6 +149,30 @@ Valida o arquivo pelo [schema compartilhado](../contracts/schemas/ml-summary.sch
 
 Na CI, `deploy/pipeline.py package soa` executa o mesmo `mvn verify` contra o PostgreSQL migrado e `tools/check_database_compatibility.py` confere contratos x catálogo real (41 campos, sem relações pendentes). Resultados de execução e prints ficam no PR.
 
+## Evidências
+
+Capturas geradas pelo roteiro [`evidencias/gerar-evidencias.sh`](evidencias/gerar-evidencias.sh), que recria o banco vazio e executa cada etapa pausando para o print (`bash soa/evidencias/gerar-evidencias.sh` na raiz do clone; requer Docker e Python 3).
+
+| # | Rubrica | O que a imagem mostra |
+| --- | --- | --- |
+| 1 | Migrations | Banco vazio → V1, V2 e V3 aplicadas pelo Flyway; tabelas `sonora` e views `sonora_read` |
+| 2 | Migrations | Seed recusado sem a trava e aplicado com ela, em histórico separado |
+| 3 | Banco | Serviço iniciado com `sonora_ingest`; Hibernate validou o schema; `ready` com banco ok |
+| 4 | Domínio / REST | 401, 403, 201, 200 (retry), 409, 403 (outro dispositivo), 400 (`origin`), 400 (faixa), 422 (futuro) |
+| 5 | Banco | Linha gravada com origem/método resolvidos no servidor; view lida pelo C#; escrita negada à conta do C# |
+| 6 | Documentação | OpenAPI 3.1 gerado: rotas, escopos e respostas; 401 sem chave |
+| 7 | Domínio / Banco | Importação real do NoiseCapture: 838 aceitos, reimportação com 838 duplicatas, motivos das rejeições |
+| 8 | Testes | `mvn verify`: 30 testes, 0 falhas |
+
+![1 - Migrations](evidencias/01-migrations.png)
+![2 - Seed](evidencias/02-seed.png)
+![3 - Serviço](evidencias/03-servico.png)
+![4 - Regras HTTP](evidencias/04-regras-http.png)
+![5 - Persistência](evidencias/05-persistencia.png)
+![6 - OpenAPI](evidencias/06-openapi.png)
+![7 - Importação NoiseCapture](evidencias/07-importacao-noisecapture.png)
+![8 - Testes](evidencias/08-testes.png)
+
 ## Limites
 
 - Wokwi gera nível **simulado**, sem calibração física; NoiseCapture é medição colaborativa de smartphone com calibração desconhecida. As origens ficam separadas e nunca são agregadas juntas.
