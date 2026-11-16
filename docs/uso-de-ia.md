@@ -26,4 +26,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 16/11/2026 | Implementar a entrega de SOA (Felipe) com assistente de IA | Migrations V2/V3, seed de laboratório e serviço Java (domínio, ingestão IoT, importação NoiseCapture, comando ML, OpenAPI gerado). Executados localmente em PostgreSQL 16 descartável: 30 testes Maven, testes de `tools/` e checker API/banco sem erros; importação do dump real conferida contra o banco. Revisão humana, PR, CI no GitHub e deploy ainda pendentes |
 
+| 16/11/2026 | Preparar a entrega de Testing (Felipe) com assistente de IA | Redação de 8 Features (história, regras, critérios Dado/Quando/Então) e 53 Test Cases de caixa-preta a partir dos contratos; cadastro no Azure Boards por script reexecutável e gerador do PDF. Itens conferidos no Azure (campos, passos e vínculos Tested By). Prints, professor como Admin, vídeo pitch e PDF final pendentes |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.

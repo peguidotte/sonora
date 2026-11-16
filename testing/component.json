@@ -1,6 +1,6 @@
 {
   "component": "testing",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Felipe Soares Xavier",
   "rm": "556931",
   "branch": "felipe/testing",
@@ -8,8 +8,10 @@
   "contract": "contracts/README.md",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
-    "dataMode": "explicit-seed-or-fixture"
+    "commands": [
+      "python testing/azure/publicar_azure.py https://dev.azure.com/sonona-gs Sonora --dry-run"
+    ],
+    "dataMode": "azure-boards-source-text"
   },
   "integrated": {
     "status": "planned",
@@ -20,11 +22,14 @@
     ]
   },
   "validation": {
-    "commands": [],
+    "commands": [
+      "python testing/azure/publicar_azure.py https://dev.azure.com/sonona-gs Sonora --dry-run"
+    ],
     "evidence": []
   },
   "deployment": {
     "target": "azure-boards",
-    "status": "not-deployed"
+    "status": "deployed",
+    "url": "https://dev.azure.com/sonona-gs/Sonora"
   }
 }
