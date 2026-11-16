@@ -81,6 +81,6 @@ Build do firmware: `pio run` em `iot/`. Comportamento elétrico, Wi-Fi e envio p
 
 ## Entrega da matéria
 
-- Link do projeto Wokwi (com circuito e firmware desta pasta).
-- Vídeo de até 4 minutos: solução Sonora, papel do circuito, potenciômetro alterando LCD/LEDs, envio à ingestão e o dado aparecendo no painel C#.
+- Projeto Wokwi: https://wokwi.com/projects/480800721533486081 (circuito e firmware desta pasta; no wokwi.com o gateway público não alcança a ingestão local, então o envio fica em reenvio).
+- Vídeo (até 4 minutos): https://youtu.be/YdfbrvcihVM — circuito, potenciômetro alterando LCD/LEDs e envio ao **mock** da ingestão Java (resposta estática, sem persistência), executado no Wokwi for VS Code.
 - [INTEGRANTES.txt](INTEGRANTES.txt).
