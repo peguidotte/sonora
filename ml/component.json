@@ -1,6 +1,6 @@
 {
   "component": "ml",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Gabriel Figueira Flora",
   "rm": "556476",
   "branch": "gabriel/ia",
@@ -8,7 +8,11 @@
   "contract": "contracts/schemas/ml-summary.schema.json",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
+    "commands": [
+      "python -m pip install -r ml/requirements.txt",
+      "curl -L -o ml/dados/raw/noisecapture-brazil.zip https://data.noise-planet.org/dump/Brazil.zip",
+      "python ml/sonora_clusters.py"
+    ],
     "dataMode": "real-public-data"
   },
   "integrated": {
@@ -16,8 +20,14 @@
     "dependencies": []
   },
   "validation": {
-    "commands": [],
-    "evidence": []
+    "commands": [
+      "cd ml && python -m jupyter nbconvert --to notebook --execute --inplace sonora_clusters.ipynb"
+    ],
+    "evidence": [
+      "ml/sonora_clusters.ipynb",
+      "ml/RELATORIO_ML.md",
+      "ml/figuras/05_treino_vs_teste.png"
+    ]
   },
   "deployment": {
     "target": "offline-artifact",

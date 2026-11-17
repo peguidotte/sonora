@@ -24,4 +24,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 09–10/11/2026 | Preparar laboratório Linux isolado e evidências para vídeo | Controlador VirtualBox/NoCloud, ensaio de provisionamento/reexecução/rede/rollback/reboot e coleta de logs/terminal/hashes. Corrigida aceitação indevida do retorno zero de netplan try; resultados executados ficam no PR e nas evidências locais, sem concluir a aplicação acadêmica |
 
+| 13–16/11/2026 | Implementar a entrega de IA/ML (Gabriel) | Script e notebook KMeans + PCA sobre o dump NoiseCapture de São Paulo (hash conferido), limpeza registrada, divisão espacial, 16 combinações com GroupKFold só no treino, métricas treino/teste, figuras, relatório e summary.json validado no schema. Resultados executados localmente; vídeo e revisão do responsável pendentes |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
