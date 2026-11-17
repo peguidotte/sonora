@@ -165,7 +165,9 @@ function renderFarolEExplicacao(report: RiskReport): string {
     })
     .join("");
   return `
-  <section class="card tone-${report.level}" id="risk-card" data-score="${report.score}" data-level="${report.level}">
+  <section class="card tone-${report.level}" id="risk-card" data-score="${
+    report.score
+  }" data-level="${report.level}">
     <div class="hero">
       <div class="farol-badge" id="risk-badge">${report.score}</div>
       <div>

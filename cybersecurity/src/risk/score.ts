@@ -23,7 +23,12 @@ export const CATEGORY_WEIGHT: Record<PiiCategory, number> = {
   credential: 3,
 };
 
-const emptyByCategory = (): Record<PiiCategory, number> => ({ cpf: 0, rg: 0, health: 0, credential: 0 });
+const emptyByCategory = (): Record<PiiCategory, number> => ({
+  cpf: 0,
+  rg: 0,
+  health: 0,
+  credential: 0,
+});
 
 /**
  * score = soma do peso de cada evento BLOQUEADO pela categoria envolvida.
@@ -46,7 +51,8 @@ export function calculateRisk(events: readonly SecurityEvent[]): RiskReport {
     }
   }
 
-  const level: RiskLevel = score === 0 ? "verde" : score <= 4 ? "amarelo" : "vermelho";
+  const level: RiskLevel =
+    score === 0 ? "verde" : score <= 4 ? "amarelo" : "vermelho";
   const explanation = `score=${score} (soma do peso das categorias bloqueadas: cpf=2, rg=1, saude=3, credencial=3); ${blockedCount} evento(s) bloqueado(s), ${allowedCount} permitido(s) após sanitização.`;
 
   return { level, score, blockedCount, allowedCount, byCategory, explanation };
