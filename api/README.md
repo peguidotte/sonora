@@ -74,7 +74,7 @@ Sonora.Api.Tests/       unitários de domínio, contrato HTTP, segurança, mapea
 
 Pré-requisitos: SDK .NET 10 (`dotnet --version` ≥ 10.0), Docker Compose e Python 3.12+ para o banco descartável do [módulo database/](../database/README.md).
 
-1. Banco local. Na raiz do clone, seguir o [README do database/](../database/README.md): `prepare.py`, `docker compose ... up` e `run --rm migrate`. Isso aplica as migrations oficiais em `127.0.0.1:55432`. **As views do domínio e o seed sintético são entregues pelo SOA (Felipe)**; até lá, `health/ready` responde 503 e as rotas de negócio respondem `503 service_unavailable`.
+1. Banco local. Na raiz do clone, seguir o [README do database/](../database/README.md): `prepare.py`, `docker compose ... up` e `run --rm migrate`. Isso aplica as migrations oficiais (V1–V3, com as views `sonora_read` do SOA) em `127.0.0.1:55432`. Para ter dados, aplicar também o seed sintético: `docker compose -p sonora-local -f database/compose.yaml run --rm -e SONORA_ALLOW_DEV_SEED=1 migrate seed`. Sem as views, `health/ready` responde 503 e as rotas de negócio respondem `503 service_unavailable`.
 2. Chaves locais. Gerar arquivos fora do Git como em [credenciais locais](../contracts/README.md#credenciais-locais-dos-starters), incluindo o escopo `acoustics:read` para consultar dados (por exemplo `["acoustics:read", "operations:read"]`). O arquivo aceita opcionalmente `expiresAt` (ISO 8601) e `revoked: true` por chave.
 3. API, na raiz do clone (macOS/Linux):
 
@@ -120,7 +120,15 @@ dotnet test api/Sonora.Api.Tests -c Release
 SONORA_DB_INTEGRATION=1 SONORA_DB_PASSWORD=ci-query-only dotnet test api/Sonora.Api.Tests -c Release
 ```
 
-Com a API rodando, `tools/smoke_integration.py` valida as respostas reais contra o OpenAPI (`API_BASE_URL`, `API_READ_KEY`, `API_OPERATOR_KEY`).
+Com a API rodando, `tools/smoke_integration.py --from 2026-11-08T15:00:00Z --to 2026-11-08T15:01:00Z` valida as respostas reais contra o OpenAPI (`API_BASE_URL`, `API_READ_KEY`, `API_OPERATOR_KEY`).
+
+**JavaScript do painel** (Node 18+, sem dependências): datas em `America/Sao_Paulo` com o horário de verão histórico dos dados públicos (2017–2019), desconexão com consulta pendente e respostas fora de ordem.
+
+```bash
+node api/Sonora.Api.Tests/Dashboard/dashboard.test.mjs
+```
+
+**Integração real (16/11/2026):** com as migrations e o seed oficiais do `database/` (PR #16), os 89 testes passam com `SONORA_DB_INTEGRATION=1`, o `smoke_integration.py` passa, `tools/check_database_compatibility.py --baseline-ref origin/main` não aponta erros (41 campos) e o fluxo ponta a ponta funciona: o dispositivo grava 60 e 70 dB pela ingestão Java (201, 201 e 200 `duplicate` no reenvio) e o `noise-profile` do C# devolve 67,40 dB(A) com o dispositivo em `recent`.
 
 ## Deploy (handoff para Linux)
 
@@ -132,7 +140,7 @@ Executável `output/api/Sonora.Api`, sem SDK no servidor; painel e Scalar ficam 
 
 ## Evidências
 
-Capturas de 15/11/2026 no macOS, sobre o commit `517466f` da branch `leo/csharp` (o teste de OpenAPI anônimo veio depois, por isso a contagem atual é 87 + 2). Os dados vêm de um PostgreSQL 16 local com **views de laboratório equivalentes ao contrato** (2 locais, 1 fonte sintética, 1 dispositivo, as 2 observações das fixtures e 864 observações sintéticas de 5 min a partir de 10/11/2026), porque as views e o seed oficiais do módulo `database/` ainda não existem. Não há dado real de medição.
+Capturas de 15/11/2026 no macOS, sobre o commit `517466f` da branch `leo/csharp` (o teste de OpenAPI anônimo veio depois, por isso a contagem atual é 87 + 2). Os dados vêm de um PostgreSQL 16 local com **views de laboratório equivalentes ao contrato** (2 locais, 1 fonte sintética, 1 dispositivo, as 2 observações das fixtures e 864 observações sintéticas de 5 min a partir de 10/11/2026), porque as views e o seed oficiais do módulo `database/` ainda não existiam. Não há dado real de medição. A validação posterior com as migrations e o seed oficiais está descrita em [Testes](#testes).
 
 | # | O que comprova | Captura |
 | --- | --- | --- |
@@ -149,6 +157,6 @@ Capturas de 15/11/2026 no macOS, sobre o commit `517466f` da branch `leo/csharp`
 
 ## Limites conhecidos
 
-- Depende das views `sonora_read` e do seed sintético do módulo `database/` (SOA). Os testes de integração passam contra um PostgreSQL de laboratório com views equivalentes ao contrato, mas a integração com as migrations oficiais só pode ser comprovada quando elas existirem.
+- Depende das views `sonora_read` e do seed do módulo `database/` (SOA), validados localmente em 16/11/2026. Na CI os dois testes de PostgreSQL ainda aparecem como pulados: habilitar `SONORA_DB_INTEGRATION=1` no pipeline é ajuste combinado com o responsável pelo CI, e ele só roda quando o orçamento do Actions permitir.
 - A view `observations` não expõe `producer_id`. O produtor de cada série é o `deviceId` quando existe e, sem dispositivo (arquivos públicos), o `sessionId`. Se o SOA publicar `producer_id`, o mapeamento passa a usá-lo.
 - O painel é demonstrativo: a chave é digitada a cada sessão e não há emissão pública de chaves.

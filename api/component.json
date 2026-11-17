@@ -14,17 +14,30 @@
     "dataMode": "postgresql-with-shared-schema-and-seed"
   },
   "integrated": {
-    "status": "planned",
+    "status": "in_progress",
     "dependencies": [
-      "postgresql"
+      "postgresql",
+      "soa"
     ]
   },
   "validation": {
     "commands": [
       "dotnet test api/Sonora.Api.Tests -c Release",
-      "SONORA_DB_INTEGRATION=1 dotnet test api/Sonora.Api.Tests -c Release"
+      "SONORA_DB_INTEGRATION=1 dotnet test api/Sonora.Api.Tests -c Release",
+      "node api/Sonora.Api.Tests/Dashboard/dashboard.test.mjs"
     ],
-    "evidence": []
+    "evidence": [
+      "api/docs/evidencias/01-testes.png",
+      "api/docs/evidencias/02-testes-integracao.png",
+      "api/docs/evidencias/03-seguranca.png",
+      "api/docs/evidencias/04-painel-acesso.png",
+      "api/docs/evidencias/05-perfil-hora.png",
+      "api/docs/evidencias/06-perfil-dia.png",
+      "api/docs/evidencias/07-sem-dados.png",
+      "api/docs/evidencias/08-dispositivos-ml.png",
+      "api/docs/evidencias/09-scalar.png",
+      "api/docs/evidencias/10-banco-indisponivel.png"
+    ]
   },
   "deployment": {
     "target": "azure-vm",

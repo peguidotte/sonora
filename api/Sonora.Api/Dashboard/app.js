@@ -1,10 +1,14 @@
-// Painel Sonora. A chave vive apenas nesta variável (memória da aba): nada em localStorage, cookies ou URL.
+// Painel Sonora. A chave vive apenas na sessão em memória (aba): nada em localStorage, cookies ou URL.
 // Todos os dados vindos da API são inseridos com textContent, nunca como HTML.
 "use strict";
 
 const API = "/api/sonora/v1";
-const SAO_PAULO_OFFSET = "-03:00"; // Brasil sem horário de verão desde 2019; a API agrupa em America/Sao_Paulo.
-let apiKey = null;
+const ZONE = "America/Sao_Paulo"; // mesmo fuso usado pela API para agrupar por hora/dia
+
+// Sessão atual: chave + AbortController. Desconectar aborta tudo que estiver pendente, e cada resposta
+// confere se ainda pertence à sessão (e, no perfil, à consulta mais recente) antes de tocar na tela.
+let session = null;
+let profileQuery = null;
 
 const $ = (id) => document.getElementById(id);
 
@@ -15,14 +19,21 @@ function el(tag, text, className) {
   return node;
 }
 
-async function api(path) {
-  const response = await fetch(API + path, { headers: { "X-Api-Key": apiKey }, cache: "no-store" });
-  if (response.status === 204) return { status: 204, body: null };
-  const body = await response.json().catch(() => null);
-  return { status: response.status, body };
+async function api(owner, path, signal = owner.controller.signal) {
+  try {
+    const response = await fetch(API + path, { headers: { "X-Api-Key": owner.key }, cache: "no-store", signal });
+    if (response.status === 204) return { status: 204, body: null };
+    const body = await response.json().catch(() => null);
+    return { status: response.status, body };
+  } catch (error) {
+    return { status: 0, body: null, aborted: error && error.name === "AbortError" };
+  }
 }
 
+const isCurrent = (owner) => owner !== null && owner === session;
+
 function describeError(result) {
+  if (result.status === 0) return "Não foi possível falar com a API (rede).";
   if (result.status === 401) return "Chave inválida, expirada ou revogada.";
   if (result.status === 403) return "A chave não tem permissão para este recurso.";
   if (result.status === 503) return "Banco de dados indisponível no momento.";
@@ -79,29 +90,61 @@ function localLabel(isoUtc, aggregation, short) {
   return short ? `${parts.hour}h` : `${parts.day}/${parts.month} ${parts.hour}h`;
 }
 
-function toUtcIso(date, addDays) {
-  const local = new Date(`${date}T00:00:00${SAO_PAULO_OFFSET}`);
-  local.setUTCDate(local.getUTCDate() + addDays);
-  return local.toISOString().replace(".000Z", "Z");
+// Datas do formulário são dias civis de São Paulo. A conversão usa as regras reais do fuso (Intl), então
+// períodos com horário de verão (até fev/2019, presentes nos dados públicos) e o dia sem meia-noite saem certos.
+const zoneParts = new Intl.DateTimeFormat("en-US", {
+  timeZone: ZONE, year: "numeric", month: "2-digit", day: "2-digit", hourCycle: "h23",
+});
+
+function zoneDate(instant) {
+  const parts = Object.fromEntries(zoneParts.formatToParts(instant).map((part) => [part.type, part.value]));
+  return `${parts.year}-${parts.month}-${parts.day}`;
+}
+
+function addDays(isoDate, days) {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
+
+// Primeiro instante do dia civil em São Paulo (00:00, ou 01:00 no dia em que o relógio pulava a meia-noite).
+// Os deslocamentos do fuso são horas inteiras entre UTC−2 e UTC−3, então passos de 30 min a partir de 00:00Z bastam.
+function startOfZoneDay(isoDate) {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  for (let t = Date.UTC(year, month - 1, day); t <= Date.UTC(year, month - 1, day, 6); t += 1800000) {
+    if (zoneDate(new Date(t)) === isoDate) return new Date(t);
+  }
+  throw new RangeError(`Data inválida: ${isoDate}`);
+}
+
+function toUtcIso(isoDate, plusDays) {
+  return startOfZoneDay(addDays(isoDate, plusDays)).toISOString().replace(".000Z", "Z");
 }
 
 function setDefaultDates() {
-  const today = new Date();
-  const week = new Date(today.getTime() - 6 * 86400000);
-  $("to").value = today.toISOString().slice(0, 10);
-  $("from").value = week.toISOString().slice(0, 10);
+  const today = zoneDate(new Date());
+  $("to").value = today;
+  $("from").value = addDays(today, -6);
+}
+
+function clearData() {
+  for (const id of ["location", "profile-summary", "profile-series", "profile-limitations", "profile-sources",
+    "devices", "ml-groups"]) $(id).replaceChildren();
+  for (const id of ["devices-status", "ml-status"]) $(id).textContent = "";
 }
 
 async function connect(event) {
   event.preventDefault();
-  apiKey = $("api-key").value.trim();
+  if (session) session.controller.abort();
+  const owner = { key: $("api-key").value.trim(), controller: new AbortController() };
+  session = owner;
   $("api-key").value = "";
   const status = $("access-status");
   status.className = "muted";
   status.textContent = "Conectando…";
-  const result = await api("/locations?pageSize=100");
+  const result = await api(owner, "/locations?pageSize=100");
+  if (!isCurrent(owner)) return; // desconectou (ou reconectou) enquanto esperava
   if (result.status !== 200) {
-    apiKey = null;
+    session = null;
     status.className = "error";
     status.textContent = describeError(result);
     return;
@@ -117,26 +160,39 @@ async function connect(event) {
   $("query-card").hidden = false;
   $("extra-card").hidden = false;
   $("disconnect").hidden = false;
-  loadDevices();
-  loadSummary();
+  loadDevices(owner);
+  loadSummary(owner);
 }
 
 function disconnect() {
-  apiKey = null;
+  if (session) session.controller.abort();
+  session = null;
+  profileQuery = null;
   for (const id of ["query-card", "profile-card", "extra-card"]) $(id).hidden = true;
+  clearData();
   $("disconnect").hidden = true;
+  $("access-status").className = "muted";
   $("access-status").textContent = "Chave descartada desta aba.";
 }
 
 async function loadProfile(event) {
   event.preventDefault();
+  const owner = session;
+  if (!owner) return;
+  // Nova consulta cancela a anterior: uma resposta antiga nunca sobrescreve a mais recente.
+  if (profileQuery) profileQuery.abort();
+  const query = new AbortController();
+  profileQuery = query;
+  owner.controller.signal.addEventListener("abort", () => query.abort(), { once: true });
   const params = new URLSearchParams({
     from: toUtcIso($("from").value, 0),
     to: toUtcIso($("to").value, 1),
     origin: $("origin").value,
     aggregation: $("aggregation").value,
   });
-  const result = await api(`/locations/${encodeURIComponent($("location").value)}/noise-profile?${params}`);
+  const result = await api(owner, `/locations/${encodeURIComponent($("location").value)}/noise-profile?${params}`,
+    query.signal);
+  if (!isCurrent(owner) || profileQuery !== query) return;
   const card = $("profile-card");
   card.hidden = false;
   const summary = $("profile-summary");
@@ -241,10 +297,11 @@ function renderChart(series, aggregation) {
   return wrapper;
 }
 
-async function loadDevices() {
+async function loadDevices(owner) {
   const list = $("devices");
   list.replaceChildren();
-  const result = await api("/devices");
+  const result = await api(owner, "/devices");
+  if (!isCurrent(owner)) return;
   if (result.status !== 200) {
     $("devices-status").textContent = describeError(result);
     return;
@@ -256,10 +313,11 @@ async function loadDevices() {
   }
 }
 
-async function loadSummary() {
+async function loadSummary(owner) {
   const list = $("ml-groups");
   list.replaceChildren();
-  const result = await api("/analytics/summary");
+  const result = await api(owner, "/analytics/summary");
+  if (!isCurrent(owner)) return;
   if (result.status === 204) {
     $("ml-status").textContent = "Nenhum resumo de ML real importado ainda.";
     return;
