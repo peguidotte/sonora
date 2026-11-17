@@ -16,7 +16,7 @@ export interface RiskReport {
 
 // Peso por categoria: saúde e credencial pesam mais que CPF/RG no cálculo do farol,
 // refletindo o dano potencial do vazamento em cada categoria — decisão documentada no README.
-const CATEGORY_WEIGHT: Record<PiiCategory, number> = {
+export const CATEGORY_WEIGHT: Record<PiiCategory, number> = {
   cpf: 2,
   rg: 1,
   health: 3,
