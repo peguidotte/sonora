@@ -141,3 +141,20 @@ for (const width of [320, 390, 768, 1440])
     ).toBeTruthy();
     await expect(page.locator("#api-form")).toBeVisible();
   });
+
+test("device reduced motion remains legible and installation controls work", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/#dispositivo");
+  await expect(page.locator("#device-concept-image")).toBeVisible();
+  await expect(page.locator("#device-canvas canvas")).toHaveCount(0);
+  await page.locator('[data-install="outlet"]').click();
+  await expect(page.locator("#installation-note")).toContainText("tomada");
+  await expect(page.locator("#device-concept-image")).toHaveAttribute(
+    "src",
+    "./images/device-outlet.webp",
+  );
+  await page.locator('[data-component="processing"]').click();
+  await expect(page.locator("#component-processing")).toBeVisible();
+});

@@ -48,3 +48,14 @@ Princípios de revisão visual considerados: capítulos de produto/close-ups (Ap
 A landing em `index.html` contém somente um convite para desenvolvedores. `api-docs.html` é uma segunda entrada Vite, com navegação própria, autenticação, índice de operações e playground local. Os links relativos funcionam também em hospedagem por subdiretório; não exige fallback SPA. O contrato completo continua no repositório, e esta documentação guiada cobre três rotas.
 
 O dispositivo usa camadas HTML/CSS independentes (gabinete, captura, placa e suporte) com separação contínua/reversível ligada ao scroll; fotos conceituais seguem na etapa de instalação. Não é modelo CAD ou render 3D real. Em `prefers-reduced-motion`, a separação é fixa e a navegação instantânea; os capítulos continuam disponíveis por botão. Os cards têm previews e links relevantes, não apenas expansão de texto.
+
+### Device motion (Three.js)
+
+The device section now uses a lazy-loaded Three.js scene (`src/device-scene.ts`), not CSS planes or a bitmap sequence. Procedural rigid parts represent the shell/grille, acoustic entry, PCB and mount. `src/device-timeline.mjs` is a single paused GSAP timeline scrubbed by the section's scroll progress: assembled → cover opens → separated layers → fully reassembled. Reverse scrolling seeks the same timeline. The pole/outlet selector changes the mounting context.
+
+- No external model account, paid animation tool, API request or recording is required.
+- This is a visual product concept, **not** final CAD, electronic design, electrical instructions or a certified device.
+- Dynamic import only near the device section; capped DPR (1.5); renderer only draws on progress/resize/visibility changes. No perpetual render loop, textures fetched externally, or postprocessing.
+- Reduced motion or unavailable/lost WebGL keeps a static concept image and readable chapter controls. Responsive orthographic camera resizes to the canvas.
+- Unit tests verify completed assembly, deterministic reverse seeking and bounded per-step transforms. `npm run test:e2e` includes a reduced-motion control test.
+- Official references consulted: [GSAP timelines](https://gsap.com/docs/v3/GSAP/Timeline/), [GSAP skills](https://github.com/greensock/gsap-skills), [Three.js responsive rendering](https://threejs.org/manual/pages/responsive.html). External skill scripts were not installed or executed.

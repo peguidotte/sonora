@@ -6,8 +6,8 @@ export const deviceMarkup = `
  <div class="installation-switch" role="group" aria-label="Conceito de instalação"><button data-install="pole" aria-pressed="true">01 / Poste público</button><button data-install="outlet" aria-pressed="false">02 / Tomada</button></div>
  <p class="installation-note" id="installation-note">Prioridade de design: fixação em poste, instalação técnica e autorização do responsável pelo espaço público. Alimentação e proteção ambiental ainda precisam de engenharia e validação.</p>
  <div class="device-scrolly">
-  <div class="device-sticky"><div class="device-visual" data-layer="mount"><img id="device-concept-image" src="./images/device-pole.webp" alt="Conceito visual de sensor Sonora fixado em um poste" width="1536" height="1024" loading="lazy"/><div class="device-assembly" aria-hidden="true"><div class="assembly-halo"></div><div class="hardware-layer hardware-back"><span>04 / SUPORTE</span></div><div class="hardware-layer hardware-board"><i></i><b></b><span>03 / PROCESSAMENTO</span></div><div class="hardware-layer hardware-sensor"><i></i><span>02 / CAPTURA</span></div><div class="hardware-layer hardware-shell"><i></i><span>01 / GABINETE</span></div><div class="assembly-axis"></div></div><div class="assembly-caption" aria-hidden="true">CAMADAS DO CONCEITO</div><div class="concept-label">CONCEITO • NÃO É HARDWARE FINAL</div><div class="layer-marker" aria-hidden="true"></div></div>
-  <div class="device-progress" role="group" aria-label="Ir para componente"><button data-component="mount" aria-pressed="true">01</button><button data-component="capture" aria-pressed="false">02</button><button data-component="processing" aria-pressed="false">03</button><button data-component="connection" aria-pressed="false">04</button><span id="component-label">Fixação e energia</span></div><p class="device-hint">Explore com a rolagem ou pelos números.</p></div>
+  <div class="device-sticky"><div class="device-visual" data-layer="mount"><img id="device-concept-image" src="./images/device-pole.webp" alt="Conceito visual do dispositivo Sonora para instalação em poste" width="1536" height="1024" loading="lazy"/><div id="device-canvas" role="img" aria-label="Modelo 3D conceitual Sonora: gabinete, sensor acústico, placa de processamento e suporte. A rolagem separa as peças e depois remonta o mesmo dispositivo."></div><div class="concept-label">SONORA / ESTUDO DE PRODUTO 01</div><div class="assembly-caption">MODELO CONCEITUAL • NÃO É HARDWARE FINAL</div><div class="device-motion-status" aria-hidden="true"><span id="device-motion-status-name">01 / INTEGRADO À CIDADE</span><span id="device-motion-status-progress">000</span></div></div>
+  <div class="device-progress" role="group" aria-label="Ir para componente"><button data-component="mount" aria-pressed="true">01</button><button data-component="capture" aria-pressed="false">02</button><button data-component="processing" aria-pressed="false">03</button><button data-component="connection" aria-pressed="false">04</button><span id="component-label">Fixação e energia</span></div><p class="device-hint">Role para abrir, explorar e remontar. Volte para inverter.</p></div>
   <div class="device-chapters">
    <article id="component-mount" data-chapter="mount"><span>01 / FIXAÇÃO E ENERGIA</span><h3>Presença discreta.<br/>Instalação pensada.</h3><p id="mount-description">A proposta parte de um suporte dedicado para poste. A instalação depende de autorização, avaliação do local e uma solução elétrica definida por profissionais habilitados.</p><small>Sem classificação IP, alimentação ou certificação definidas nesta proposta.</small></article>
    <article id="component-capture" data-chapter="capture"><span>02 / ENTRADA ACÚSTICA</span><h3>O som entra.<br/>A gravação, não.</h3><p>A abertura frontal representa a captura acústica. O produto trabalha com observações e metadados, não com arquivos de áudio. Proteção contra vento e chuva ainda é parte do projeto a validar.</p><small>Vista explodida ilustrativa. Componentes não estão em escala técnica.</small></article>
@@ -27,22 +27,43 @@ export function initDevice() {
     processing: "Processamento",
     connection: "Conexão",
   };
+  let scene:
+    | {
+        setProgress: (p: number) => void;
+        setInstallation: (mode: string) => void;
+      }
+    | undefined;
+  let progressValue = 0;
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+  const loadScene = new IntersectionObserver(
+    async (entries) => {
+      if (!entries.some((e) => e.isIntersecting)) return;
+      loadScene.disconnect();
+      if (reduced.matches) return;
+      try {
+        const { createDeviceScene } = await import("./device-scene");
+        scene = createDeviceScene(
+          document.querySelector<HTMLElement>("#device-canvas")!,
+        );
+        scene.setInstallation(installation);
+        scene.setProgress(progressValue);
+        visual.classList.add("has-webgl");
+      } catch {
+        visual.classList.add("device-fallback");
+      }
+    },
+    { rootMargin: "500px" },
+  );
+  loadScene.observe(visual);
+  reduced.addEventListener("change", () => {
+    visual.classList.toggle("motion-disabled", reduced.matches);
+    if (!reduced.matches && !scene) loadScene.observe(visual);
+  });
   let installation = "pole",
     active = "mount";
   function show(key: string) {
     active = key;
     visual.dataset.layer = key;
-    const src =
-      key === "mount"
-        ? `./images/device-${installation}.webp`
-        : "./images/device-exploded.webp";
-    if (image.getAttribute("src") !== src) image.src = src;
-    image.alt =
-      key === "mount"
-        ? installation === "pole"
-          ? "Conceito de sensor fixado em poste público"
-          : "Conceito de sensor para ambiente com tomada"
-        : "Vista explodida conceitual: gabinete, entrada acústica, placa e suporte";
     document.querySelector("#component-label")!.textContent = labels[key];
     document
       .querySelectorAll<HTMLButtonElement>("[data-component]")
@@ -67,6 +88,12 @@ export function initDevice() {
         installation === "pole"
           ? "A proposta parte de um suporte dedicado para poste. A instalação depende de autorização, avaliação do local e uma solução elétrica definida por profissionais habilitados."
           : "Uma versão compacta poderia usar uma tomada disponível no ambiente. O formato final e a alimentação dependem de projeto elétrico e validação de segurança, sem intervenção improvisada na rede.";
+      image.src = `./images/device-${installation}.webp`;
+      image.alt =
+        installation === "pole"
+          ? "Conceito do dispositivo no poste"
+          : "Conceito do dispositivo para tomada";
+      scene?.setInstallation(installation);
       show("mount");
       document.querySelector("#component-mount")!.scrollIntoView({
         behavior: matchMedia("(prefers-reduced-motion: reduce)").matches
@@ -119,12 +146,18 @@ export function initDevice() {
           (last.top + last.height / 2 - first.top - first.height / 2),
       ),
     );
-    visual.style.setProperty(
-      "--unfold",
-      String(
-        matchMedia("(prefers-reduced-motion: reduce)").matches ? 0.7 : progress,
-      ),
-    );
+    progressValue = progress;
+    if (!reduced.matches) scene?.setProgress(progress);
+    document.querySelector("#device-motion-status-progress")!.textContent =
+      String(Math.round(progress * 100)).padStart(3, "0");
+    document.querySelector("#device-motion-status-name")!.textContent =
+      progress < 0.15
+        ? "01 / INTEGRADO À CIDADE"
+        : progress < 0.42
+          ? "02 / ABRINDO O CONCEITO"
+          : progress < 0.7
+            ? "03 / CADA CAMADA, UM PAPEL"
+            : "04 / DE VOLTA AO TODO";
   }
   addEventListener(
     "scroll",

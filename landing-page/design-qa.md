@@ -46,3 +46,13 @@ O relato de bloqueio anterior acima registra a tentativa inicial; não descreve 
 - Desktop (viewport CSS 1180 px): docs e assembly inspecionados visualmente. Landing sem overflow horizontal (scrollWidth 1165). Imagens verificadas carregadas. Scroll e botão 02/03 alteram capítulo e separação de peças; a apresentação agora usa geometria CSS estilizada, não modelo CAD/3D fotorealista.
 - Build TypeScript/Vite e os 11 testes Node passam. Testes E2E foram atualizados para rota separada, navegação, playground e larguras adicionais; execução ainda bloqueada por Chromium: socket() failed: Operation not permitted. Não alegar Playwright/axe aprovados.
 - Sem alteração de backend/CORS/infra. Sem merge ou deploy. Vídeos temporários não fazem parte desta alteração.
+
+## Real 3D device pass
+
+- Replaced old layered CSS/image switching with one actual Three.js scene and one GSAP timeline. All parts return to original positions, with no repeated stills masquerading as motion.
+- Added tests: complete reassembly; reverse seeking equality; 1,000 bounded progression steps. Build and all 14 unit tests pass.
+- Main bundle remains separate from lazy 3D chunk (~160 KB gzip). Existing API Docs/contract untouched.
+- Cloud Chrome currently reports GL_RENDERER=Disabled; observed static fallback, not the 3D result. Native rendering/video check tracked separately; no claim of WebGL visual approval from fallback.
+- Playwright browser tests were attempted but runner has no installed Chromium executable. They are **not** marked passing.
+
+- Native Chromium with software rendering verified the actual WebGL scene: four separate layers at ~60–67%, full reassembly at 99–100%, and reverse back to 0. No canvas clipping observed on desktop. Pole/outlet selection changed context and text correctly. Continuous native screen recording captured the real scroll, not a slideshow. Added enclosure sidewalls after this first pass so assembled electronics are hidden. Mobile and E2E are not asserted fully approved.
