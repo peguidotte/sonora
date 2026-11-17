@@ -31,3 +31,5 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 | 16/11/2026 | Implementar a entrega de SOA (Felipe) com assistente de IA | Migrations V2/V3, seed de laboratório e serviço Java (domínio, ingestão IoT, importação NoiseCapture, comando ML, OpenAPI gerado). Executados localmente em PostgreSQL 16 descartável: 30 testes Maven, testes de `tools/` e checker API/banco sem erros; importação do dump real conferida contra o banco. Revisão humana, PR, CI no GitHub e deploy ainda pendentes |
 
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
+
+| 17/11/2026 | Implementar landing Sonora a partir de direção visual aprovada | Landing isolada com assets conceituais gerados por IA, demo acústica local, dispositivo e arquitetura interativos. Build e 5 testes de domínio passaram. QA visual/E2E bloqueado pelo navegador do ambiente; não houve deploy, merge ou execução de Actions. |

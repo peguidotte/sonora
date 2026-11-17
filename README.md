@@ -56,3 +56,7 @@ python -m venv .venv
 No Windows, usar .venv/Scripts/python.exe. [Execução dos mocks](contracts/README.md); a reprodução real de cada entrega fica no README da respectiva pasta, quando implementada. Os contratos usam inglês e X-Api-Key com escopos.
 
 Prazo conservador: **19/11/2026 às 23h55**, conforme PDF. Resultados de testes, tarefas diárias e revisão de código ficam em PRs/Azure Boards; esta documentação registra somente acordos duráveis. Materiais privados, segredos e dados brutos ficam fora do Git.
+
+## Landing page
+
+A experiência demonstrativa de produto está em [`landing-page/`](landing-page/README.md), isolada das APIs. Veja o estado de validação visual em [`design-qa.md`](landing-page/design-qa.md).
