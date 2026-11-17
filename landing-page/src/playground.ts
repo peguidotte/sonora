@@ -3,7 +3,7 @@ import { simulateQuery } from "./playground-model.mjs";
 
 export const playgroundHTML = `
 <section id="api" class="api-lab section" aria-labelledby="api-title">
-  <div class="section-kicker">05 / PARA QUEM CONSTRÓI</div>
+  <div class="section-kicker">PLAYGROUND / EXPLORE O CONTRATO</div>
   <div class="section-heading"><h2 id="api-title">Contexto pronto<br/><span>para integrar.</span></h2><p>Explore o contrato da API C#. Entenda a consulta, a resposta e o que cada campo quer dizer. Sem configurar nada.</p></div>
   <div class="api-mode"><span class="api-mode-dot"></span><strong>Playground local · dados sintéticos</strong><span>Nenhuma requisição é enviada. Nenhuma chave é solicitada.</span></div>
   <div class="api-workbench">
@@ -25,7 +25,7 @@ export const playgroundHTML = `
     </div>
   </div>
   <div class="api-insights"><article><span>01</span><h3>O nível não conta tudo.</h3><p><code>laeqDbA</code> usa média energética. No exemplo, 60 e 70 dB em janelas iguais resultam em 67,40 dB, não 65.</p></article><article><span>02</span><h3>A cobertura vem junto.</h3><p><code>observedSeconds</code>, método e origem acompanham a leitura. Dez segundos observados não representam uma hora inteira.</p></article><article><span>03</span><h3>Ausência é informação.</h3><p><code>status: no_data</code> e <code>laeqDbA: null</code> significam falta de observações. Nunca silêncio ou zero decibéis.</p></article></div>
-  <details class="api-real"><summary>Como executar contra a API real? <i class="ph ph-arrow-down" aria-hidden="true"></i></summary><p>Execute a API C# e o PostgreSQL conforme o README do projeto. O cURL usa a URL local documentada e a variável <code>SONORA_API_KEY</code>, que você define apenas no seu terminal com uma credencial autorizada. Não cole segredos nesta página. A API não habilita CORS para navegadores externos, por isso esta landing não tenta conectá-la nem permite configurar destinos arbitrários.</p><p>A documentação interativa Scalar está em <code>/dashboard/docs</code> no servidor C# em execução. <code>/api/sonora/v1/openapi.json</code> exige escopo <code>operations:read</code>. O health/live é anônimo e não comprova acesso ao banco.</p></details>
+  <details class="api-real"><summary>Como executar contra a API real? <i class="ph ph-arrow-down" aria-hidden="true"></i></summary><p>Execute a API C# e o PostgreSQL conforme o README do projeto. O cURL usa a URL local documentada e a variável <code>SONORA_API_KEY</code>, que você define apenas no seu terminal com uma credencial autorizada. Não cole segredos nesta página. A API não habilita CORS para navegadores externos, por isso esta documentação não tenta conectá-la nem permite configurar destinos arbitrários.</p><p>A documentação interativa Scalar está em <code>/dashboard/docs</code> no servidor C# em execução. <code>/api/sonora/v1/openapi.json</code> exige escopo <code>operations:read</code>. O health/live é anônimo e não comprova acesso ao banco.</p></details>
   <div class="api-doc-links"><a href="https://github.com/peguidotte/sonora/blob/main/api/README.md" target="_blank" rel="noopener noreferrer">Guia da API C# ↗<span class="sr-only"> (nova aba)</span></a><a href="https://github.com/peguidotte/sonora/blob/main/contracts/openapi/csharp.openapi.json" target="_blank" rel="noopener noreferrer">Contrato OpenAPI ↗<span class="sr-only"> (nova aba)</span></a></div>
 </section>`;
 

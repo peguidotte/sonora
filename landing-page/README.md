@@ -42,3 +42,9 @@ O dispositivo agora tem conceitos de poste público (prioritário) e tomada, com
 O playground em `playground.ts/css` simula três rotas reais do contrato C# 0.4.0, incluindo respostas disponíveis, vazias e erros de autenticação. `playground-fixtures.mjs` mantém exemplos verificados por teste contra o OpenAPI. Nunca faz fetch ou solicita chaves. Como a API não habilita CORS externo, a página não oferece URL arbitrária; mostra cURL e orienta documentação Scalar no servidor autorizado.
 
 Princípios de revisão visual considerados: capítulos de produto/close-ups (Apple), request/response legíveis (Stripe) e hierarquia/consistência do taste-skill. Nenhum código, hook ou instalador externo dessas referências foi executado.
+
+## Documentação independente e narrativa em camadas
+
+A landing em `index.html` contém somente um convite para desenvolvedores. `api-docs.html` é uma segunda entrada Vite, com navegação própria, autenticação, índice de operações e playground local. Os links relativos funcionam também em hospedagem por subdiretório; não exige fallback SPA. O contrato completo continua no repositório, e esta documentação guiada cobre três rotas.
+
+O dispositivo usa camadas HTML/CSS independentes (gabinete, captura, placa e suporte) com separação contínua/reversível ligada ao scroll; fotos conceituais seguem na etapa de instalação. Não é modelo CAD ou render 3D real. Em `prefers-reduced-motion`, a separação é fixa e a navegação instantânea; os capítulos continuam disponíveis por botão. Os cards têm previews e links relevantes, não apenas expansão de texto.

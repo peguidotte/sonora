@@ -38,3 +38,11 @@ O relato de bloqueio anterior acima registra a tentativa inicial; não descreve 
 - Desktop e larguras CSS 400 e 333 px conferidas via tamanho da janela e zoom nativo (não emulação de dispositivo). Sem overflow horizontal: 388/400 e 323/333. Corrigidos cards estreitos, corte da vista explodida e altura sticky em viewport baixo. Zoom restaurado após teste.
 - API C# privada: sem conexão live testada, sem CORS externo no código/documentação. Playground local honesto, não confirmação de deploy.
 - Permanecem pendentes axe e suíte Playwright por restrição de inicialização do Chromium; não alegar validação em todos os dispositivos ou cobertura total WCAG.
+
+## Rodada: API Docs independente e motion em camadas
+
+- Separação verificada manualmente no Chrome: `/api-docs.html` mostra navegação própria, autenticação, operações e playground; voltar ao produto retorna à landing, que só contém CTA para documentação.
+- Simulação manual de health 200 e perfil 401 funcionou na nova página. Não houve requisição à API real nem uso de credencial.
+- Desktop (viewport CSS 1180 px): docs e assembly inspecionados visualmente. Landing sem overflow horizontal (scrollWidth 1165). Imagens verificadas carregadas. Scroll e botão 02/03 alteram capítulo e separação de peças; a apresentação agora usa geometria CSS estilizada, não modelo CAD/3D fotorealista.
+- Build TypeScript/Vite e os 11 testes Node passam. Testes E2E foram atualizados para rota separada, navegação, playground e larguras adicionais; execução ainda bloqueada por Chromium: socket() failed: Operation not permitted. Não alegar Playwright/axe aprovados.
+- Sem alteração de backend/CORS/infra. Sem merge ou deploy. Vídeos temporários não fazem parte desta alteração.

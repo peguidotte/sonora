@@ -6,7 +6,7 @@ export const deviceMarkup = `
  <div class="installation-switch" role="group" aria-label="Conceito de instalação"><button data-install="pole" aria-pressed="true">01 / Poste público</button><button data-install="outlet" aria-pressed="false">02 / Tomada</button></div>
  <p class="installation-note" id="installation-note">Prioridade de design: fixação em poste, instalação técnica e autorização do responsável pelo espaço público. Alimentação e proteção ambiental ainda precisam de engenharia e validação.</p>
  <div class="device-scrolly">
-  <div class="device-sticky"><div class="device-visual" data-layer="mount"><img id="device-concept-image" src="./images/device-pole.webp" alt="Conceito visual de sensor Sonora fixado em um poste" width="1536" height="1024" loading="lazy"/><div class="concept-label">CONCEITO • NÃO É HARDWARE FINAL</div><div class="layer-marker" aria-hidden="true"></div></div>
+  <div class="device-sticky"><div class="device-visual" data-layer="mount"><img id="device-concept-image" src="./images/device-pole.webp" alt="Conceito visual de sensor Sonora fixado em um poste" width="1536" height="1024" loading="lazy"/><div class="device-assembly" aria-hidden="true"><div class="assembly-halo"></div><div class="hardware-layer hardware-back"><span>04 / SUPORTE</span></div><div class="hardware-layer hardware-board"><i></i><b></b><span>03 / PROCESSAMENTO</span></div><div class="hardware-layer hardware-sensor"><i></i><span>02 / CAPTURA</span></div><div class="hardware-layer hardware-shell"><i></i><span>01 / GABINETE</span></div><div class="assembly-axis"></div></div><div class="assembly-caption" aria-hidden="true">CAMADAS DO CONCEITO</div><div class="concept-label">CONCEITO • NÃO É HARDWARE FINAL</div><div class="layer-marker" aria-hidden="true"></div></div>
   <div class="device-progress" role="group" aria-label="Ir para componente"><button data-component="mount" aria-pressed="true">01</button><button data-component="capture" aria-pressed="false">02</button><button data-component="processing" aria-pressed="false">03</button><button data-component="connection" aria-pressed="false">04</button><span id="component-label">Fixação e energia</span></div><p class="device-hint">Explore com a rolagem ou pelos números.</p></div>
   <div class="device-chapters">
    <article id="component-mount" data-chapter="mount"><span>01 / FIXAÇÃO E ENERGIA</span><h3>Presença discreta.<br/>Instalação pensada.</h3><p id="mount-description">A proposta parte de um suporte dedicado para poste. A instalação depende de autorização, avaliação do local e uma solução elétrica definida por profissionais habilitados.</p><small>Sem classificação IP, alimentação ou certificação definidas nesta proposta.</small></article>
@@ -109,6 +109,22 @@ export function initDevice() {
       }
     }
     if (closest.dataset.chapter !== active) show(closest.dataset.chapter!);
+    const first = chapters[0].getBoundingClientRect();
+    const last = chapters[chapters.length - 1].getBoundingClientRect();
+    const progress = Math.max(
+      0,
+      Math.min(
+        1,
+        (line - first.top - first.height / 2) /
+          (last.top + last.height / 2 - first.top - first.height / 2),
+      ),
+    );
+    visual.style.setProperty(
+      "--unfold",
+      String(
+        matchMedia("(prefers-reduced-motion: reduce)").matches ? 0.7 : progress,
+      ),
+    );
   }
   addEventListener(
     "scroll",
@@ -121,4 +137,6 @@ export function initDevice() {
     { passive: true },
   );
   show("mount");
+  update();
+  addEventListener("resize", update);
 }

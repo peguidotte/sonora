@@ -92,7 +92,7 @@ test("WCAG scan", async ({ page }) => {
 test("API playground never needs a key and changes scenarios", async ({
   page,
 }) => {
-  await page.goto("/");
+  await page.goto("/api-docs.html");
   await page
     .locator("#api-form")
     .getByRole("button", { name: "Executar simulação" })
@@ -115,3 +115,29 @@ test("API playground never needs a key and changes scenarios", async ({
     .click();
   await expect(page.locator("#api-response")).toContainText('"status": "ok"');
 });
+
+test("docs is a separate page and returns to product", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.locator("#api-form")).toHaveCount(0);
+  await page
+    .getByRole("link", { name: "API Docs ↗", exact: true })
+    .first()
+    .click();
+  await expect(page).toHaveURL(/api-docs.html$/);
+  await expect(page.locator("h1")).toHaveText("Sonora API Docs.");
+  await page.locator('[data-route="health"]').click();
+  await expect(page.locator("#api-endpoint")).toHaveValue("health");
+  await page.getByRole("link", { name: "← Voltar ao produto" }).click();
+  await expect(page.locator("h1")).toContainText("Toda cidade");
+});
+for (const width of [320, 390, 768, 1440])
+  test(`docs responsive ${width}`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/api-docs.html");
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBeTruthy();
+    await expect(page.locator("#api-form")).toBeVisible();
+  });
