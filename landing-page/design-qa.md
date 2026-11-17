@@ -30,3 +30,11 @@ A rota direta `http://127.0.0.1:4173` abriu corretamente no Chrome cloud. `termi
 Encontrado e corrigido rodapé comprimido: layout mobile agora usa grid e texto institucional ocupa linha completa. Revalidado visualmente após build, sem overflow. Capturas de hero desktop/estreito e rodapé foram salvas como evidência da revisão.
 
 O relato de bloqueio anterior acima registra a tentativa inicial; não descreve mais o QA manual. Playwright continua sem iniciar Chromium (socket proibido). DevTools indisponível por política, respeitada. Ainda não executados: axe, varredura 320/390/768/1440/1920 e emulação reduced-motion. Não declarar esses critérios aprovados.
+
+## Evolução: dispositivo, períodos e API
+
+- Build TypeScript/Vite e 11 testes Node passaram, incluindo fixtures comparadas ao OpenAPI real.
+- QA manual Chrome: seleção Noite troca imagem real e dados; cards expandem; instalação tomada troca imagem/texto; capítulos do dispositivo acompanham scroll e botões; playground retorna 200/401 e health conforme cenário.
+- Desktop e larguras CSS 400 e 333 px conferidas via tamanho da janela e zoom nativo (não emulação de dispositivo). Sem overflow horizontal: 388/400 e 323/333. Corrigidos cards estreitos, corte da vista explodida e altura sticky em viewport baixo. Zoom restaurado após teste.
+- API C# privada: sem conexão live testada, sem CORS externo no código/documentação. Playground local honesto, não confirmação de deploy.
+- Permanecem pendentes axe e suíte Playwright por restrição de inicialização do Chromium; não alegar validação em todos os dispositivos ou cobertura total WCAG.

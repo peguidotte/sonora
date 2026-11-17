@@ -34,3 +34,11 @@ npm run preview -- --host 127.0.0.1
 ## Validação
 
 `npm test` valida cálculo e estados; `npm run build` valida TypeScript e bundle. `npm run test:e2e` contém jornada, larguras 320/390/768/1440/1920, motion, menu e axe WCAG. Requer Chromium instalado (`npx playwright install chromium`) ou `CHROMIUM_PATH`. Ver `design-qa.md`: a revisão manual desktop/500px foi feita, incluindo correção de rodapé; a suíte automatizada e outras larguras ainda estão pendentes por restrição do ambiente. Não confundir testes preparados com executados.
+
+## Evolução interativa
+
+O dispositivo agora tem conceitos de poste público (prioritário) e tomada, com vista explodida e quatro capítulos por rolagem; os botões numéricos oferecem navegação direta. Não é especificação de hardware/instalação elétrica. `device.ts/css` isolam essa narrativa. `city-morning.webp`, `city.webp` e `city-night.webp` trocam o contexto visual conforme o período. Os cards introdutórios usam disclosure nativo por clique/teclado.
+
+O playground em `playground.ts/css` simula três rotas reais do contrato C# 0.4.0, incluindo respostas disponíveis, vazias e erros de autenticação. `playground-fixtures.mjs` mantém exemplos verificados por teste contra o OpenAPI. Nunca faz fetch ou solicita chaves. Como a API não habilita CORS externo, a página não oferece URL arbitrária; mostra cURL e orienta documentação Scalar no servidor autorizado.
+
+Princípios de revisão visual considerados: capítulos de produto/close-ups (Apple), request/response legíveis (Stripe) e hierarquia/consistência do taste-skill. Nenhum código, hook ou instalador externo dessas referências foi executado.

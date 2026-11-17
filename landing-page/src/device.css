@@ -1,0 +1,248 @@
+.device-story {
+  background: #f6f5f2;
+}
+.installation-switch {
+  display: flex;
+  gap: 8px;
+  margin-top: 36px;
+}
+.installation-switch button {
+  border: 1px solid #ccd0d8;
+  background: transparent;
+  padding: 16px 22px;
+  border-radius: 6px;
+  color: #4e5666;
+  cursor: pointer;
+}
+.installation-switch button[aria-pressed="true"] {
+  background: #143dff;
+  color: white;
+  border-color: #143dff;
+}
+.installation-note {
+  max-width: 780px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: #59616e;
+  margin: 20px 0 50px;
+}
+.device-scrolly {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 9%;
+  align-items: start;
+}
+.device-sticky {
+  position: sticky;
+  top: 28px;
+}
+.device-visual {
+  position: relative;
+  aspect-ratio: 1/1;
+  overflow: hidden;
+  background: #e8ecf2;
+  border-radius: 12px;
+}
+.device-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition:
+    transform 0.8s ease,
+    filter 0.5s ease;
+}
+.device-visual[data-layer="capture"] img {
+  transform: scale(1.06) translateY(2%);
+}
+.device-visual[data-layer="processing"] img {
+  transform: scale(1.12);
+}
+.device-visual[data-layer="connection"] img {
+  transform: scale(1.06) translateY(-3%);
+}
+.concept-label {
+  position: absolute;
+  top: 22px;
+  left: 20px;
+  font-size: 9px;
+  letter-spacing: 0.11em;
+  padding: 8px 10px;
+  background: #ffffffeb;
+  border-radius: 3px;
+}
+.layer-marker {
+  position: absolute;
+  width: 22%;
+  height: 22%;
+  border: 1px solid #143dff88;
+  border-radius: 50%;
+  left: 38%;
+  top: 39%;
+  box-shadow: 0 0 0 12px #143dff0a;
+  opacity: 0;
+  transition: all 0.6s ease;
+  pointer-events: none;
+}
+.device-visual[data-layer="capture"] .layer-marker {
+  opacity: 1;
+  top: 20%;
+  left: 22%;
+}
+.device-visual[data-layer="processing"] .layer-marker {
+  opacity: 1;
+  top: 40%;
+  left: 40%;
+}
+.device-visual[data-layer="connection"] .layer-marker {
+  opacity: 1;
+  top: 58%;
+  left: 58%;
+}
+.device-progress {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 18px;
+}
+.device-progress button {
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border: 1px solid #cdd2df;
+  background: transparent;
+  color: #515b6c;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 11px;
+}
+.device-progress button[aria-pressed="true"] {
+  background: #143dff;
+  color: white;
+  border-color: #143dff;
+}
+.device-progress span {
+  font-size: 12px;
+  margin-left: 10px;
+}
+.device-hint {
+  font-size: 11px;
+  color: #616b7a;
+}
+.device-chapters article {
+  min-height: 440px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-bottom: 1px solid #d7dce5;
+  padding: 36px 0;
+  opacity: 0.55;
+  transition: opacity 0.4s;
+}
+.device-chapters article.active {
+  opacity: 1;
+}
+.device-chapters article > span {
+  color: #143dff;
+  letter-spacing: 0.12em;
+  font-size: 10px;
+  font-weight: 700;
+}
+.device-chapters h3 {
+  font-family: "Manrope Variable", sans-serif;
+  font-size: clamp(26px, 3vw, 42px);
+  line-height: 1.18;
+  letter-spacing: -0.045em;
+  margin: 20px 0;
+}
+.device-chapters p {
+  font-size: 15px;
+  line-height: 1.75;
+  color: #535c6b;
+}
+.device-chapters small {
+  font-size: 11px;
+  line-height: 1.6;
+  color: #656e7b;
+  margin-top: 14px;
+}
+@media (max-width: 700px) {
+  .device-scrolly {
+    display: block;
+  }
+  .device-sticky {
+    top: 0;
+    background: #f6f5f2;
+    z-index: 3;
+    padding: 8px 0 12px;
+  }
+  .device-visual {
+    aspect-ratio: auto;
+    height: 230px;
+  }
+  .device-visual img {
+    object-fit: contain;
+  }
+  .device-progress {
+    margin-top: 10px;
+  }
+  .device-progress span {
+    font-size: 11px;
+  }
+  .device-hint {
+    display: none;
+  }
+  .device-chapters article {
+    min-height: 340px;
+    padding: 32px 0;
+    scroll-margin-top: 320px;
+  }
+  .device-chapters h3 {
+    font-size: 30px;
+  }
+  .installation-switch button {
+    padding: 13px 15px;
+    font-size: 12px;
+  }
+  .installation-note {
+    margin-bottom: 24px;
+  }
+  .concept-label {
+    top: 12px;
+    left: 12px;
+    font-size: 8px;
+  }
+  .device-chapters p {
+    font-size: 14px;
+  }
+  .layer-marker {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .device-visual img,
+  .device-chapters article,
+  .layer-marker {
+    transition: none;
+  }
+  .device-visual img {
+    transform: none !important;
+  }
+}
+.device-visual[data-layer="capture"] img,
+.device-visual[data-layer="processing"] img,
+.device-visual[data-layer="connection"] img {
+  object-fit: contain;
+  transform: none;
+}
+@media (max-width: 700px) and (max-height: 650px) {
+  .device-visual {
+    height: 26svh;
+  }
+  .device-chapters article {
+    scroll-margin-top: 200px;
+  }
+  .device-progress button {
+    width: 32px;
+    height: 32px;
+  }
+}
