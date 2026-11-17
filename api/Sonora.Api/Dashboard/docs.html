@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sonora | Documentação da API</title>
+  <script src="/dashboard/scalar/scalar.js" defer></script>
+  <script src="/dashboard/docs.js" defer></script>
+</head>
+<body>
+<header>
+  <h1>Sonora — documentação da API</h1>
+  <p>O documento OpenAPI é gerado pela própria aplicação e exige uma chave com escopo <code>operations:read</code>.
+     A chave fica somente na memória desta aba e é usada também nos testes do Scalar.</p>
+</header>
+<main>
+  <section id="docs-access">
+    <form id="docs-form" autocomplete="off">
+      <label for="docs-key">Chave X-Api-Key de operação</label>
+      <input id="docs-key" type="password" required maxlength="512" spellcheck="false">
+      <button type="submit">Carregar documentação</button>
+      <a href="/dashboard">Voltar ao painel</a>
+    </form>
+    <p id="docs-status" role="status"></p>
+  </section>
+</main>
+<div id="docs"></div>
+</body>
+</html>
