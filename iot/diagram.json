@@ -1,0 +1,76 @@
+{
+  "version": 1,
+  "author": "Leonardo Correa de Mello (RM555573) — Sonora",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-potentiometer", "id": "pot", "top": -110, "left": -150, "attrs": {} },
+    { "type": "wokwi-lcd1602", "id": "lcd", "top": -150, "left": 120, "attrs": { "pins": "i2c" } },
+    {
+      "type": "wokwi-led",
+      "id": "ledGreen",
+      "top": 284.4,
+      "left": 186.2,
+      "attrs": { "color": "green", "label": "baixo" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledYellow",
+      "top": 284.4,
+      "left": 243.8,
+      "attrs": { "color": "yellow", "label": "moderado" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "ledRed",
+      "top": 284.4,
+      "left": 301.4,
+      "attrs": { "color": "red", "label": "alto" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rGreen",
+      "top": 240,
+      "left": 190,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rYellow",
+      "top": 240,
+      "left": 240,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "rRed",
+      "top": 240,
+      "left": 290,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "pot:VCC", "esp:3V3", "red", [] ],
+    [ "pot:GND", "esp:GND.1", "black", [] ],
+    [ "pot:SIG", "esp:34", "orange", [] ],
+    [ "lcd:VCC", "esp:5V", "red", [] ],
+    [ "lcd:GND", "esp:GND.2", "black", [] ],
+    [ "lcd:SDA", "esp:21", "blue", [] ],
+    [ "lcd:SCL", "esp:22", "purple", [] ],
+    [ "esp:25", "rGreen:1", "green", [] ],
+    [ "rGreen:2", "ledGreen:A", "green", [] ],
+    [ "esp:26", "rYellow:1", "gold", [] ],
+    [ "rYellow:2", "ledYellow:A", "gold", [] ],
+    [ "esp:27", "rRed:1", "red", [] ],
+    [ "rRed:2", "ledRed:A", "red", [] ],
+    [ "ledGreen:C", "esp:GND.3", "black", [] ],
+    [ "ledYellow:C", "esp:GND.3", "black", [] ],
+    [ "ledRed:C", "esp:GND.3", "black", [] ]
+  ],
+  "dependencies": {}
+}

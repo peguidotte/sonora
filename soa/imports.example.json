@@ -1,0 +1,12 @@
+{
+  "files": [
+    {
+      "fileId": "noisecapture-sp-2026-11-08",
+      "sourceId": "55555555-5555-4555-8555-555555555555",
+      "path": "../noisecapture/sao-paulo.points.geojson",
+      "format": "noisecapture_points_geojson",
+      "maxDistanceMeters": 50,
+      "calibrationStatus": "unknown"
+    }
+  ]
+}
