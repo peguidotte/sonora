@@ -26,4 +26,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 14/11/2026 | Preparar ambiente IoT/Wokwi (Leonardo) | Circuito ESP32, firmware PlatformIO com janela LAeq de 5 s, NTP, fila de reenvio idempotente e tratamento 401/403; build do firmware, testes da lógica no computador e payload aceito pelo mock da ingestão. Simulação no Wokwi, envio ao Java real, link e vídeo continuam pendentes |
 
+| 16/11/2026 | Implementar a entrega de SOA (Felipe) com assistente de IA | Migrations V2/V3, seed de laboratório e serviço Java (domínio, ingestão IoT, importação NoiseCapture, comando ML, OpenAPI gerado). Executados localmente em PostgreSQL 16 descartável: 30 testes Maven, testes de `tools/` e checker API/banco sem erros; importação do dump real conferida contra o banco. Revisão humana, PR, CI no GitHub e deploy ainda pendentes |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
