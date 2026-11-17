@@ -6,6 +6,20 @@ Equipe: Leonardo Correa de Mello (RM555573), Felipe Soares Xavier (RM556931), Pe
 
 [Especificação da matéria](../docs/disciplinas/csharp.md) · [Arquitetura](../docs/arquitetura.md) · [Contratos](../contracts/README.md) · [OpenAPI alvo](../contracts/openapi/csharp.openapi.json)
 
+## Guia de avaliação (C# Software Development)
+
+> **Escopo desta entrega: somente a pasta `api/`.** O repositório reúne a Global Solution inteira do grupo; as demais pastas (`soa/`, `iot/`, `ml/`, `linux/`, entre outras) pertencem a outras matérias e **não fazem parte desta avaliação**. A API C# roda sozinha: lê o PostgreSQL preparado pelo módulo `database/`, sem precisar do serviço Java.
+
+| Entregável pedido | Onde está |
+| --- | --- |
+| Projeto C# e Web API | [`Sonora.Api/`](Sonora.Api): Minimal API .NET 10; rotas em [`Http/SonoraEndpoints.cs`](Sonora.Api/Http/SonoraEndpoints.cs) |
+| Entity Framework Core + LINQ | [`SonoraReadContext.cs`](Sonora.Api/SonoraReadContext.cs) e [`Data/EfAcousticReadStore.cs`](Sonora.Api/Data/EfAcousticReadStore.cs) |
+| README com execução e descrição | Este arquivo: [O que a aplicação faz](#o-que-a-aplicação-faz) e [Executar](#executar) |
+| Documentação dos endpoints | Scalar em `/dashboard/docs` com a API rodando ([captura 9](docs/evidencias/09-scalar.png)); [tabela de rotas](#rotas-apisonorav1); OpenAPI em [`contracts/openapi/csharp.openapi.json`](../contracts/openapi/csharp.openapi.json) |
+| Evidências da aplicação | [Evidências](#evidências): 10 capturas e resultados da integração real |
+| Testes unitários e de integração | [`Sonora.Api.Tests/`](Sonora.Api.Tests) e a seção [Testes](#testes) |
+| Critérios da rubrica (POO, Web API, EF Core + LINQ, async/await, qualidade) | [Organização e rubrica](#organização-e-rubrica): cada critério ligado aos arquivos |
+
 ## O que a aplicação faz
 
 Imobiliárias e pessoas escolhendo onde morar não conseguem perceber, numa visita, o barulho de um endereço ao longo da semana. A API Sonora consulta observações acústicas persistidas pelo serviço Java (sensores ESP32/Wokwi simulados e arquivos públicos NoiseCapture) e entrega **perfis por local, dia e horário**, sempre informando origem, método, cobertura e limitações.
