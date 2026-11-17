@@ -10,7 +10,7 @@
     "requiresCloud": false,
     "commands": [
       "python -m pip install -r ml/requirements.txt",
-      "curl -L -o ml/dados/raw/noisecapture-brazil.zip https://data.noise-planet.org/dump/Brazil.zip",
+      "curl --create-dirs -L -o ml/dados/raw/noisecapture-brazil.zip https://data.noise-planet.org/dump/Brazil.zip",
       "python ml/sonora_clusters.py"
     ],
     "dataMode": "real-public-data"

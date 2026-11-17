@@ -21,6 +21,7 @@ As 5 features por sessão são muito correlacionadas (de 0,87 a 0,98 entre os n�
 | Filtro (contagens em `output/limpeza.csv`) | Sessões restantes |
 | --- | ---: |
 | Dados brutos | 1.894 |
+| Coordenadas fora do município ou datas implausíveis (nenhum ponto removido) | 1.894 |
 | Nível ≤ 0 dB, GPS pior que 50 m e duplicados | 1.823 |
 | Sessões marcadas `indoor` ou `test` (o foco é ruído externo) | 1.522 |
 | Menos de 30 pontos válidos | 1.230 |
@@ -69,13 +70,15 @@ O PC3 explica menos de 1% da variância. Por isso, usar 3 componentes sem whiten
 | Davies–Bouldin (↓) | 0,954 | 0,940 |
 | Distância média ao centro (↓) | 1,398 | 1,321 |
 
-**Overfitting.** A silhouette cai pouco no teste, e as outras métricas quase não mudam: os dois perfis se mantêm em regiões que o modelo não viu. O resultado também não depende da semente (ARI = 1,00 entre 10 sementes).
+**Overfitting.** A silhouette cai pouco no teste, e as outras métricas quase não mudam: neste recorte, o modelo aprendido no treino separa as sessões das células reservadas com qualidade parecida. O resultado também não depende da semente de inicialização (ARI = 1,00 entre 10 sementes), o que mostra estabilidade do ajuste, não dos grupos em outros lugares.
 
-Há, porém, um limite. Um KMeans ajustado **só** com o teste concorda pouco com o modelo de treino (ARI = 0,17). O teste tem mais sessões ruidosas (59%, contra 37% no treino), o que desloca o limiar entre os grupos. A existência dos dois perfis é robusta, mas o ponto de corte (~60 dB) depende de onde se mediu.
+Há, porém, um limite. Um KMeans ajustado **só** com o teste concorda pouco com o modelo de treino (ARI = 0,17). O teste tem mais sessões ruidosas (59%, contra 37% no treino), o que desloca o limiar entre os grupos. Os dois perfis aparecem no treino e no teste deste recorte, mas a fronteira entre eles (~60 dB) muda com a região medida, e a evidência disponível não basta para afirmar que esses perfis se repetem em outras áreas da cidade.
+
+Também não analisei a proximidade entre células vizinhas nem os trajetos que atravessam mais de uma célula: cada sessão entra pela sua posição mediana. Células de treino e teste vizinhas podem ter ruído parecido, o que tornaria o teste menos independente do que parece. Não há evidência de vazamento, mas essa verificação não foi feita.
 
 ## 6. Leitura para o cidadão
 
-| Perfil | Sessões | LAeq mediana | p90 | Tags mais declaradas |
+| Perfil | Sessões | LAeq mediana | Mediana do p90 das sessões | Tags mais declaradas |
 | --- | ---: | ---: | ---: | --- |
 | **G0, ambiente moderado** | 698 | 54,9 dB(A) | 56,9 | animais, vegetação, via |
 | **G1, ambiente ruidoso** | 487 | 68,0 dB(A) | 70,6 | via, conversa |
@@ -91,7 +94,8 @@ O Sonora pode dizer a quem procura imóvel "as medições perto daqui se parecem
 
 - Celulares sem calibração não fazem medição legal.
 - Sessões de minutos não equivalem ao Lden, então a comparação com as normas é só uma ordem de grandeza.
-- A cobertura está concentrada em poucas regiões.
+- A cobertura está concentrada em poucas regiões, e não foi verificado se os perfis se repetem fora delas.
+- Os valores dos perfis são medianas entre sessões. Como as sessões têm durações muito diferentes (de 30 a mais de 6.000 s), eles não dizem quanto do tempo total ficou abaixo de um nível.
 - Um perfil **não classifica** um endereço sem medições.
 
 O resultado é exportado em `output/summary.json`, no contrato `ml-summary`, para a API C# exibir.

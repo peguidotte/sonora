@@ -13,12 +13,14 @@ A contagem bruta inicial (campos, horários e totais antes da limpeza) está em 
 
 As contagens de cada etapa estão em `../output/limpeza.csv`.
 
-1. **Nível ≤ 0 dB:** é um valor sentinela de falha, não silêncio. Saem 75 pontos.
-2. **Precisão de GPS pior que 50 m:** sem uma posição confiável, não dá para associar a medição a um local.
-3. **Duplicados por (sessão, segundo):** 2.590 pontos.
-4. **Sessões com as tags `indoor` ou `test`:** o produto trata de ruído ambiente externo, e sessões de teste não são medições reais.
-5. **Sessões com menos de 30 pontos válidos:** cerca de 30 s não bastam para os percentis.
-6. **Sessões com desvio-padrão < 0,5 dB:** são 45 sessões com nível constante perto de 93 dB, o que indica sensor travado ou saturado e não som real.
+1. **Coordenadas ausentes ou fora do município:** caixa envolvente aproximada de São Paulo (lat -24,01 a -23,35; lon -46,83 a -46,36). Neste snapshot não sai nenhum ponto: tudo fica entre lat -23,83 e -23,44 e lon -46,79 e -46,38.
+2. **Datas ausentes ou implausíveis:** antes de 2016 ou depois do download (08/11/2026). Neste snapshot não sai nenhum ponto: as datas brutas vão de 12/04/2017 a 11/07/2025.
+3. **Nível ≤ 0 dB:** é um valor sentinela de falha, não silêncio. Saem 75 pontos.
+4. **Precisão de GPS pior que 50 m:** sem uma posição confiável, não dá para associar a medição a um local.
+5. **Duplicados por (sessão, segundo):** 2.590 pontos.
+6. **Sessões com as tags `indoor` ou `test`:** o produto trata de ruído ambiente externo, e sessões de teste não são medições reais.
+7. **Sessões com menos de 30 pontos válidos:** cerca de 30 s não bastam para os percentis.
+8. **Sessões com desvio-padrão < 0,5 dB:** são 45 sessões com nível constante perto de 93 dB, o que indica sensor travado ou saturado e não som real.
 
 Resultado: **1.185 sessões e 228.444 pontos**.
 

@@ -15,12 +15,12 @@ Responsável: **Gabriel Figueira Flora, RM556476**. A análise completa está no
 
 ## Como executar
 
-Pré-requisito: Python 3.12 ou mais recente (testado com 3.14.6). Os comandos abaixo rodam a partir da raiz do repositório.
+Pré-requisito: Python 3.12 ou mais recente (testado com 3.14.6). Os comandos abaixo rodam a partir da raiz do repositório, num shell bash (no Windows, Git Bash). O `--create-dirs` cria `ml/dados/raw/`, que não existe num clone limpo. No Windows PowerShell, `curl` é um apelido do `Invoke-WebRequest`; use `curl.exe` com os mesmos argumentos.
 
 ```bash
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -r ml/requirements.txt   # Linux/macOS: .venv/bin/python
-curl -L -o ml/dados/raw/noisecapture-brazil.zip https://data.noise-planet.org/dump/Brazil.zip
+curl --create-dirs -L -o ml/dados/raw/noisecapture-brazil.zip https://data.noise-planet.org/dump/Brazil.zip
 .venv/Scripts/python.exe ml/sonora_clusters.py
 ```
 

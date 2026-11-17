@@ -60,6 +60,11 @@ MAX_GPS_ACCURACY_M = 50  # precisão do GPS pior que isso não localiza a sessã
 MIN_POINTS_PER_SESSION = 30  # ~30 s de medição válida
 EXCLUDED_TAGS = {"indoor", "test"}  # queremos ruído ambiente externo
 MIN_SESSION_STD_DB = 0.5  # sinal quase constante = sensor travado/saturado
+# Caixa envolvente aproximada do município de São Paulo (lat/lon em graus)
+SP_BBOX = {"lat": (-24.01, -23.35), "lon": (-46.83, -46.36)}
+# Datas plausíveis: antes de 2016 não há NoiseCapture; depois do download é erro de relógio
+VALID_FROM = pd.Timestamp("2016-01-01", tz="UTC")
+VALID_TO = pd.Timestamp("2026-11-08", tz="UTC")  # data do download (dados/README.md)
 CELL_DEG = 0.0045  # ~500 m de latitude; unidade espacial da divisão
 TEST_FRACTION = 0.20
 N_FOLDS = 5
@@ -69,7 +74,7 @@ FEATURE_LABELS = {
     "laeq": "LAeq (média energética)",
     "p10": "p10 (níveis baixos)",
     "p50": "p50 (mediana)",
-    "p90": "p90 (picos)",
+    "p90": "p90 (níveis altos)",
     "std": "desvio-padrão",
 }
 
@@ -144,7 +149,17 @@ def log_step(name: str, df: pd.DataFrame) -> None:
 
 log_step("dados brutos", points)
 
-pts = points[np.isfinite(points.db) & (points.db > 0)]
+in_bbox = (
+    points.lat.between(*SP_BBOX["lat"]) & points.lon.between(*SP_BBOX["lon"])
+)  # between é False para NaN, então coordenadas ausentes também saem
+pts = points[in_bbox]
+log_step("remove coordenadas ausentes ou fora do município", pts)
+
+when = pd.to_datetime(pts.epoch_ms, unit="ms", utc=True, errors="coerce")
+pts = pts[when.between(VALID_FROM, VALID_TO)]
+log_step("remove datas ausentes ou fora de 2016 até o download", pts)
+
+pts = pts[np.isfinite(pts.db) & (pts.db > 0)]
 log_step("remove nível <= 0 dB (sentinela)", pts)
 
 pts = pts[pts.accuracy <= MAX_GPS_ACCURACY_M]
@@ -482,10 +497,12 @@ save(fig, "08_mapa_e_horario.png")
 
 # %%
 def describe_group(g: int) -> str:
+    # Todos os valores são medianas entre sessões do grupo, não percentis do tempo
+    # agregado: sessões têm durações muito diferentes.
     r = profile.loc[g]
     return (
-        f"LAeq mediana {r.laeq:.1f} dB(A); metade do tempo abaixo de {r.p50:.1f} dB(A); "
-        f"picos (p90) de {r.p90:.1f} dB(A); variação típica {r['std']:.1f} dB."
+        f"Medianas entre as sessões do grupo: LAeq {r.laeq:.1f} dB(A); "
+        f"p50 {r.p50:.1f} dB(A); percentil 90 {r.p90:.1f} dB(A); desvio-padrão {r['std']:.1f} dB."
     )
 
 
