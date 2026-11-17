@@ -15,9 +15,10 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "in_progress",
     "dependencies": [
-      "soa"
+      "soa",
+      "postgresql"
     ]
   },
   "validation": {

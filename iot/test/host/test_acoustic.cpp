@@ -73,6 +73,68 @@ int main() {
   CHECK(classifyResponse(-1) == SendOutcome::Retry);
   CHECK(retryDelaySeconds(1) == 2 && retryDelaySeconds(5) == 32 && retryDelaySeconds(6) == 60 && retryDelaySeconds(40) == 60);
 
+  // Janela fechada pelo relógio: 60 s de amostragem a cada 100 ms -> 12 janelas de 50 amostras,
+  // encadeadas a cada 5 s (observedAt sem sobreposição nem buraco).
+  {
+    TimedWindow timed(5000, 100);
+    ClosedWindow closed{};
+    int windows = 0, samples = 0;
+    time_t previous = 0;
+    bool chained = true, allComplete = true, spanOk = true;
+    for (uint32_t ms = 0; ms < 60000; ms += 100) {
+      ++samples;
+      if (timed.add(ms, 1794150000 + ms / 1000, 62.5f, closed)) {
+        ++windows;
+        if (closed.count != 50) allComplete = false;
+        if (!closed.complete || closed.spanMs != 4900) spanOk = false;
+        if (previous != 0 && closed.startEpoch != previous + 5) chained = false;
+        previous = closed.startEpoch;
+      }
+    }
+    CHECK(samples == 600 && windows == 12);
+    CHECK(allComplete && spanOk && chained);
+  }
+
+  // Variação de 1–2 ms do agendador (visto no Wokwi: 4899 ms em vez de 4900) não muda a contagem: sempre 50.
+  {
+    TimedWindow timed(5000, 100);
+    ClosedWindow closed{};
+    bool always50 = true;
+    int windows = 0;
+    for (uint32_t k = 0; k < 600; ++k) {
+      const uint32_t jitter = (k % 3 == 0) ? 0 : (k % 3 == 1 ? 1 : 2);  // leituras 0–2 ms adiantadas
+      const uint32_t ms = k * 100 + 10 - jitter;
+      if (timed.add(ms, 1794150000 + ms / 1000, 50.0f, closed)) {
+        ++windows;
+        if (closed.count != 50 || !closed.complete) always50 = false;
+      }
+    }
+    CHECK(windows == 12 && always50);
+  }
+
+  // Cenário da revisão: se a leitura atrasar (ex.: tarefa parada ~5 s), a janela NÃO se estica além de 5 s
+  // nem é enviada com 5 s declarados: fecha pelo relógio, sai incompleta e a próxima recomeça no tempo real.
+  {
+    TimedWindow timed(5000, 100);
+    ClosedWindow closed{};
+    bool closedOnce = false;
+    for (uint32_t ms = 0; ms <= 2000; ms += 100) closedOnce |= timed.add(ms, 1794150000, 60.0f, closed);
+    CHECK(!closedOnce);
+    CHECK(timed.add(7000, 1794150007, 70.0f, closed));  // primeira leitura após o atraso
+    CHECK(!closed.complete && closed.count == 21 && closed.spanMs == 2000 && closed.startEpoch == 1794150000);
+    CHECK(timed.count() == 1);  // a amostra atrasada abriu a próxima janela
+    for (uint32_t ms = 7100; ms < 11900; ms += 100) timed.add(ms, 1794150007 + (ms - 7000) / 1000, 70.0f, closed);
+    CHECK(timed.add(11900, 1794150011, 70.0f, closed));
+    CHECK(closed.complete && closed.count == 50 && closed.startEpoch == 1794150007);  // 7 s depois, não 5
+  }
+
+  // Encadeamento do observedAt: segue +5 s com pequena variação; recomeça após salto ou sem NTP.
+  CHECK(nextWindowStart(1794150000, 1794150005, 5) == 1794150005);
+  CHECK(nextWindowStart(1794150000, 1794150006, 5) == 1794150005);
+  CHECK(nextWindowStart(1794150000, 1794150020, 5) == 1794150020);
+  CHECK(nextWindowStart(0, 1794150000, 5) == 1794150000);
+  CHECK(nextWindowStart(1794150000, 12, 5) == 12);  // sem relógio: continua inválido, não é enviado
+
   std::printf("OK: %d verificações da lógica do firmware.\n", checks);
   return 0;
 }
