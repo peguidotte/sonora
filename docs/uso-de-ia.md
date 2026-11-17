@@ -26,4 +26,6 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 14/11/2026 | Implementar a API C# de consulta (Leonardo) | Domínio acústico, EF Core sobre as views do contrato, rotas, segurança por escopo, painel e Scalar; testes de domínio/HTTP/segurança/EF e integração em PostgreSQL de laboratório com views equivalentes ao contrato. Integração com as migrations oficiais de SOA ainda pendente |
 
+| 16/11/2026 | Implementar a entrega de SOA (Felipe) com assistente de IA | Migrations V2/V3, seed de laboratório e serviço Java (domínio, ingestão IoT, importação NoiseCapture, comando ML, OpenAPI gerado). Executados localmente em PostgreSQL 16 descartável: 30 testes Maven, testes de `tools/` e checker API/banco sem erros; importação do dump real conferida contra o banco. Revisão humana, PR, CI no GitHub e deploy ainda pendentes |
+
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
