@@ -9,8 +9,8 @@ App React Native + TypeScript com Expo Router (SDK 52). Consome somente a API C#
 ## Versões
 
 - Node 22, npm.
-- Expo SDK 52, Expo Router 4, React Native 0.76.9, React 18.3.1.
-- TypeScript 5.3 em modo `strict`.
+- Expo SDK 58, Expo Router 6, React Native 0.88.1, React 19.3.0.
+- TypeScript 6.0 em modo `strict`.
 - Testes: Jest + ts-jest.
 - Build Android: Expo prebuild gerenciado + Gradle (Java 17), conforme [pipeline.json](../deploy/pipeline.json) e o [contrato das aplicações](../deploy/azure/README.md#contrato-das-aplicações).
 
@@ -60,7 +60,7 @@ Sem conexão (401/403/rede), o app nunca tenta retry automático: mostra mensage
 - Cache do perfil acústico em SQLite com data de obtenção (`src/storage/cache.ts`), usado automaticamente quando a API está inacessível.
 - Acessibilidade: escala de fonte (normal/grande/extra grande), tema de alto contraste, rótulos e `accessibilityRole`/`accessibilityState` em todos os controles, alvos de toque com no mínimo 48dp (`src/theme.ts`), e nenhum estado depende somente de cor (ícones/texto acompanham sempre).
 
-Validado nesta máquina: `npm ci`, `npx tsc --noEmit`, `npx jest` (7/7) e `npx expo-doctor` (18/18) sem erros; `npx expo prebuild --platform android --clean --no-install` gera o projeto nativo sem falhas.
+Validado nesta máquina: `npm ci`, `npx tsc --noEmit`, `npx jest` (7/7) e `npx expo-doctor` (20/20) sem erros; `npx expo prebuild --platform android --clean --no-install` gera o projeto nativo sem falhas.
 
 ## Pendências
 
