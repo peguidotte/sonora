@@ -19,6 +19,17 @@ export interface HttpClientConfig {
 }
 
 const PREFIX = "/api/sonora/v1";
+const REQUEST_TIMEOUT_MS = 10_000;
+
+/** Accepts what people paste into Settings: trims, drops trailing slashes and a
+ * pasted contract prefix, so `http://host:8080/api/sonora/v1/` still works. */
+export function normalizeBaseUrl(value: string): string {
+  let url = value.trim().replace(/\/+$/, "");
+  if (url.toLowerCase().endsWith(PREFIX)) {
+    url = url.slice(0, -PREFIX.length).replace(/\/+$/, "");
+  }
+  return url;
+}
 
 function buildQuery(params: Record<string, string | number | undefined>): string {
   const entries = Object.entries(params).filter(([, value]) => value !== undefined);
@@ -32,15 +43,20 @@ function buildQuery(params: Record<string, string | number | undefined>): string
 
 async function request<T>(config: HttpClientConfig, path: string): Promise<T> {
   let response: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
-    response = await fetch(`${config.baseUrl}${PREFIX}${path}`, {
+    response = await fetch(`${normalizeBaseUrl(config.baseUrl)}${PREFIX}${path}`, {
       method: "GET",
-      headers: { "X-Api-Key": config.apiKey },
+      headers: { "X-Api-Key": config.apiKey, Accept: "application/json" },
+      signal: controller.signal,
     });
   } catch {
     // Covers DNS failure, timeout and offline device: never retried
     // automatically (docs/disciplinas/mobile.md: "sem retry infinito").
     throw new SonoraNetworkError("Could not reach the Sonora API.");
+  } finally {
+    clearTimeout(timer);
   }
 
   if (!response.ok) {
@@ -70,7 +86,7 @@ export function createHttpClient(config: HttpClientConfig): SonoraClient {
     },
 
     async getLocation(locationId: string): Promise<Location> {
-      return request<Location>(config, `/locations/${locationId}`);
+      return request<Location>(config, `/locations/${encodeURIComponent(locationId)}`);
     },
 
     async getProfile(params: GetProfileParams): Promise<Profile> {
@@ -80,7 +96,10 @@ export function createHttpClient(config: HttpClientConfig): SonoraClient {
         origin: params.origin,
         aggregation: params.aggregation,
       });
-      return request<Profile>(config, `/locations/${params.locationId}/noise-profile${query}`);
+      return request<Profile>(
+        config,
+        `/locations/${encodeURIComponent(params.locationId)}/noise-profile${query}`,
+      );
     },
   };
 }

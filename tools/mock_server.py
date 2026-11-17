@@ -125,6 +125,8 @@ def create_server(service="csharp", host="127.0.0.1", port=4010):
                 # Somente eco de identificador/janela para navegação; nenhum cálculo ou gravação real.
                 if isinstance(value, dict) and "locationId" in value and "locationId" in path_values:
                     value["locationId"] = path_values["locationId"]
+                if isinstance(value, dict) and path == "/api/sonora/v1/locations/{locationId}":
+                    value["id"] = path_values["locationId"]
                 if isinstance(value, dict) and "from" in query:
                     if "from" in value:
                         value["from"], value["to"] = query["from"][0], query["to"][0]

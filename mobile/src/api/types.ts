@@ -13,6 +13,8 @@ export interface Location {
   latitude: number;
   longitude: number;
   isDemo: boolean;
+  /** Present only when the list was filtered by latitude/longitude. */
+  distanceMeters?: number;
 }
 
 export interface LocationPage {

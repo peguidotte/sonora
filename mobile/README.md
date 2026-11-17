@@ -48,12 +48,37 @@ API base URL: http://<host-do-C#>:8080
 API key: <chave acoustics:read fornecida pelo operador>
 ```
 
+### Contra o fake server do contrato (mesmas rotas do C#)
+
+O [mock do contrato](../contracts/README.md#mocks-de-desenvolvimento) expõe exatamente as rotas de `contracts/openapi/csharp.openapi.json`, então o app o usa pelo mesmo caminho HTTP que usará com o C# real; só a URL e a chave mudam. Na raiz do clone, com o Python do ambiente virtual:
+
+```bash
+python tools/mock_server.py --service csharp --port 4010                 # emulador/Expo web no mesmo PC
+python tools/mock_server.py --service csharp --host 0.0.0.0 --port 4010  # celular físico na mesma rede
+```
+
+| Onde o app roda | URL base em Settings |
+| --- | --- |
+| Emulador Android | `http://10.0.2.2:4010` (alias do host) |
+| Simulador iOS / Expo web | `http://127.0.0.1:4010` |
+| Celular físico (Expo Go) | `http://<IP-da-máquina>:4010` |
+
+Chave pública do mock: `mock-consumer-key` (`acoustics:read`). A URL é normalizada (barra final e um `/api/sonora/v1` colado são removidos). O mock devolve fixtures estáticas: não calcula perfil nem filtra por raio, e `origin=public_dataset` responde `no_data`. Build de release Android bloqueia HTTP sem TLS; HTTP simples só vale em desenvolvimento (Expo Go/dev build).
+
+Para conferir que o cliente HTTP cumpre o contrato contra qualquer servidor (mock ou C# real), sem alterar o app:
+
+```bash
+SONORA_API_URL=http://127.0.0.1:4010 SONORA_API_KEY=mock-consumer-key npx jest integration
+```
+
+Sem `SONORA_API_URL` esses testes são pulados. Passar no mock não comprova integração com o C# real; isso só vale quando a mesma execução apontar para a API de Leonardo.
+
 Sem conexão (401/403/rede), o app nunca tenta retry automático: mostra mensagem compreensível (sessão inválida/sem escopo) ou, se já houver cache local daquela consulta, reaproveita o cache mostrando a data do último sucesso ("Offline — showing cached data from …").
 
 ## O que está implementado
 
 - Navegação Expo Router: lista de locais (`app/index.tsx`) → detalhe/perfil acústico (`app/locations/[id].tsx`), comparação (`app/compare.tsx`), favoritos (`app/favorites.tsx`) e configurações (`app/settings.tsx`).
-- Adaptador único (`src/api/client.ts`) com duas implementações — mock (`mockClient.ts`) e HTTP real (`httpClient.ts`) — trocadas pela tela Settings, sem alterar as telas.
+- Adaptador único (`src/api/client.ts`) com duas implementações — mock (`mockClient.ts`) e HTTP real (`httpClient.ts`) — trocadas pela tela Settings, sem alterar as telas. O HTTP usa só as rotas de consulta que o app precisa (`GET /locations`, `/locations/{id}`, `/locations/{id}/noise-profile`), com janela UTC `yyyy-MM-ddTHH:mm:ssZ`, timeout de 10 s e sem retry.
 - Perfil acústico: estados carregando, disponível, `no_data` (vazio), erro de rede com cache offline e erro de autenticação (401/403) tratado sem repetição automática.
 - Comparação de dois locais: exige mesmo período/origem/método (`src/domain/compare.ts`, com testes) e nunca produz um ranking absoluto de conforto — só reporta incompatibilidade quando houver.
 - Favoritos em SQLite (`src/storage/favorites.ts`): persistem entre aberturas do app (comprovado reabrindo o Metro/app e revisitando a tela Favorites).
