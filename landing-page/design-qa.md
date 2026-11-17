@@ -1,6 +1,6 @@
 # Design QA — 17/11/2026
 
-**Status: BLOCKED (não aprovado visualmente).**
+**Status: revisão visual manual parcial aprovada; suíte automatizada e faixas menores ainda pendentes.**
 
 ## Referência e implementação
 
@@ -22,3 +22,11 @@ Referência aprovada: hero editorial claro, título preto/cobalto à esquerda, i
 ## Critérios de fechamento
 
 Hero fiel sem sobreposição; imagens nítidas; 320–1920 px sem overflow; menu/teclado/Escape funcionais; estados demo e dispositivo corretos; zero violações axe críticas/sérias; ondas pausáveis e reduced-motion; links válidos; nenhuma promessa comercial inventada. Não disparar Actions pagos para suprir QA local.
+
+## Continuação da validação manual
+
+A rota direta `http://127.0.0.1:4173` abriu corretamente no Chrome cloud. `terminal.local` era a rota inadequada para esse preview. Hero, tipografia, assets e hierarquia foram inspecionados renderizados no desktop e janela estreita (500 px). Estados Noite/Sem dados, dispositivo, arquitetura, FAQ, pausa, menu móvel, fechamento por link e Escape funcionaram. Em 500 px: scrollWidth 485, sem overflow horizontal.
+
+Encontrado e corrigido rodapé comprimido: layout mobile agora usa grid e texto institucional ocupa linha completa. Revalidado visualmente após build, sem overflow. Capturas de hero desktop/estreito e rodapé foram salvas como evidência da revisão.
+
+O relato de bloqueio anterior acima registra a tentativa inicial; não descreve mais o QA manual. Playwright continua sem iniciar Chromium (socket proibido). DevTools indisponível por política, respeitada. Ainda não executados: axe, varredura 320/390/768/1440/1920 e emulação reduced-motion. Não declarar esses critérios aprovados.

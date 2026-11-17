@@ -33,4 +33,4 @@ npm run preview -- --host 127.0.0.1
 
 ## Validação
 
-`npm test` valida cálculo e estados; `npm run build` valida TypeScript e bundle. `npm run test:e2e` contém jornada, larguras 320/390/768/1440/1920, motion, menu e axe WCAG. Requer Chromium instalado (`npx playwright install chromium`) ou `CHROMIUM_PATH`. Ver `design-qa.md`: a suíte de navegador e a aprovação visual ainda estão pendentes por restrição do ambiente de execução. Não confundir testes preparados com executados.
+`npm test` valida cálculo e estados; `npm run build` valida TypeScript e bundle. `npm run test:e2e` contém jornada, larguras 320/390/768/1440/1920, motion, menu e axe WCAG. Requer Chromium instalado (`npx playwright install chromium`) ou `CHROMIUM_PATH`. Ver `design-qa.md`: a revisão manual desktop/500px foi feita, incluindo correção de rodapé; a suíte automatizada e outras larguras ainda estão pendentes por restrição do ambiente. Não confundir testes preparados com executados.
