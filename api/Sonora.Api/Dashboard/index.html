@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sonora | Painel acústico</title>
+  <link rel="stylesheet" href="/dashboard/app.css">
+  <script src="/dashboard/app.js" defer></script>
+</head>
+<body>
+<header class="top">
+  <h1>Sonora <span>painel acústico</span></h1>
+  <p>Contexto de ruído por local, dia e horário. Dados privados: informe uma chave de leitura. A chave fica somente na memória desta aba.</p>
+</header>
+
+<main>
+  <section class="card" aria-labelledby="access-title">
+    <h2 id="access-title">Acesso</h2>
+    <form id="access" autocomplete="off">
+      <label for="api-key">Chave X-Api-Key</label>
+      <input id="api-key" type="password" required maxlength="512" spellcheck="false">
+      <button type="submit">Conectar</button>
+      <button type="button" id="disconnect" hidden>Sair</button>
+      <a class="link" href="/dashboard/docs">Documentação da API (Scalar)</a>
+    </form>
+    <p id="access-status" role="status" class="muted"></p>
+  </section>
+
+  <section class="card" id="query-card" hidden aria-labelledby="query-title">
+    <h2 id="query-title">Consulta</h2>
+    <form id="query" class="grid">
+      <div class="field wide">
+        <label for="location">Local</label>
+        <select id="location" required></select>
+      </div>
+      <div class="field">
+        <label for="from">De (data em São Paulo)</label>
+        <input id="from" type="date" required>
+      </div>
+      <div class="field">
+        <label for="to">Até (inclusive)</label>
+        <input id="to" type="date" required>
+      </div>
+      <div class="field">
+        <label for="origin">Origem</label>
+        <select id="origin">
+          <option value="simulated">Simulada (ESP32/Wokwi)</option>
+          <option value="public_dataset">Dados públicos (NoiseCapture)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="aggregation">Agrupar por</label>
+        <select id="aggregation">
+          <option value="hour">Hora</option>
+          <option value="day">Dia</option>
+        </select>
+      </div>
+      <div class="field wide">
+        <button type="submit">Ver perfil sonoro</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card" id="profile-card" hidden aria-labelledby="profile-title" aria-live="polite">
+    <h2 id="profile-title">Perfil sonoro</h2>
+    <div id="profile-summary" class="summary"></div>
+    <div id="profile-series"></div>
+    <h3>Limitações</h3>
+    <ul id="profile-limitations"></ul>
+    <h3>Fontes</h3>
+    <ul id="profile-sources"></ul>
+  </section>
+
+  <section class="card" id="extra-card" hidden aria-labelledby="extra-title">
+    <h2 id="extra-title">Operação e análise</h2>
+    <div class="grid two">
+      <div>
+        <h3>Dispositivos</h3>
+        <p id="devices-status" class="muted"></p>
+        <ul id="devices"></ul>
+      </div>
+      <div>
+        <h3>Resumo ML</h3>
+        <p id="ml-status" class="muted"></p>
+        <ul id="ml-groups"></ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="muted">
+  Sonora informa observações, período, fonte e cobertura. Não garante silêncio, conforto dentro do imóvel nem conformidade legal.
+</footer>
+</body>
+</html>
