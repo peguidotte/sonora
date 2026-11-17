@@ -45,3 +45,7 @@ crash.log
 
 # Build Java
 soa/target/
+
+# Firmware IoT: build PlatformIO e configuração local com credenciais
+iot/.pio/
+iot/include/config.h
