@@ -87,3 +87,5 @@ sudo bash linux/verify.sh
 O primeiro comando cadastra o local identificado como demonstração e usa a credencial de dispositivo da VM para enviar uma janela sintética ao Java. O reenvio retorna o registro anterior. O C# lê o perfil pelo PostgreSQL. No painel, selecione **Laboratório Sonora (simulado)**, origem simulada e um intervalo que inclua **17/11/2026 às 12h de São Paulo**. A janela registrada tem cinco segundos e 63,4 dB(A).
 
 O cadastro usa a identidade de dispositivo da instalação padrão. Se já estiver vinculada a outro local, o script interrompe a transação. As credenciais ficam na VM.
+
+O [smoke integrado manual](https://github.com/peguidotte/sonora/actions/workflows/integration-smoke.yml) usa o modo `azure` para conferir serviços e consultar a janela de demonstração com `demo.sh --check`. Esse modo lê o perfil existente e mantém as chaves na VM.

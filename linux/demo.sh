@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 # Demonstração opt-in da GS. Requer as migrations e as chaves locais do provisionamento.
 set -Eeuo pipefail
+case "${1:-run}" in
+  run|--check) ;;
+  *) echo 'Uso: demo.sh [--check]' >&2; exit 2 ;;
+esac
+if [[ ${1:-run} == run ]]; then
 runuser -u postgres -- psql -X -q -v ON_ERROR_STOP=1 -d sonora <<'SQL'
 BEGIN;
 INSERT INTO sonora.locations (id,name,city,latitude,longitude,is_demo)
@@ -19,8 +24,10 @@ DO $$ BEGIN
 END $$;
 COMMIT;
 SQL
-python3 - <<'PY'
+fi
+python3 - "${1:-run}" <<'PY'
 import json
+import sys
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -34,7 +41,8 @@ def request(port, path, key, data=None):
 
 item = dict(deviceId="11111111-1111-4111-8111-111111111111", sessionId="gs-linux-2026",
             externalId="janela-001", observedAt="2026-11-17T15:00:00Z", durationSeconds=5, laeqDbA=63.4)
-for _ in range(2):
+if sys.argv[1] == "run":
+  for _ in range(2):
     status, _result = request(8082, "/api/ingestion/v1/sonora/observations", "device", item)
     print(f"Java: HTTP {status} | externalId=janela-001")
 prefix = "/api/sonora/v1/locations/b791ced1-b669-474c-a17c-72ab39415b89"
