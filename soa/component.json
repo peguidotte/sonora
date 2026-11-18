@@ -1,6 +1,6 @@
 {
   "component": "soa",
-  "status": "in_progress",
+  "status": "ready",
   "owner": "Felipe Soares Xavier",
   "rm": "556931",
   "branch": "felipe/soa",
@@ -9,24 +9,37 @@
   "standalone": {
     "requiresCloud": false,
     "commands": [
-      "mvn -f soa/pom.xml spring-boot:run"
+      "docker compose -p sonora-local -f database/compose.yaml up -d --wait postgres",
+      "docker compose -p sonora-local -f database/compose.yaml run --rm migrate",
+      "mvn -B -f soa/pom.xml verify",
+      "java -jar soa/target/sonora-ingestion-0.1.0-SNAPSHOT.jar"
     ],
     "dataMode": "postgresql-and-local-inputs"
   },
   "integrated": {
-    "status": "planned",
+    "status": "validated",
     "dependencies": [
       "postgresql"
     ]
   },
   "validation": {
     "commands": [
-      "mvn -B -f soa/pom.xml verify"
+      "mvn -B -f soa/pom.xml verify",
+      "python tools/check_database_compatibility.py --baseline-ref origin/main"
     ],
-    "evidence": []
+    "evidence": [
+      "soa/evidencias/01-migrations.png",
+      "soa/evidencias/02-seed.png",
+      "soa/evidencias/03-servico.png",
+      "soa/evidencias/04-regras-http.png",
+      "soa/evidencias/05-persistencia.png",
+      "soa/evidencias/06-openapi.png",
+      "soa/evidencias/07-importacao-noisecapture.png",
+      "soa/evidencias/08-testes.png"
+    ]
   },
   "deployment": {
     "target": "azure-vm",
-    "status": "not-deployed"
+    "status": "deployed"
   }
 }

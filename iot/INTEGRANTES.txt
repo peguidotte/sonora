@@ -1,0 +1,12 @@
+Sonora - CitizenTech FIAP 2026 - turma 3ESPV
+Physical Computing: IoT & IoB
+
+Leonardo Correa de Mello - RM555573
+Felipe Soares Xavier - RM556931
+Pedro Visconti Guidotte - RM556630
+Herbert de Sousa Vilela - RM555701
+Gabriel Figueira Flora - RM556476
+
+Projeto Wokwi: https://wokwi.com/projects/480800721533486081
+Vídeo: https://youtu.be/YdfbrvcihVM
+Repositório: https://github.com/peguidotte/sonora (pasta iot/)

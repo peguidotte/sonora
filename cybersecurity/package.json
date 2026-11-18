@@ -1,0 +1,20 @@
+{
+  "name": "sonora-cybersecurity",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Motor de parsing de PII, taint analysis, traducao via LLM e dashboard Risco Cidadao (fixtures sinteticas).",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "pretest": "npm run build",
+    "test": "node --test dist/test/**/*.test.js",
+    "predemo": "npm run build",
+    "demo": "node dist/scripts/run-demo.js",
+    "prestart": "npm run build",
+    "start": "node dist/src/server/main.js"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  }
+}

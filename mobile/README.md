@@ -1,8 +1,8 @@
-# Consulta e favoritos
+# Sonora Mobile
 
-Responsável: **Herbert de Sousa Vilela, RM555701**. [Equipe completa](../README.md#equipe).
+Consulte um local, compare perfis acústicos e salve favoritos no celular. O app usa React Native, TypeScript e Expo Router. SQLite guarda favoritos e consultas salvas no aparelho.
 
-[Especificação da matéria](../docs/disciplinas/mobile.md) · [Arquitetura](../docs/arquitetura.md) · [Contratos](../contracts/README.md).
+[Requisitos da disciplina](../docs/disciplinas/mobile.md) · [Equipe](../README.md#equipe)
 
 App React Native + TypeScript com Expo Router (SDK 52). Consome somente a API C# (`/api/sonora/v1`), nunca o banco ou a ingestão Java. Favoritos e cache offline ficam em SQLite local (`expo-sqlite`), sem compartilhar arquivo com outro backend.
 

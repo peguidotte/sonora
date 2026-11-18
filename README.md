@@ -1,58 +1,37 @@
-# Sonora
+<p align="center"><img src="landing-page/public/images/sonora-logo.png" width="96" alt="Símbolo Sonora"></p>
+<h1 align="center">Sonora</h1>
+<p align="center">Contexto acústico para quem compara lugares para morar em São Paulo.</p>
+<p align="center"><a href="https://peguidotte.github.io/sonora/"><strong>Conheça o Sonora</strong></a> · <a href="https://peguidotte.github.io/sonora/api-docs.html">Explore a API</a> · <a href="https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard">Abra o painel</a></p>
 
-API privada de contexto acústico para apoiar decisões imobiliárias. Projeto CitizenTech da FIAP, turma 3ESPV-2026. A marca da empresa continua em aberto; a entrega atual é Sonora.
+Uma visita a um imóvel dura minutos. O Sonora permite consultar o ruído observado em diferentes horários e informa a origem dos dados e quanto tempo foi medido. Portais imobiliários podem integrar essa consulta pela API privada. Quando não há medições para um período, o resultado indica **sem dados**.
 
-## Referências do projeto
+## Explore o projeto
 
-- [Arquitetura](docs/arquitetura.md): responsabilidades, banco compartilhado, segurança, regras e execução.
-- [Contratos](contracts/README.md): OpenAPI C#/Java, interface de banco, exemplos e mocks.
-- [Entregas por disciplina](docs/disciplinas/README.md) e [requisitos oficiais](docs/01-contexto-e-requisitos.md).
-- [Contribuição e auditoria](CONTRIBUTING.md): branches, revisão e evidências.
-- [Dados reais](ml/dados/README.md) e [registro de IA](docs/uso-de-ia.md).
+| Disciplina | O que você encontra | Responsável |
+| --- | --- | --- |
+| [Physical Computing · IoT](iot/README.md) | Circuito ESP32, simulação no Wokwi e vídeo | Leonardo |
+| [SOA e Web Services](soa/README.md) | Ingestão Java, importação NoiseCapture e [migrations](database/README.md) | Felipe |
+| [C# Software Development](api/README.md) | Consulta acústica, painel e documentação da API | Leonardo |
+| [Mobile Development](mobile/README.md) | Consulta e comparação de locais pelo celular | Herbert |
+| [IA e Machine Learning](ml/README.md) | Perfis aprendidos em medições públicas, notebook e vídeo | Gabriel |
+| [Operating Systems · Linux](linux/README.md) | Servidor, automação Bash, monitoramento e demonstração | Pedro |
+| [Cybersecurity](cybersecurity/README.md) | Auditoria de dados pessoais, painel, PDF e vídeo | Herbert |
+| [Testing, Compliance & QA](testing/README.md) | Critérios de aceite, casos funcionais e entrega do pitch | Felipe |
+
+## Como uma leitura chega ao cidadão
+
+O serviço Java recebe janelas acústicas do ESP32 simulado e importa arquivos públicos do NoiseCapture. Grava os dados no PostgreSQL com a origem de cada medição. A API C# lê as views do banco e calcula os perfis que o painel e o app consultam. As consultas preservam a distinção entre simulação e dados públicos. O Sonora não armazena áudio.
+
+Para desenvolver, comece pelo README da sua matéria. As interfaces ficam nos [contratos](contracts/README.md), as decisões de integração na [arquitetura](docs/arquitetura.md) e a publicação no [guia de deploy](deploy/azure/README.md). Veja também as [rubricas](docs/disciplinas/README.md) e o [fluxo de contribuição](CONTRIBUTING.md).
 
 ## Equipe
 
-| Integrante | RM | GitHub | Responsabilidade | Branch |
-| --- | --- | --- | --- | --- |
-| Leonardo Correa de Mello | 555573 | [leocorreamello](https://github.com/leocorreamello) | C# e IoT | leo/csharp; leo/iot |
-| Felipe Soares Xavier | 556931 | [felipexaviersz](https://github.com/felipexaviersz) | SOA e Testing | felipe/soa; felipe/testing |
-| Pedro Visconti Guidotte | 556630 | [peguidotte](https://github.com/peguidotte) | Operating Systems e coordenação de auditoria | pedro/operating-systems |
-| Herbert de Sousa Vilela | 555701 | [herbertdesousa](https://github.com/herbertdesousa) | Cybersecurity e Mobile | herbert/cybersecurity; herbert/mobile |
-| Gabriel Figueira Flora | 556476 | [gabrielfe1202](https://github.com/gabrielfe1202) | IA/ML | gabriel/ia |
+Global Solution CitizenTech · Engenharia de Software · FIAP Paulista · 3ESPV 2026
 
-## Começar uma entrega
-
-1. Ler os [requisitos docentes e pendências](docs/01-contexto-e-requisitos.md) e a [ficha da própria disciplina](docs/disciplinas/README.md): definem rubrica, aceite e artefatos acadêmicos.
-2. Ler a [arquitetura](docs/arquitetura.md): define responsabilidades, regras de negócio e integração. Os [contratos verificáveis](contracts/README.md) definem os formatos HTTP, SQL e do resumo ML; exemplos são sintéticos.
-3. Seguir o README da própria pasta para reprodução. Para C#, SOA e Mobile, conferir o [contrato de build/publicação](deploy/azure/README.md#contrato-das-aplicações); [pipeline.json](deploy/pipeline.json) centraliza caminhos e toolchains usados pela CI.
-4. Trabalhar na branch da entrega e abrir PR conforme [CONTRIBUTING.md](CONTRIBUTING.md). Agentes devem seguir [AGENTS.md](AGENTS.md). Divergências entre código e especificação precisam ser resolvidas nas fontes correspondentes, sem criar contratos paralelos.
-
-`component.json` declara o estado de cada entrega; código executável e evidências sustentam essa declaração. CI verde comprova somente os jobs executados: componentes ausentes podem ser pulados, e mocks não comprovam a aplicação real. Resultados de execução e auditoria ficam nos PRs/Actions.
-
-## Arquitetura aprovada
-
-```text
-NoiseCapture (arquivos) ─┐
-                        ├─> Java / SOA ──grava──> PostgreSQL
-ESP32 / Wokwi ──HTTP─────┘                            ▲
-                                                     │ consulta
-Mobile / clientes ──HTTPS──> C# Sonora ────────────────┘
-```
-
-Java possui a captura; [database/](database/README.md) executa migrations independentes, mantidas na entrega de SOA; C# lê views publicadas e calcula perfis. A integração é pelo banco, sem repasse HTTP Java -> C#. PostgreSQL é compartilhado entre os backends; SQLite é usado somente no Mobile para favoritos/cache. Deploy inicial: serviços independentes numa VM Linux na Azure, com proxy HTTPS e banco interno.
-
-Pastas: api/ (C#), soa/ (Java), mobile/, iot/, ml/, linux/, cybersecurity/, testing/, contracts/, database/ e tools/. Backends e app devem ser implementados pelos responsáveis. [Infraestrutura e CI/CD](deploy/azure/README.md) define Terraform, provisionamento e publicação; Linux continua em desenvolvimento para cumprir toda a rubrica. Os mocks são apenas ferramentas de desenvolvimento, sem persistência ou autenticação de produção.
-
-## Conferir a fundação
-
-```bash
-python -m venv .venv
-.venv/bin/python -m pip install -r requirements-dev.txt
-.venv/bin/python tools/validate_contracts.py
-.venv/bin/python -m unittest discover -s tools -p 'test_*.py' -v
-.venv/bin/python tools/check_delivery_manifests.py
-```
-
-No Windows, usar .venv/Scripts/python.exe. [Execução dos mocks](contracts/README.md); a reprodução real de cada entrega fica no README da respectiva pasta, quando implementada. Os contratos usam inglês e X-Api-Key com escopos.
-
-Prazo conservador: **19/11/2026 às 23h55**, conforme PDF. Resultados de testes, tarefas diárias e revisão de código ficam em PRs/Azure Boards; esta documentação registra somente acordos duráveis. Materiais privados, segredos e dados brutos ficam fora do Git.
+| Integrante | RM |
+| --- | --- |
+| Leonardo Correa de Mello | 555573 |
+| Felipe Soares Xavier | 556931 |
+| Pedro Visconti Guidotte | 556630 |
+| Herbert de Sousa Vilela | 555701 |
+| Gabriel Figueira Flora | 556476 |

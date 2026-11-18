@@ -17,7 +17,7 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "verified-local-emulator",
     "dependencies": [
       "api"
     ]
