@@ -9,7 +9,8 @@
     "newArchEnabled": true,
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-asset"
     ],
     "android": {
       "package": "br.com.sonora.mobile"
