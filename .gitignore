@@ -16,6 +16,7 @@ scripts/exportar-ideias.py
 venv/
 __pycache__/
 node_modules/
+dist/
 bin/
 obj/
 .expo/

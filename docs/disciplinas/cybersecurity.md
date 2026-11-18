@@ -13,11 +13,11 @@ PDF pp. 28–29: evoluir regras de parsing de PII, rastrear dados por taint anal
 | IA na remediação | 2,0 | Explicação clara a partir de diagnóstico sanitizado |
 | Dashboard | 2,0 | Risco Cidadão com cálculo explicado e comparação |
 
-Primeiro localizar e executar a base de aula. O contrato/README dessa ferramenta determina extensão e linguagem; não substituir por scanner genérico ou checklist.
+Esclarecimento do Prof. Vitor Lasse (documento "Explicação: Global Solutions", Teams da turma): não existe uma ferramenta/base pronta para localizar. A entrega é um middleware/interceptador implementado do zero pelo grupo, em qualquer linguagem (C#, Python, Node etc.), cobrindo os quatro pontos da rubrica sobre dados sintéticos; não substituir por scanner genérico ou checklist.
 
 ## Responsabilidade
 
-Executar e estender o motor/dashboard usado em aula. Auditar a versão identificada de Java, C#, Mobile e configuração, com fixtures sintéticas. Não adicionar coleta real de CPF/saúde ao produto nem substituir os quatro itens da rubrica por login.
+Implementar o middleware/interceptador e o dashboard descritos no esclarecimento do professor, cobrindo as quatro entregas da rubrica (parsing de PII, taint analysis, tradução via LLM, dashboard Risco Cidadão), em Node/TypeScript, de forma standalone na pasta `cybersecurity/`. Auditar com fixtures sintéticas representando payloads de Java, C#, Mobile e configuração. Não adicionar coleta real de CPF/saúde ao produto nem substituir os quatro itens da rubrica por login.
 
 ## Cenários e aceite
 
@@ -32,7 +32,7 @@ Localização de ponto público não é automaticamente dado de pessoa: justific
 
 ## Entrega
 
-Código da base de aula adaptada, fixtures, instruções, evidências de parsing/taint/bloqueio, vídeo e print do painel. ZIP final sem .env/segredos. Se depender de protótipo mínimo, explicitar o que ele cobre; auditar fixture não certifica o sistema inteiro. Uso real/fallback de LLM precisa ser declarado.
+Código do middleware/interceptador implementado, fixtures, instruções, evidências de parsing/taint/bloqueio, vídeo e print do painel. ZIP final sem .env/segredos. Se depender de protótipo mínimo, explicitar o que ele cobre; auditar fixture não certifica o sistema inteiro. Uso real/fallback de LLM precisa ser declarado.
 
 
 Referências comuns: [arquitetura](../arquitetura.md), [contratos](../../contracts/README.md) e [auditoria](../../CONTRIBUTING.md). Comandos e evidências reais ficam no README/PR da entrega.
