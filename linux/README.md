@@ -14,6 +14,17 @@ Reprodução esperada: VM/WSL, PostgreSQL e C# real com setup/seed; sem conta Az
 
 `provision.sh` prepara Ubuntu 24.04/PostgreSQL/Java/Caddy/systemd e retenção de logs; `network.sh` verifica/configura rede; `monitor.sh` acompanha CPU/RAM/disco com alerta e recuperação por recurso; `verify.sh` verifica a VM e executa testes limitados de falha/carga; `deploy-release.py` instala releases privados e verifica saúde. [Infraestrutura e CI/CD](../deploy/azure/README.md) define execução Azure e contrato de publicação. Schema/views/seed continuam sendo entrega do SOA no [módulo database/](../database/README.md), com artefato independente das aplicações.
 
+## Roteiro para a gravação de Pedro
+
+| Na gravação | O que mostrar |
+| --- | --- |
+| 0–2 min · Servidor e rede | Abra o índice do ensaio indicado abaixo. Use o log de boot limpo e o de provisionamento para mostrar a VM inicial, as dependências e a reexecução. Mostre IP estático, retorno a DHCP e o teste de rollback. |
+| 2–4 min · Aplicação da equipe | Abra o painel e reproduza a [consulta NoiseCapture](#consultar-uma-medição-pública-no-painel). Mostre a origem e os 24 segundos de cobertura. Explique onde Java grava e de onde o C# lê. |
+| 4–6 min · Monitor, falha e recuperação | No registro do laboratório, mostre CPU, RAM e disco, o alerta de carga e sua recuperação. Compare o PID do monitor antes e depois do crash e mostre o retorno após reboot. |
+| Último minuto · Auditoria | Mostre os timestamps e os códigos de saída no log, o resultado do verificador e a equipe. Mantenha chaves de acesso fora da gravação. |
+
+Os nomes do laboratório e dos logs refletem resultados já obtidos. Na reprodução, abra o `index.html` do ensaio gerado em `output/evidence/linux/`.
+
 ## Reprodução local
 
 Em VM Ubuntu 24.04 descartável com systemd, a partir da raiz do clone:
