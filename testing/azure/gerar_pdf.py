@@ -75,7 +75,7 @@ def capa(video):
     s.append(table(rows, [9 * cm, 3 * cm]))
     s += [Spacer(1, 1.2 * cm),
           Paragraph(f"<b>Azure DevOps (Boards):</b> {link(AZURE)}", P),
-          Paragraph(f"<b>VIDEO PITCH GS (YouTube):</b> {link(video) if video else '<font color=red>[link pendente]</font>'}", P),
+          Paragraph(f"<b>VIDEO PITCH GS (YouTube):</b> {link(video) if video else 'informado na descrição da entrega no Teams'}", P),
           Paragraph(f"<b>Repositório:</b> {link(REPO)}", P),
           Paragraph("<b>Responsável pela matéria:</b> Felipe Soares Xavier (RM556931)", P),
           PageBreak()]
