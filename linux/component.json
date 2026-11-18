@@ -1,6 +1,6 @@
 {
   "component": "linux",
-  "status": "ready",
+  "status": "in_progress",
   "owner": "Pedro Visconti Guidotte",
   "rm": "556630",
   "branch": "pedro/operating-systems",
@@ -31,7 +31,11 @@
       "sudo bash linux/verify.sh"
     ],
     "evidence": [
-      "linux/evidencias/demonstracao.mp4",
+      "linux/evidencias/01-provisionamento.png",
+      "linux/evidencias/02-rede.png",
+      "linux/evidencias/03-monitoramento.png",
+      "linux/evidencias/04-recuperacao.png",
+      "linux/evidencias/05-aplicacao-azure.png",
       "linux/evidencias/painel-azure.png"
     ]
   },

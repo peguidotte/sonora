@@ -21,7 +21,7 @@
   },
   "validation": {
     "commands": [],
-    "evidence": ["testing/video-pitch-gs.mp4"]
+    "evidence": []
   },
   "deployment": {
     "target": "azure-boards",

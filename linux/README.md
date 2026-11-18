@@ -1,8 +1,10 @@
 # Operating Systems · Linux
 
-[Vídeo demonstrativo](evidencias/demonstracao.mp4) · [Capturas da execução](evidencias/) · [Painel na Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard)
+[Capturas da execução](evidencias/) · [Painel na Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard)
 
 O servidor hospeda a ingestão Java, o PostgreSQL e a API C#. O monitor acompanha CPU, RAM e disco. O laboratório demonstra provisionamento do zero, mudança de rede com rollback e recuperação do serviço após falha.
+
+**Vídeo para a entrega:** Pedro vai gravar a demonstração de até sete minutos. As [capturas do laboratório](evidencias/) mostram o provisionamento, a configuração de rede, o monitor e sua recuperação. Para mostrar a aplicação de outra disciplina, siga a [consulta no painel da Azure](#consultar-uma-medição-pública-no-painel).
 
 Responsável: **Pedro Visconti Guidotte, RM556630**. [Equipe completa](../README.md#equipe).
 
