@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="./images/sonora-logo.png" />
+    <title>Arquitetura interativa · Sonora</title>
+    <meta
+      name="description"
+      content="Acompanhe uma observação acústica da origem até o aplicativo Sonora."
+    />
+  </head>
+  <body class="arch">
+    <a class="skip" href="#percurso">Pular para o percurso</a>
+    <header class="arch-header">
+      <a href="./index.html" class="wordmark" aria-label="Sonora, início"
+        ><img
+          class="brand-mark" width="36" height="36"
+          src="./images/sonora-logo.png"
+          alt=""
+        /><span>sonora<span class="brand-dot">.</span></span></a
+      >
+      <nav aria-label="Navegação">
+        <a href="./index.html">Produto</a
+        ><a href="./arquitetura.html" aria-current="page">Arquitetura</a
+        ><a href="./api-docs.html">API Docs ↗</a>
+      </nav>
+    </header>
+    <main id="percurso" class="arch-main">
+      <div class="arch-intro">
+        <h1>Da borda <span>à tela.</span></h1>
+        <p>
+          Escolha a origem de uma observação acústica e acompanhe seu caminho
+          até o aplicativo Sonora.
+        </p>
+      </div>
+      <section class="console" aria-label="Percurso interativo da observação">
+        <div class="console-tools">
+          <div
+            role="group"
+            aria-label="Origem do percurso"
+            class="source-picker"
+          >
+            <button data-source="iot" aria-pressed="true">ESP32 / Wokwi</button
+            ><button data-source="archive" aria-pressed="false">
+              NoiseCapture
+            </button>
+          </div>
+          <code id="origin"></code>
+        </div>
+        <div
+          class="signal-map"
+          role="group"
+          aria-label="Etapas do percurso"
+        ></div>
+        <div class="readout">
+          <div class="readout-text" aria-live="polite" aria-atomic="true">
+            <span id="phase"></span>
+            <h2 id="stage-title"></h2>
+            <p id="narration"></p>
+          </div>
+          <div class="transport">
+            <button id="play"></button>
+            <div>
+              <button id="prev" aria-label="Etapa anterior">←</button
+              ><button id="next" aria-label="Próxima etapa">→</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="support">
+        <h2>Quem sustenta o percurso?</h2>
+        <details>
+          <summary>
+            <i class="ph ph-terminal-window" aria-hidden="true"></i
+            ><span>Linux</span>Infraestrutura
+          </summary>
+          <p>
+            A VM Ubuntu na Azure hospeda Java, C# e PostgreSQL. O proxy
+            encaminha as requisições HTTPS, o systemd mantém os serviços ativos
+            e o monitor acompanha CPU, memória e disco. O aplicativo roda no
+            aparelho.
+          </p>
+        </details>
+        <details>
+          <summary>
+            <i class="ph ph-list-checks" aria-hidden="true"></i
+            ><span>Testing</span>Qualidade de ponta a ponta
+          </summary>
+          <p>
+            A frente de Testing organiza as jornadas, os critérios de aceite e
+            os casos de teste no Azure Boards. Um dos cenários acompanha o
+            reenvio de uma leitura pelo dispositivo e verifica se há apenas um
+            registro. Outro confere se uma consulta sem observações retorna
+            <code>no_data</code>.
+          </p>
+        </details>
+        <a
+          class="text-link"
+          href="https://github.com/peguidotte/sonora/blob/main/docs/arquitetura.md"
+          >Ler a arquitetura do projeto ↗</a
+        >
+      </section>
+    </main>
+    <script type="module" src="/src/architecture.ts"></script>
+  </body>
+</html>

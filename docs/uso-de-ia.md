@@ -43,3 +43,5 @@ Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreend
 Em 17/11, o grupo utilizou ImageGen para criar o símbolo acústico do Sonora. A marca aparece no site e no README. O assistente também apoiou a organização das entregas, os testes de integração e a preparação de evidências a partir de execuções reais.
 
 Em 18/11, o assistente apoiou a animação de abertura da landing, a adaptação ao celular e a integração do playground com o OpenAPI C#. A validação do site usa exemplos locais e dados sintéticos.
+
+Em 18/11, o assistente apoiou a criação da aba de arquitetura da landing com percursos por origem e explicações de Linux e Testing.

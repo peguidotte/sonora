@@ -21,6 +21,8 @@ npm run preview -- --host 127.0.0.1
 
 ## Interações e limites
 
+A aba de arquitetura em `arquitetura.html` acompanha uma observação do ESP32/Wokwi ou do NoiseCapture até o Mobile. Selecione etapas diretamente ou reproduza o percurso. Linux e Testing têm explicações próprias abaixo do diagrama.
+
 - Ondas com pausa, respeito a `prefers-reduced-motion`, suspensão fora da tela e em aba oculta.
 - Perfis demonstrativos por período, média energética para intervalos de mesma duração e estado sem dados explícito.
 - Exploração do dispositivo conceitual e das quatro etapas do modelo: fontes → Java → PostgreSQL → C#.
