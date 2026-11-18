@@ -158,3 +158,56 @@ test("device reduced motion remains legible and installation controls work", asy
   await page.locator('[data-component="processing"]').click();
   await expect(page.locator("#component-processing")).toBeVisible();
 });
+
+test("every reference entry opens its local example, including HTML and 204", async ({
+  page,
+}) => {
+  const apiCalls: string[] = [];
+  page.on("request", (request) => {
+    if (request.resourceType() === "fetch" || request.resourceType() === "xhr")
+      apiCalls.push(request.url());
+  });
+  await page.goto("/api-docs.html");
+  const entries = page.locator("[data-route]");
+  await expect(entries).toHaveCount(9);
+  const run = page.getByRole("button", { name: "Executar simulação" });
+  for (const entry of await entries.all()) {
+    const key = await entry.getAttribute("data-route");
+    await entry.click();
+    await expect(page.locator("#api-endpoint")).toHaveValue(key!);
+    await run.click();
+    await expect(page.locator("#api-status")).toContainText("200");
+    if (key === "dashboard") {
+      await expect(page.locator("#api-format")).toHaveText("text/html");
+      await expect(page.locator("#api-response")).toContainText(
+        "<!doctype html>",
+      );
+      await expect(page.locator("#api-response *")).toHaveCount(0);
+    }
+    if (key === "summary") {
+      await page.locator("#api-scenario").selectOption("empty");
+      await run.click();
+      await expect(page.locator("#api-status")).toContainText("204");
+    }
+  }
+  expect(apiCalls).toEqual([]);
+});
+
+test("opening reveals the city, pauses, and respects a change in motion preference", async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/");
+  const reveal = page.locator(".city-reveal");
+  await expect(reveal).toHaveCSS("animation-name", /city-listen/);
+  const asset = await reveal.evaluate(
+    (el) => getComputedStyle(el).backgroundImage,
+  );
+  const image = await page.request.get(asset.slice(5, -2));
+  expect(image.headers()["content-type"]).toContain("image/webp");
+  await page.locator("#motion-toggle").click();
+  await expect(reveal).toHaveCSS("animation-play-state", /paused/);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(reveal).toHaveCSS("animation-name", "none");
+  await expect(page.locator(".hero-art img")).toHaveCSS("filter", "none");
+});

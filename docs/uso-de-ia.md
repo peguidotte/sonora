@@ -41,3 +41,5 @@ Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreend
 | 17/11/2026 | Implementar landing Sonora a partir de direção visual aprovada | Landing isolada com assets conceituais gerados por IA, demo acústica local, dispositivo e arquitetura interativos. Build e 5 testes de domínio passaram. QA visual/E2E bloqueado pelo navegador do ambiente; não houve deploy, merge ou execução de Actions. |
 
 Em 17/11, o grupo utilizou ImageGen para criar o símbolo acústico do Sonora. A marca aparece no site e no README. O assistente também apoiou a organização das entregas, os testes de integração e a preparação de evidências a partir de execuções reais.
+
+Em 18/11, o assistente apoiou a animação de abertura da landing, a adaptação ao celular e a integração do playground com o OpenAPI C#. A validação do site usa exemplos locais e dados sintéticos.

@@ -1425,3 +1425,51 @@ footer > a:not(.wordmark) {
 .mini-periods i:nth-child(3n) {
   height: 40%;
 }
+
+/* The opening pulse brings the city's blue acoustic layer into view. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-art img { filter: grayscale(1) sepia(.48) hue-rotate(172deg) saturate(1.35) brightness(.78); }
+  .city-reveal {
+    position: absolute;
+    inset: 0;
+    background-position: 58% center;
+    background-size: cover;
+    background-repeat: no-repeat;
+    animation: city-listen 1.9s cubic-bezier(.22,.65,.19,1) both,
+               city-breathe 18s ease-in-out infinite alternate;
+  }
+  .hero-copy h1 span {
+    display: inline-block;
+    animation: title-arrive .8s .12s cubic-bezier(.2,.7,.2,1) both;
+  }
+  .motion-paused :is(.city-reveal, .hero-copy h1 span) { animation-play-state: paused; }
+}
+@keyframes city-listen {
+  from { clip-path: circle(0% at 62% 62%); }
+  to { clip-path: circle(95% at 62% 62%); }
+}
+@keyframes title-arrive {
+  from { opacity: .85; transform: translateY(.28em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@media (max-width: 600px) {
+  .hero { display: flex; flex-direction: column; min-height: 0; }
+  .hero-copy { order: -1; padding: 30px 6% 0; }
+  .hero-art {
+    position: relative;
+    inset: auto;
+    height: clamp(245px, 70vw, 360px);
+    margin-top: 12px;
+    clip-path: ellipse(105% 99% at 84% 100%);
+  }
+  .hero-caption { left: 7%; bottom: 20px; }
+  .motion-button { bottom: 18px; }
+}
+
+.hero-art::after {
+  content: "";
+  position: absolute;
+  inset: 50% 0 0;
+  pointer-events: none;
+  background: linear-gradient(transparent 45%, rgba(10, 22, 45, .72));
+}

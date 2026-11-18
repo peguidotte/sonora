@@ -11,7 +11,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = `
 <header class="header"><a class="wordmark" href="#" aria-label="Sonora, início"><img class="brand-mark" src="./images/sonora-logo.png" alt="" width="36" height="36"><span>sonora<span class="brand-dot">.</span></span></a><nav class="desktop-nav" aria-label="Navegação principal"><a href="#produto">O produto</a><a href="#experimente">Experimente</a><a href="#dispositivo">O dispositivo</a><a href="./api-docs.html">API Docs ↗</a></nav><a class="button small header-cta" href="#experimente">Explore o Sonora ${icon("arrow-up-right")}</a><button class="menu-toggle icon-button" aria-label="Abrir menu" aria-expanded="false" aria-controls="mobile-nav">${icon("list")}</button></header>
 <nav id="mobile-nav" class="mobile-nav" aria-label="Navegação móvel" hidden><a href="#produto">O produto</a><a href="#experimente">Experimente</a><a href="#dispositivo">O dispositivo</a><a href="./api-docs.html">API Docs ↗</a></nav>
 <main id="conteudo">
-<section class="hero" aria-labelledby="hero-title"><div class="hero-art"><img src="./images/city.webp" alt="Ilustração conceitual de uma cidade atravessada por ondas azuis" width="1536" height="1024" fetchpriority="high"/><canvas id="wave-canvas" aria-hidden="true"></canvas></div><div class="hero-copy"><div class="eyebrow"><span class="line"></span> CONTEXTO ALÉM DO ENDEREÇO</div><h1 id="hero-title">Toda cidade<br/>tem camadas.<br/><span>Nós revelamos<br/>contexto.</span></h1><p>O lugar onde a vida acontece tem muito a dizer. Conheça sua paisagem sonora antes de tomar a próxima decisão.</p><a class="button" href="#experimente">Conheça o Sonora ${icon("arrow-right")}</a><div class="hero-note">Inteligência acústica para decisões imobiliárias.</div></div><div class="hero-caption"><span class="status-dot"></span> A cidade como você ainda não ouviu.<span>VISUALIZAÇÃO CONCEITUAL</span></div><button class="motion-button" id="motion-toggle" aria-pressed="false">${icon("pause")}<span>Pausar movimento</span></button></section>
+<section class="hero" aria-labelledby="hero-title"><div class="hero-art"><img src="./images/city.webp" alt="Ilustração conceitual de uma cidade atravessada por ondas azuis" width="1536" height="1024" fetchpriority="high"/><div class="city-reveal" style="background-image:url(./images/city.webp)" aria-hidden="true"></div><canvas id="wave-canvas" aria-hidden="true"></canvas></div><div class="hero-copy"><div class="eyebrow"><span class="line"></span> CONTEXTO ALÉM DO ENDEREÇO</div><h1 id="hero-title">Toda cidade<br/>tem camadas.<br/><span>Nós revelamos<br/>contexto.</span></h1><p>O lugar onde a vida acontece tem muito a dizer. Conheça sua paisagem sonora antes de tomar a próxima decisão.</p><a class="button" href="#experimente">Conheça o Sonora ${icon("arrow-right")}</a><div class="hero-note">Inteligência acústica para decisões imobiliárias.</div></div><div class="hero-caption"><span class="status-dot"></span> Paisagem sonora urbana<span>ILUSTRAÇÃO CONCEITUAL</span></div><button class="motion-button" id="motion-toggle" aria-pressed="false">${icon("pause")}<span>Pausar movimento</span></button></section>
 <section id="produto" class="intro section"><div class="section-kicker">01 / O PRODUTO</div><div class="intro-grid"><h2>Um novo jeito<br/>de ler o lugar.</h2><div class="intro-detail"><p class="lead">Não é só sobre decibéis.<br/>É sobre <em>entender o contexto.</em></p><p>Sonora organiza observações acústicas em uma API privada. Fonte, período e cobertura acompanham os dados para ajudar plataformas imobiliárias a construir decisões mais informadas.</p></div></div><div class="principles"><article><details><summary>${icon("map-pin-line")}<h3>O lugar, em perspectiva</h3><span class="card-explore">Explorar +</span></summary><p>Contexto territorial para ir além das características de um imóvel. Fonte e cobertura ajudam a interpretar os limites de cada leitura.</p><div class="card-preview"><span>ORIGEM VISÍVEL</span><strong>Local → Fonte → Cobertura</strong><a href="#experimente">Explorar uma leitura ↗</a></div></details></article><article><details><summary>${icon("clock")}<h3>O tempo faz diferença</h3><span class="card-explore">Explorar +</span></summary><p>Explore como as observações variam entre períodos e fontes. Uma leitura da manhã não descreve automaticamente a noite.</p><div class="card-preview"><span>MESMO LUGAR · OUTRO MOMENTO</span><div class="mini-periods" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div><a href="#experimente">Comparar períodos ↗</a></div></details></article><article><details><summary>${icon("shield-check")}<h3>Dados, não gravações</h3><span class="card-explore">Explorar +</span></summary><p>Sem armazenar áudio. Sem transformar falta de dados em certeza. Observações simuladas e dados públicos mantêm suas origens separadas.</p><div class="card-preview"><span>PRIVACIDADE POR DESIGN</span><strong>Observação ≠ arquivo de áudio</strong><a href="#modelo">Ver o caminho dos dados ↗</a></div></details></article></div></section>
 <section id="experimente" class="experience section"><div class="section-kicker">02 / EXPLORE A EXPERIÊNCIA</div><div class="section-heading"><h2>Uma cidade.<br/><span>Muitas leituras.</span></h2><p>Mude o período e descubra como o Sonora apresenta uma paisagem sonora. Este exemplo é inteiramente simulado.</p></div><div class="demo"><div class="demo-map"><img src="./images/city.webp" alt="Cidade ilustrativa, sem representação de um endereço real" loading="lazy" width="1536" height="1024"/><div class="map-label">${icon("map-pin")} Local demonstrativo <span>NENHUM ENDEREÇO REAL</span></div><div class="map-pin" aria-hidden="true">${icon("waveform")}</div><div class="map-foot">Uma perspectiva sobre o ambiente.<br/>Não uma promessa de silêncio.</div></div><div class="demo-panel"><div class="demo-top"><span>PERFIL ACÚSTICO</span><span class="tag">Simulação</span></div><h3>O mesmo lugar.<br/>Em outro momento.</h3><div class="periods" role="group" aria-label="Período do exemplo"><button data-period="morning" aria-pressed="true">Manhã</button><button data-period="afternoon" aria-pressed="false">Tarde</button><button data-period="evening" aria-pressed="false">Noite</button><button data-period="empty" aria-pressed="false">Sem dados</button></div><div id="profile-output" aria-live="polite" aria-atomic="true"></div><div class="demo-foot">${icon("info")} Valores fictícios, em janelas de igual duração. Não representam medições ou cobertura do produto.</div></div></div></section>
 ${deviceMarkup}
@@ -126,7 +126,8 @@ const canvas = document.querySelector<HTMLCanvasElement>("#wave-canvas")!,
 const reduce = matchMedia("(prefers-reduced-motion: reduce)");
 let paused = reduce.matches,
   frame = 0,
-  phase = 0,
+  elapsed = 0,
+  previousTime = 0,
   visible = true;
 const motionButton =
   document.querySelector<HTMLButtonElement>("#motion-toggle")!;
@@ -142,31 +143,39 @@ function resize() {
   canvas.height = Math.round(rect.height * dpr);
   ctx?.setTransform(dpr, 0, 0, dpr, 0, 0);
 }
-function draw() {
+function draw(time: number) {
   if (!ctx) return;
-  const { width: w, height: h } = canvas.getBoundingClientRect();
-  ctx.clearRect(0, 0, w, h);
-  for (let n = 0; n < 9; n++) {
+  if (previousTime && !paused) elapsed += Math.min(time - previousTime, 64);
+  previousTime = time;
+  const { width, height } = canvas.getBoundingClientRect();
+  ctx.clearRect(0, 0, width, height);
+  // Perspective compresses the wavefronts onto the plane of the streets.
+  ctx.save();
+  ctx.translate(width * 0.62, height * 0.62);
+  ctx.rotate(-0.13);
+  const cycle = 4200;
+  for (let i = 0; i < 4; i++) {
+    const progress = ((elapsed / cycle + i / 4) % 1);
+    const radius = 2 + progress * width * 0.62;
     ctx.beginPath();
-    for (let x = 0; x <= w; x += 5) {
-      const y =
-        h * 0.63 +
-        Math.sin((x / w) * Math.PI * 2.3 + phase + n * 0.035) * h * 0.1 +
-        n * 5;
-      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    }
-    ctx.strokeStyle = `rgba(92,163,255,${0.55 - n * 0.035})`;
-    ctx.lineWidth = 1.2;
+    ctx.ellipse(0, 0, radius, radius * 0.34, 0, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(169,224,255,${0.8 * (1 - progress) ** 2})`;
+    ctx.lineWidth = 1 + 2 * (1 - progress);
     ctx.stroke();
   }
-  if (!paused && !document.hidden && visible) {
-    phase += 0.007;
-    frame = requestAnimationFrame(draw);
-  }
+  ctx.fillStyle = "#eafaff";
+  ctx.shadowColor = "#2678ff";
+  ctx.shadowBlur = 14;
+  ctx.beginPath();
+  ctx.arc(0, 0, 3.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  if (!paused && !document.hidden && visible) frame = requestAnimationFrame(draw);
 }
 function start() {
   cancelAnimationFrame(frame);
-  draw();
+  previousTime = 0;
+  draw(performance.now());
 }
 motionButton.addEventListener("click", () => {
   paused = !paused;
