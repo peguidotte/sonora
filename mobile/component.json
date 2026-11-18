@@ -1,6 +1,6 @@
 {
   "component": "mobile",
-  "status": "in_progress",
+  "status": "ready",
   "owner": "Herbert de Sousa Vilela",
   "rm": "555701",
   "branch": "herbert/mobile",
@@ -17,7 +17,7 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "verified-local-emulator",
     "dependencies": [
       "api"
     ]
@@ -25,12 +25,21 @@
   "validation": {
     "commands": [
       "npx tsc --noEmit",
-      "npx jest"
+      "npx jest",
+      "npx expo export --platform android",
+      "./gradlew assembleRelease"
     ],
-    "evidence": []
+    "evidence": [
+      "mobile/evidencias/01-locais.png",
+      "mobile/evidencias/02-perfil.png",
+      "mobile/evidencias/03-favoritos.png",
+      "mobile/evidencias/04-comparacao.png",
+      "mobile/evidencias/05-api-real.png",
+      "mobile/evidencias/06-perfil-salvo-offline.png"
+    ]
   },
   "deployment": {
-    "target": "expo-prebuild-android-debug-apk",
-    "status": "not-deployed"
+    "target": "expo-prebuild-android-demo-apk",
+    "status": "demo-release"
   }
 }

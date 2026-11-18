@@ -12,7 +12,7 @@
   "mobile": {
     "project": "mobile/package.json",
     "nodeVersion": "22",
-    "distribution": "android-debug-apk"
+    "distribution": "android-demo-apk"
   },
   "database": {
     "module": "database",
