@@ -2,6 +2,8 @@
 
 Responsável: **Gabriel Figueira Flora, RM556476**. A análise completa está no [RELATORIO_ML.md](RELATORIO_ML.md) e a descrição da fonte em [dados/README.md](dados/README.md).
 
+[Vídeo da entrega](https://youtu.be/3-1f9XAvlZY) · [Notebook executado](sonora_clusters.ipynb)
+
 ## Estrutura
 
 | Caminho | Conteúdo |
@@ -21,7 +23,7 @@ Pré-requisito: Python 3.12 ou mais recente (testado com 3.14.6). Os comandos ab
 python -m venv .venv
 .venv/Scripts/python.exe -m pip install -r ml/requirements.txt   # Linux/macOS: .venv/bin/python
 curl --create-dirs -L -o ml/dados/raw/noisecapture-brazil.zip https://data.noise-planet.org/dump/Brazil.zip
-.venv/Scripts/python.exe ml/sonora_clusters.py
+.venv/Scripts/python.exe -X utf8 ml/sonora_clusters.py
 ```
 
 Para regenerar o notebook executado depois de alterar o `.py`:
