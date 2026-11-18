@@ -3,12 +3,17 @@ name: Smoke integrado — manual
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: Verificação na VM Azure ou validação OpenAPI externa com chaves configuradas
+        type: choice
+        options: [azure, external]
+        default: azure
       from:
-        description: Início UTC do período consultado
+        description: Início UTC (modo external)
         required: true
         default: '2026-11-08T15:00:00Z'
       to:
-        description: Fim UTC do período consultado
+        description: Fim UTC (modo external)
         required: true
         default: '2026-11-08T16:00:00Z'
 
@@ -17,7 +22,7 @@ permissions:
 
 jobs:
   smoke:
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && inputs.mode == 'external'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -36,3 +41,34 @@ jobs:
           PERIOD_FROM: ${{ inputs.from }}
           PERIOD_TO: ${{ inputs.to }}
         run: python tools/smoke_integration.py --from "$PERIOD_FROM" --to "$PERIOD_TO"
+
+  azure:
+    if: github.ref == 'refs/heads/main' && inputs.mode == 'azure'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Validar serviços e consultar perfil simulado com credenciais locais da VM
+        env:
+          RESOURCE_GROUP: ${{ vars.AZURE_RESOURCE_GROUP }}
+          VM: ${{ vars.AZURE_VM_NAME }}
+        run: |
+          set -euo pipefail
+          script="$RUNNER_TEMP/smoke.sh"
+          {
+            echo 'set -eu'
+            echo 'bash /opt/sonora/bootstrap/verify.sh'
+            printf 'echo %s | base64 -d | bash -s -- --check\n' "$(base64 -w0 linux/demo.sh)"
+            echo 'echo SONORA_AZURE_SMOKE_OK'
+          } > "$script"
+          result=$(az vm run-command invoke -g "$RESOURCE_GROUP" -n "$VM" --command-id RunShellScript --scripts "@$script" --query 'value[].message' -o tsv)
+          printf '%s\n' "$result"
+          grep -Fxq SONORA_AZURE_SMOKE_OK <<< "$result"

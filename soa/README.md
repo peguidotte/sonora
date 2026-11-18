@@ -1,4 +1,6 @@
-# Sonora — ingestão Java (SOA e Web Services)
+# Ingestão de medições · Java
+
+[Executar localmente](#executar-localmente) · [Rotas](#rotas-apiingestionv1) · [Evidências](#evidências) · [Saúde do serviço na Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/api/ingestion/v1/health/live)
 
 Responsável: **Felipe Soares Xavier, RM556931**. [Equipe completa](../README.md#equipe): Leonardo Correa de Mello (RM555573), Felipe Soares Xavier (RM556931), Pedro Visconti Guidotte (RM556630), Herbert de Sousa Vilela (RM555701) e Gabriel Figueira Flora (RM556476).
 
@@ -151,7 +153,7 @@ Na CI, `deploy/pipeline.py package soa` executa o mesmo `mvn verify` contra o Po
 
 ## Implantação (handoff para Linux/deploy)
 
-O provisionamento (`linux/`, Pedro) deve gerar de forma reprodutível, além de `SONORA_DB_*` e `SONORA_KEYS_FILE`:
+O provisionamento ([Linux](../linux/README.md)) prepara o ambiente e documenta as credenciais de serviço. Para uma instalação nova, configure, além de `SONORA_DB_*` e `SONORA_KEYS_FILE`:
 
 1. **`SONORA_IMPORTS_FILE`** no `soa.env`, apontando para um catálogo fora do Git (ex.: `/etc/sonora/soa-imports.json`), no formato de [`imports.example.json`](imports.example.json) com `path` **absoluto** do dataset (ex.: `/var/lib/sonora/imports/sao-paulo.points.geojson`). Sem essa variável o serviço sobe, mas todo `fileId` responde 404 (falha fechada).
 2. **Dataset legível pelo usuário do serviço Java** (arquivo regular, sem link simbólico; somente leitura basta). Baixar de `https://data.noise-planet.org/dump/Brazil.zip`, conferir o SHA-256 e extrair o arquivo `Brazil_São Paulo_São Paulo.points.geojson`.

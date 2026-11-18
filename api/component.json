@@ -41,6 +41,6 @@
   },
   "deployment": {
     "target": "azure-vm",
-    "status": "not-deployed"
+    "status": "deployed"
   }
 }

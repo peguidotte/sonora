@@ -2,7 +2,7 @@
 
 Responsável: **Gabriel Figueira Flora, RM556476**. A análise completa está no [RELATORIO_ML.md](RELATORIO_ML.md) e a descrição da fonte em [dados/README.md](dados/README.md).
 
-[Vídeo da entrega](https://youtu.be/3-1f9XAvlZY) · [Notebook executado](sonora_clusters.ipynb)
+[Vídeo da entrega](https://youtu.be/3-1f9XAvlZY) · [Notebook executado](sonora_clusters.ipynb) · [Relatório em PDF (3 páginas)](RELATORIO_ML.pdf) · [Resumo servido pela API](summary.json)
 
 ## Estrutura
 
