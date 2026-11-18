@@ -38,7 +38,7 @@
 .sidebar-caption {
   font-size: 10px;
   letter-spacing: 0.15em;
-  color: #737d8f;
+  color: #596577;
 }
 .docs-sidebar nav {
   display: grid;
@@ -171,7 +171,7 @@
   max-width: 680px;
 }
 .docs-main .api-workbench {
-  grid-template-columns: 280px minmax(0, 1fr);
+  grid-template-columns: minmax(288px, .85fr) minmax(0, 1.8fr);
 }
 .docs-main .api-insights {
   grid-template-columns: 1fr;
@@ -281,7 +281,7 @@
     gap: 10px;
   }
   .docs-main .api-code {
-    font-size: 11px;
+    font-size: 12px;
   }
 }
 @media (prefers-reduced-motion: reduce) {

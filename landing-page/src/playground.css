@@ -137,7 +137,7 @@
 .api-code {
   margin: 0;
   padding: 0 22px 22px;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.7;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
@@ -257,3 +257,8 @@
     font-size: 12px;
   }
 }
+
+#api-params { border-block: 1px solid #d1d7e2; padding: 14px 0; }
+#api-params summary { cursor: pointer; font-size: 13px; font-weight: 650; }
+#api-fields label { margin: 16px 0 6px; }
+#api-fields small { display: block; color: #536077; font-weight: 400; margin-top: 3px; }

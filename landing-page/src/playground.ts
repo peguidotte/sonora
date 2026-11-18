@@ -1,27 +1,38 @@
 import "./playground.css";
-import { simulateQuery } from "./playground-model.mjs";
+import {
+  choices,
+  operations,
+  scenarios,
+  scenarioNames,
+  simulateQuery,
+} from "./playground-model.mjs";
 
 export const playgroundHTML = `
 <section id="api" class="api-lab section" aria-labelledby="api-title">
   <div class="section-kicker">PLAYGROUND / EXPLORE O CONTRATO</div>
-  <div class="section-heading"><h2 id="api-title">Contexto pronto<br/><span>para integrar.</span></h2><p>Explore o contrato da API C#. Entenda a consulta, a resposta e o que cada campo quer dizer. Sem configurar nada.</p></div>
+  <div class="section-heading"><h2 id="api-title">Contexto pronto<br/><span>para integrar.</span></h2><p>Explore o contrato da API C#. Escolha uma operação e compare as respostas.</p></div>
   <div class="api-mode"><span class="api-mode-dot"></span><strong>Playground local · dados sintéticos</strong><span>Nenhuma requisição é enviada. Nenhuma chave é solicitada.</span></div>
   <div class="api-workbench">
     <form id="api-form" class="api-controls">
       <label for="api-endpoint">O que você quer consultar?</label>
-      <select id="api-endpoint"><option value="profile">Perfil acústico de um local</option><option value="locations">Locais cadastrados</option><option value="health">Estado do processo</option></select>
-      <div id="api-profile-options"><label for="api-origin">Origem das observações</label><select id="api-origin"><option value="simulated">simulated · exemplo sintético</option><option value="public_dataset">public_dataset · sem dados nesta demo</option></select><div class="api-window"><span>JANELA FIXA DO EXEMPLO · UTC</span><code>2026-11-08 15:00:00 → 15:01:00</code><small>from inclusivo · to exclusivo · aggregation=hour</small></div></div>
-      <div id="api-scenario-field"><label for="api-scenario">Explore um cenário</label><select id="api-scenario"><option value="available">Resposta disponível</option><option value="empty">Sem observações</option><option value="unauthorized">401 · chave ausente ou inválida</option><option value="forbidden">403 · escopo insuficiente</option></select></div>
+      <select id="api-endpoint">${Object.entries(operations)
+        .map(
+          ([key, op]) =>
+            `<option value="${key}" ${key === "profile" ? "selected" : ""}>${op.label}</option>`,
+        )
+        .join("")}</select>
+      <details id="api-params"><summary>Parâmetros do exemplo</summary><div id="api-fields"></div></details>
+      <div id="api-scenario-field"><label for="api-scenario">Cenário simulado</label><select id="api-scenario"></select></div>
       <p id="api-scope" class="api-scope">Escopo necessário: <code>acoustics:read</code></p>
       <button class="button api-run" type="submit"><i class="ph ph-play" aria-hidden="true"></i> Executar simulação</button>
-      <p class="api-safety">O exemplo usa o contrato v0.4.0. Não comprova disponibilidade de um servidor ou cobertura acústica.</p>
+      <p class="api-safety">Os parâmetros oferecem valores de exemplo do contrato v0.4.0. Não comprova disponibilidade de um servidor ou cobertura acústica.</p>
     </form>
     <div class="api-code-area">
       <div class="api-request-heading"><span class="api-method">GET</span><code id="api-path"></code></div>
       <div class="api-code-toolbar"><span>EXEMPLO cURL</span><button type="button" id="api-copy">Copiar <i class="ph ph-copy" aria-hidden="true"></i></button></div>
       <pre class="api-code" tabindex="0" aria-label="Comando cURL de exemplo"><code id="api-curl"></code></pre>
-      <div class="api-response-heading"><span>RESPOSTA JSON</span><span id="api-status" role="status" aria-live="polite">Pronto para simular</span></div>
-      <pre class="api-code api-response" tabindex="0" aria-label="Resposta simulada JSON"><code id="api-response">Clique em Executar simulação para explorar a resposta.</code></pre>
+      <div class="api-response-heading"><span id="api-format">RESPOSTA</span><span id="api-status" role="status" aria-live="polite">Pronto para simular</span></div>
+      <pre class="api-code api-response" tabindex="0" aria-label="Resposta simulada"><code id="api-response">Clique em Executar simulação para explorar a resposta.</code></pre>
     </div>
   </div>
   <div class="api-insights"><article><span>01</span><h3>O nível não conta tudo.</h3><p><code>laeqDbA</code> usa média energética. No exemplo, 60 e 70 dB em janelas iguais resultam em 67,40 dB, não 65.</p></article><article><span>02</span><h3>A cobertura vem junto.</h3><p><code>observedSeconds</code>, método e origem acompanham a leitura. Dez segundos observados não representam uma hora inteira.</p></article><article><span>03</span><h3>Ausência é informação.</h3><p><code>status: no_data</code> e <code>laeqDbA: null</code> significam falta de observações. Nunca silêncio ou zero decibéis.</p></article></div>
@@ -33,22 +44,64 @@ export function initPlayground() {
   const root = document.querySelector<HTMLElement>("#api");
   if (!root) return;
   const endpoint = root.querySelector<HTMLSelectElement>("#api-endpoint")!;
-  const origin = root.querySelector<HTMLSelectElement>("#api-origin")!;
+  const fields = root.querySelector<HTMLElement>("#api-fields")!;
+  const names = choices as Record<string, string[]>;
+  const hints: Record<string, string> = {
+    locationId: "UUID do local",
+    from: "Início inclusivo · UTC",
+    to: "Fim exclusivo · UTC, até 31 dias",
+    origin: "Origem das observações",
+    aggregation: "Agrupamento · padrão hour",
+    page: "Página · a partir de 1",
+    pageSize: "Itens por página · 1 a 100",
+    latitude: "Latitude · −90 a 90",
+    longitude: "Longitude · −180 a 180",
+    radiusMeters: "Raio com coordenadas · 1 a 1000 m, padrão 500",
+  };
   const scenario = root.querySelector<HTMLSelectElement>("#api-scenario")!;
   const status = root.querySelector<HTMLElement>("#api-status")!;
   const response = root.querySelector<HTMLElement>("#api-response")!;
   const copy = root.querySelector<HTMLButtonElement>("#api-copy")!;
-  let current = simulateQuery(endpoint.value, origin.value, scenario.value);
-  function update() {
-    current = simulateQuery(endpoint.value, origin.value, scenario.value);
-    root!.querySelector<HTMLElement>("#api-profile-options")!.hidden =
-      endpoint.value !== "profile";
+  let current = simulateQuery("profile");
+  function configure() {
+    const op = operations[endpoint.value];
+    fields.innerHTML = op.parameters
+      .map(
+        ({ name, required }: { name: string; required: boolean }) =>
+          `<label for="param-${name}"><code>${name}</code> · ${required ? "obrigatório" : "opcional"}<small>${hints[name]}</small></label>
+       <select id="param-${name}" name="${name}" ${names[name].length === 1 ? "disabled" : ""}>${names[name].map((value) => `<option value="${value}">${value || "Omitir"}</option>`).join("")}</select>`,
+      )
+      .join("");
+    root!.querySelector<HTMLElement>("#api-params")!.hidden =
+      !op.parameters.length;
+    const options = scenarios(endpoint.value);
+    scenario.replaceChildren(
+      ...options.map(
+        (key) =>
+          new Option(scenarioNames[key as keyof typeof scenarioNames], key),
+      ),
+    );
     root!.querySelector<HTMLElement>("#api-scenario-field")!.hidden =
-      endpoint.value === "health";
-    root!.querySelector<HTMLElement>("#api-scope")!.textContent =
-      endpoint.value === "health"
-        ? "Sem autenticação · verifica somente o processo"
-        : "Escopo necessário: acoustics:read";
+      options.length < 2;
+    root!.querySelector("#api-scope")!.textContent = op.scope
+      ? `Escopo necessário: ${op.scope}`
+      : "Acesso anônimo";
+    update();
+  }
+  function update() {
+    const params = Object.fromEntries(
+      Array.from(fields.querySelectorAll("select"), (el) => [
+        el.name,
+        el.value,
+      ]),
+    );
+    current = simulateQuery(
+      endpoint.value,
+      params.origin,
+      scenario.value,
+      params,
+    );
+    root!.querySelector("#api-format")!.textContent = current.format;
     root!.querySelector("#api-path")!.textContent = current.path;
     root!.querySelector("#api-curl")!.textContent = current.curl;
     status.textContent = "Parâmetros atualizados · execute a simulação";
@@ -57,14 +110,19 @@ export function initPlayground() {
       "A resposta anterior foi limpa. Execute a simulação com os parâmetros atuais.";
     copy.textContent = "Copiar";
   }
-  [endpoint, origin, scenario].forEach((el) =>
-    el.addEventListener("change", update),
-  );
+  endpoint.addEventListener("change", configure);
+  fields.addEventListener("change", update);
+  scenario.addEventListener("change", update);
   root.querySelector("#api-form")!.addEventListener("submit", (e) => {
     e.preventDefault();
     status.textContent = `${current.status} · resposta simulada`;
-    status.dataset.kind = current.status === 200 ? "ok" : "error";
-    response.textContent = JSON.stringify(current.body, null, 2);
+    status.dataset.kind = current.status < 300 ? "ok" : "error";
+    response.textContent =
+      current.body === null
+        ? "204 No Content · sem corpo de resposta."
+        : typeof current.body === "string"
+          ? current.body
+          : JSON.stringify(current.body, null, 2);
   });
   copy.addEventListener("click", async () => {
     try {
@@ -74,5 +132,5 @@ export function initPlayground() {
       copy.textContent = "Selecione o comando para copiar";
     }
   });
-  update();
+  configure();
 }

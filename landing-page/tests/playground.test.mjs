@@ -1,6 +1,10 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { simulateQuery } from "../src/playground-model.mjs";
+import {
+  simulateQuery,
+  operations,
+  scenarios,
+} from "../src/playground-model.mjs";
 test("profile uses public synthetic contract example and proper request query", () => {
   const r = simulateQuery("profile");
   assert.equal(r.status, 200);
@@ -42,24 +46,86 @@ test("unknown input rejects rather than invents route", () => {
   assert.throws(() => simulateQuery("profile", "simulated", "oops"));
 });
 
-test("public fixtures match canonical OpenAPI examples", async () => {
-  const { readFile } = await import("node:fs/promises");
-  const { fixtures } = await import("../src/playground-fixtures.mjs");
-  const spec = JSON.parse(
-    await readFile(
-      new URL("../../contracts/openapi/csharp.openapi.json", import.meta.url),
-      "utf8",
-    ),
+test("every contract route, scope and response is reachable", async () => {
+  const { default: spec } = await import(
+    "../../contracts/openapi/csharp.openapi.json",
+    { with: { type: "json" } }
   );
-  const examples =
-    spec.paths["/api/sonora/v1/locations/{locationId}/noise-profile"].get
-      .responses["200"].content["application/json"].examples;
-  assert.deepEqual(fixtures.available, examples.available.value);
-  assert.deepEqual(fixtures.empty, examples.empty.value);
   assert.deepEqual(
-    fixtures.locations,
-    spec.paths["/api/sonora/v1/locations"].get.responses["200"].content[
-      "application/json"
-    ].example,
+    Object.values(operations)
+      .map((op) => op.path)
+      .sort(),
+    Object.keys(spec.paths).sort(),
+  );
+  for (const [key, op] of Object.entries(operations)) {
+    const route = spec.paths[op.path].get;
+    const statuses = new Set();
+    for (const scenario of scenarios(key)) {
+      const result = simulateQuery(key, "simulated", scenario);
+      statuses.add(String(result.status));
+      const content = route.responses[result.status].content;
+      assert.equal(
+        result.curl.includes("X-Api-Key"),
+        !!op.scope && result.status !== 401,
+      );
+      if (!content) assert.equal(result.body, null);
+      else if (content["text/html"])
+        assert.match(result.body, /^<!doctype html>/);
+      else {
+        const { example, examples } = content["application/json"];
+        if (examples) assert.deepEqual(result.body, examples[scenario].value);
+        else if (scenario !== "empty") assert.deepEqual(result.body, example);
+      }
+    }
+    assert.deepEqual([...statuses].sort(), Object.keys(route.responses).sort());
+  }
+});
+
+test("sample pagination, proximity and origin filters agree with the request", () => {
+  const page = simulateQuery("observations", "simulated", "available", {
+    page: "2",
+    pageSize: "1",
+  }).body;
+  assert.equal(page.items.length, 1);
+  assert.equal(page.items[0].externalId, "fixture-a-2");
+  assert.equal(page.total, 2);
+  assert.deepEqual(
+    simulateQuery("observations", "public_dataset").body.items,
+    [],
+  );
+  assert.equal(
+    simulateQuery("locations", "simulated", "available", { latitude: "-23.56" })
+      .status,
+    400,
+  );
+  const nearby = simulateQuery("locations", "simulated", "available", {
+    latitude: "-23.56",
+    longitude: "-46.65",
+  });
+  assert.equal(nearby.body.items[0].distanceMeters, 0);
+});
+
+test("synthetic window controls distinguish empty, invalid and unknown location", () => {
+  const from = "2026-11-08T15:01:00Z";
+  const to = "2026-11-08T15:02:00Z";
+  const empty = simulateQuery("profile", "simulated", "available", {
+    from,
+    to,
+  });
+  assert.equal(empty.body.status, "no_data");
+  assert.equal(empty.body.from, from);
+  assert.equal(empty.body.to, to);
+  assert.equal(
+    simulateQuery("observations", "simulated", "available", { from }).status,
+    400,
+  );
+  const missing = { locationId: "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb" };
+  assert.equal(
+    simulateQuery("location", "simulated", "available", missing).status,
+    404,
+  );
+  assert.equal(
+    simulateQuery("location", "simulated", "unauthorized", missing).status,
+    401,
   );
 });
