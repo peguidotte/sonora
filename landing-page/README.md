@@ -2,6 +2,8 @@
 
 Experiência editorial/interativa em português, isolada das aplicações acadêmicas. Branco quente, preto e azul cobalto; cidade em recorte curvo e ondas animadas seguem a direção visual aprovada. A marca da empresa permanece em definição.
 
+[Abrir o site público](https://peguidotte.github.io/sonora/) · [API Docs](https://peguidotte.github.io/sonora/api-docs.html)
+
 ## Executar
 
 Node.js 22+ e npm:
@@ -15,7 +17,7 @@ npm run build
 npm run preview -- --host 127.0.0.1
 ```
 
-`dist/` é estático; `base: './'` permite hospedar a pasta sem mudar os outros módulos. Nenhum deploy ou workflow foi incluído.
+`dist/` é estático; `base: './'` permite hospedar a pasta sem mudar os outros módulos. O GitHub Pages publica a raiz da branch `gh-pages`. Para republicar, execute `npm ci` e `npm run build` a partir da versão desejada da `main`. Em um checkout separado de `gh-pages`, substitua os arquivos pelo conteúdo de `dist/`, preserve `.nojekyll` e faça commit e push. O catálogo usa exemplos simulados e funciona sem credenciais.
 
 ## Interações e limites
 

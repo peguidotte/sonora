@@ -18,9 +18,9 @@ test("interactive journey, no-data, device and architecture", async ({
   await page.getByRole("button", { name: "Manhã", exact: true }).click();
   await expect(page.locator(".bar")).toHaveCount(6);
   await page.locator('[data-component="capture"]').click();
-  await expect(page.locator("#device-concept-image")).toHaveAttribute(
-    "src",
-    "./images/device-exploded.webp",
+  await expect(page.locator(".device-visual")).toHaveAttribute(
+    "data-layer",
+    "capture",
   );
   await page.locator("[data-step=database]").click();
   await expect(page.locator("#step-title")).toHaveText(

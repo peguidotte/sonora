@@ -135,11 +135,9 @@
   justify-content: center;
   border-bottom: 1px solid #d7dce5;
   padding: 36px 0;
-  opacity: 0.55;
-  transition: opacity 0.4s;
 }
 .device-chapters article.active {
-  opacity: 1;
+  border-bottom-color: #143dff;
 }
 .device-chapters article > span {
   color: #143dff;
