@@ -1,4 +1,8 @@
-# Sonora — API de consulta acústica (.NET) e painel
+# API de consulta acústica · C#
+
+Compare locais e horários por nível sonoro, cobertura e origem da medição.
+
+[Abrir painel na Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard) · [Consultar as rotas](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard/docs) · [Executar localmente](#executar)
 
 Responsável: **Leonardo Correa de Mello, RM555573** (C# Software Development).
 
@@ -7,8 +11,6 @@ Equipe: Leonardo Correa de Mello (RM555573), Felipe Soares Xavier (RM556931), Pe
 [Especificação da matéria](../docs/disciplinas/csharp.md) · [Arquitetura](../docs/arquitetura.md) · [Contratos](../contracts/README.md) · [OpenAPI alvo](../contracts/openapi/csharp.openapi.json)
 
 ## Guia de avaliação (C# Software Development)
-
-> **Escopo desta entrega: somente a pasta `api/`.** O repositório reúne a Global Solution inteira do grupo; as demais pastas (`soa/`, `iot/`, `ml/`, `linux/`, entre outras) pertencem a outras matérias e **não fazem parte desta avaliação**. A API C# roda sozinha: lê o PostgreSQL preparado pelo módulo `database/`, sem precisar do serviço Java.
 
 | Entregável pedido | Onde está |
 | --- | --- |
@@ -171,6 +173,5 @@ Capturas de 15/11/2026 no macOS, sobre o commit `517466f` da branch `leo/csharp`
 
 ## Limites conhecidos
 
-- Depende das views `sonora_read` e do seed do módulo `database/` (SOA), validados localmente em 16/11/2026. Na CI os dois testes de PostgreSQL ainda aparecem como pulados: habilitar `SONORA_DB_INTEGRATION=1` no pipeline é ajuste combinado com o responsável pelo CI, e ele só roda quando o orçamento do Actions permitir.
 - A view `observations` não expõe `producer_id`. O produtor de cada série é o `deviceId` quando existe e, sem dispositivo (arquivos públicos), o `sessionId`. Se o SOA publicar `producer_id`, o mapeamento passa a usá-lo.
 - O painel é demonstrativo: a chave é digitada a cada sessão e não há emissão pública de chaves.

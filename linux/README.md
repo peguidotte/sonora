@@ -1,4 +1,8 @@
-# Provisionamento e monitoramento
+# Operating Systems · Linux
+
+[Vídeo demonstrativo](evidencias/demonstracao.mp4) · [Capturas da execução](evidencias/) · [Painel na Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard)
+
+O servidor hospeda a ingestão Java, o PostgreSQL e a API C#. O monitor acompanha CPU, RAM e disco. O laboratório demonstra provisionamento do zero, mudança de rede com rollback e recuperação do serviço após falha.
 
 Responsável: **Pedro Visconti Guidotte, RM556630**. [Equipe completa](../README.md#equipe).
 
@@ -18,7 +22,7 @@ sudo install -m 0700 linux/*.sh linux/deploy-release.py /opt/sonora/bootstrap/
 sudo bash /opt/sonora/bootstrap/provision.sh sonora.localhost --local
 ```
 
-Modo local usa HTTP; no Azure o cloud-init passa FQDN real e HTTPS. `SONORA_HOSTNAME` permite escolher o hostname, padrão `sonora`. Backends/migrations precisam ser fornecidos pelos responsáveis. Não executar provisionamento no host pessoal ou em servidor com dados/serviços de outros projetos.
+Modo local usa HTTP; no Azure o cloud-init passa FQDN real e HTTPS. `SONORA_HOSTNAME` permite escolher o hostname, padrão `sonora`. Para instalar as releases compiladas, siga o [procedimento de publicação](../deploy/azure/README.md). Não executar provisionamento no host pessoal ou em servidor com dados/serviços de outros projetos.
 
 ### Laboratório isolado no Windows
 
@@ -71,4 +75,15 @@ Monitor: `INTERVAL_SECONDS` de 1 a 3600; `CPU_THRESHOLD`, `MEMORY_THRESHOLD`, `D
 
 Comprovar novo PID/reinício e logs após crash e reboot. Aplicações só ficam ativas após deploy real. Scripts registram etapas/timestamp/resultado em `/var/log/sonora-*.log`, com rotação; serviços usam journald persistente limitado a 100 MB/14 dias. Reexecução deve preservar banco, chaves e dados. Para evidências, salvar saída real e metadados de ambiente/commit em `output/` local ou anexar ao PR, sem segredos. Um reboot precisa ser executado e verificado de fato; `is-enabled` sozinho não comprova recuperação pós-boot.
 
-Para fechar a entrega: demonstrar aplicação de outra disciplina com banco/migrations reais, persistência e falhas da aplicação/banco; configuração de rede e rollback em laboratório; reprodução completa e vídeo até 7 minutos. Usar a [rubrica](../docs/disciplinas/linux.md) para organizar essas evidências. Infraestrutura disponível não conclui a matéria; `component.json` permanece em desenvolvimento até comprovar tudo.
+## Reproduzir a demonstração na VM
+
+Com as migrations e as releases instaladas, execute na raiz do clone:
+
+```bash
+sudo bash linux/demo.sh
+sudo bash linux/verify.sh
+```
+
+O primeiro comando cadastra o local identificado como demonstração e usa a credencial de dispositivo da VM para enviar uma janela sintética ao Java. O reenvio retorna o registro anterior. O C# lê o perfil pelo PostgreSQL. No painel, selecione **Laboratório Sonora (simulado)**, origem simulada e um intervalo que inclua **17/11/2026 às 12h de São Paulo**. A janela registrada tem cinco segundos e 63,4 dB(A).
+
+O cadastro usa a identidade de dispositivo da instalação padrão. Se já estiver vinculada a outro local, o script interrompe a transação. As credenciais ficam na VM.

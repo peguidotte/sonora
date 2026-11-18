@@ -36,10 +36,7 @@ function isPlainObject(value: unknown): value is Record<string, JsonValue> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
-// `source` é um identificador de proveniência (nome da fonte), não dado do payload: ele entra
-// direto no prompt da IA e no log de eventos sem passar pelo motor de PII. Por isso precisa
-// ser um identificador curto e previsível — nunca texto livre onde alguém poderia embutir um
-// segredo (ex: source: "password=segredo-real") para fazê-lo vazar pro prompt/eventos.
+// Valida o formato na entrada. O middleware normaliza fontes desconhecidas antes do registro.
 const SAFE_SOURCE = /^[a-zA-Z0-9][a-zA-Z0-9_.:-]{0,63}$/;
 
 function isSafeSource(value: string): boolean {
