@@ -21,6 +21,8 @@ npm run preview -- --host 127.0.0.1
 
 ## Interações e limites
 
+A aba de arquitetura em `arquitetura.html` apresenta os diagramas de fluxo de dados e infraestrutura. Selecione um bloco para destacar suas conexões ou reproduza a visita guiada. A visão de infraestrutura delimita a VM Linux na Azure.
+
 - Ondas com pausa, respeito a `prefers-reduced-motion`, suspensão fora da tela e em aba oculta.
 - Perfis demonstrativos por período, média energética para intervalos de mesma duração e estado sem dados explícito.
 - Exploração do dispositivo conceitual e das quatro etapas do modelo: fontes → Java → PostgreSQL → C#.
