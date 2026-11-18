@@ -97,7 +97,8 @@ jobs:
             SONORA_DB_USER=sonora_ingest SONORA_DB_PASSWORD=ci-ingest-only python deploy/pipeline.py package soa
           fi
           if [[ "$DO_API" == 'true' ]]; then
-            SONORA_DB_USER=sonora_query SONORA_DB_PASSWORD=ci-query-only python deploy/pipeline.py package api
+            SONORA_ALLOW_DEV_SEED=1 bash database/migrate.sh seed
+            SONORA_DB_INTEGRATION=1 SONORA_DB_USER=sonora_query SONORA_DB_PASSWORD=ci-query-only python deploy/pipeline.py package api
           fi
       - name: Conferir contratos contra PostgreSQL real e versão anterior
         env:

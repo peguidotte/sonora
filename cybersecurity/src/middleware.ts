@@ -6,6 +6,9 @@ import { safeLog, TaintBlockedError } from "./taint/sinks.js";
 import { translateDiagnostic } from "./llm/translate.js";
 import { SecurityEventLog, type SecurityEvent } from "./risk/events.js";
 
+const KNOWN_SOURCES = new Set(["java-ingestion", "mobile-form", "csharp-config", "user-record-leaked",
+  "user-record-masked", "credential-in-log-leaked", "credential-in-log-masked"]);
+
 export interface InterceptResult {
   findings: PiiFinding[];
   events: SecurityEvent[];
@@ -17,12 +20,13 @@ export interface InterceptResult {
  * eventos no log para alimentar o dashboard Risco Cidadão.
  */
 export async function interceptRequest(payload: JsonValue, source: string, log: SecurityEventLog): Promise<InterceptResult> {
+  const publicSource = KNOWN_SOURCES.has(source) ? source : "manual";
   const findings = scanPayload(payload);
   const events: SecurityEvent[] = [];
 
   for (const finding of findings) {
-    const unsafeEvent = await attemptUnsafeLog(finding, source);
-    const safeEvent = await attemptSanitizedLog(finding, source);
+    const unsafeEvent = await attemptUnsafeLog(finding, publicSource);
+    const safeEvent = await attemptSanitizedLog(finding, publicSource);
     events.push(unsafeEvent, safeEvent);
     log.record(unsafeEvent);
     log.record(safeEvent);

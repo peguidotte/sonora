@@ -65,13 +65,15 @@ for name in ('api', 'soa'):
 print('Configuration metadata checked; no secret contents emitted.')
 PY
 check internal_listeners python3 - <<'PY'
-import subprocess
+import ipaddress, subprocess
 lines = subprocess.check_output(['ss','-H','-ltn'], text=True).splitlines()
 for line in lines:
     address = line.split()[3]
     host, _, port = address.rpartition(':')
     if port in ('5432','8080','8082'):
-        assert host in ('127.0.0.1','[::1]','::1'), 'Application/database listener is public'
+        ip = ipaddress.ip_address(host.strip('[]'))
+        endpoint = getattr(ip, 'ipv4_mapped', None) or ip
+        assert endpoint.is_loopback, 'Application/database listener is public'
 print('Application/database listeners restricted to loopback.')
 PY
 

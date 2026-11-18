@@ -16,7 +16,7 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "validated",
     "dependencies": [
       "postgresql",
       "api",
@@ -30,10 +30,13 @@
       "sudo bash linux/verify.sh --infrastructure-only --load-test",
       "sudo bash linux/verify.sh"
     ],
-    "evidence": []
+    "evidence": [
+      "linux/evidencias/demonstracao.mp4",
+      "linux/evidencias/painel-azure.png"
+    ]
   },
   "deployment": {
     "target": "azure-vm-and-local-vm",
-    "status": "infrastructure-provisioned-applications-pending"
+    "status": "deployed"
   }
 }

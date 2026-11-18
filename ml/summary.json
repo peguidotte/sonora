@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "city": "São Paulo",
+  "modelVersion": "kmeans2-pca2-v1",
+  "sourceUrl": "https://data.noise-planet.org/dump/Brazil.zip",
+  "datasetSha256": "540aef978fd95a0fcb9e09a2a59bf91ba0ee98b2a85d771f3d7f6580181df9aa",
+  "dataPeriod": {
+    "from": "2017-10-26T02:23:25Z",
+    "to": "2025-07-11T01:38:30Z"
+  },
+  "sampleCount": 1185,
+  "groups": [
+    {
+      "id": "G0",
+      "count": 698,
+      "description": "Medianas entre as sessões do grupo: LAeq 54.9 dB(A); p50 51.1 dB(A); percentil 90 56.9 dB(A); desvio-padrão 3.5 dB."
+    },
+    {
+      "id": "G1",
+      "count": 487,
+      "description": "Medianas entre as sessões do grupo: LAeq 68.0 dB(A); p50 64.6 dB(A); percentil 90 70.6 dB(A); desvio-padrão 4.3 dB."
+    }
+  ],
+  "metrics": [
+    {
+      "name": "silhouette",
+      "train": 0.4006,
+      "test": 0.3382
+    },
+    {
+      "name": "daviesBouldin",
+      "train": 0.9542,
+      "test": 0.9402
+    },
+    {
+      "name": "meanDistanceToCentroid",
+      "train": 1.3979,
+      "test": 1.321
+    }
+  ],
+  "limitations": [
+    "Medições voluntárias com celulares não calibrados; não são medições legais.",
+    "Cobertura concentrada em poucas regiões e em 2023-2024; não representa toda a cidade.",
+    "Um grupo descreve sessões medidas, não classifica automaticamente um endereço.",
+    "Sessões curtas (minutos) não equivalem a indicadores de longo prazo como Lden."
+  ]
+}
