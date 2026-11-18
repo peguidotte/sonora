@@ -12,6 +12,8 @@ O painel acompanha o que acontece quando um formulário ou uma API recebe dados 
 
 A captura acima é de uma execução complementar com credencial fictícia. O vídeo original usa o texto padrão disponível offline.
 
+[Baixar o ZIP com o módulo, as evidências de auditoria, o vídeo e o painel](https://github.com/peguidotte/sonora/releases/download/cyber-gs-2026.2/sonora-cybersecurity.zip)
+
 ## Executar
 
 Na pasta `cybersecurity/`, com Node 22.23 ou mais recente:

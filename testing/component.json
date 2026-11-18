@@ -1,6 +1,6 @@
 {
   "component": "testing",
-  "status": "planned",
+  "status": "in_progress",
   "owner": "Felipe Soares Xavier",
   "rm": "556931",
   "branch": "felipe/testing",
@@ -12,7 +12,7 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "in_progress",
     "dependencies": [
       "api",
       "soa",
@@ -21,7 +21,7 @@
   },
   "validation": {
     "commands": [],
-    "evidence": []
+    "evidence": ["testing/video-pitch-gs.mp4"]
   },
   "deployment": {
     "target": "azure-boards",

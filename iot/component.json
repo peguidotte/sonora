@@ -1,6 +1,6 @@
 {
   "component": "iot",
-  "status": "in_progress",
+  "status": "ready",
   "owner": "Leonardo Correa de Mello",
   "rm": "555573",
   "branch": "leo/iot",
@@ -15,7 +15,7 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "in_progress",
+    "status": "validated",
     "dependencies": [
       "soa",
       "postgresql"
@@ -26,7 +26,10 @@
       "c++ -std=c++17 -Wall -Wextra -I iot/include iot/test/host/test_acoustic.cpp -o output/iot-host-tests && output/iot-host-tests",
       "cd iot && pio run"
     ],
-    "evidence": []
+    "evidence": [
+      "iot/README.md",
+      "iot/INTEGRANTES.txt"
+    ]
   },
   "deployment": {
     "target": "wokwi",

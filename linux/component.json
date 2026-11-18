@@ -1,6 +1,6 @@
 {
   "component": "linux",
-  "status": "in_progress",
+  "status": "ready",
   "owner": "Pedro Visconti Guidotte",
   "rm": "556630",
   "branch": "pedro/operating-systems",
