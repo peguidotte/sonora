@@ -1,0 +1,75 @@
+// Public synthetic examples from contracts/openapi/csharp.openapi.json v0.4.0.
+export const fixtures = {
+  available: {
+    locationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    from: "2026-11-08T15:00:00Z",
+    to: "2026-11-08T15:01:00Z",
+    timezone: "America/Sao_Paulo",
+    origin: "simulated",
+    aggregation: "hour",
+    status: "available",
+    laeqDbA: 67.40362689494243,
+    sources: [
+      {
+        id: "22222222-2222-4222-8222-222222222222",
+        name: "Shared synthetic dataset",
+        sourceUrl: "https://example.invalid/fixtures",
+        snapshotDate: "2026-11-08",
+        license: "Synthetic project fixture",
+        origin: "simulated",
+        limitations: ["Not a physical sound measurement."],
+      },
+    ],
+    series: [
+      {
+        producerId: "11111111-1111-4111-8111-111111111111",
+        method: "wokwi_linear_demo",
+        calibrationStatus: "simulated",
+        bins: [
+          {
+            from: "2026-11-08T15:00:00Z",
+            to: "2026-11-08T15:01:00Z",
+            laeqDbA: 67.40362689494243,
+            observationCount: 2,
+            sessionCount: 1,
+            observedSeconds: 10,
+            firstObservedAt: "2026-11-08T15:00:00Z",
+            lastObservedAt: "2026-11-08T15:00:05Z",
+          },
+        ],
+      },
+    ],
+    limitations: [
+      "Only 10 seconds observed; this does not represent the entire hour.",
+      "Synthetic values.",
+    ],
+  },
+  empty: {
+    locationId: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+    from: "2026-11-08T15:00:00Z",
+    to: "2026-11-08T15:01:00Z",
+    timezone: "America/Sao_Paulo",
+    origin: "simulated",
+    aggregation: "hour",
+    status: "no_data",
+    laeqDbA: null,
+    sources: [],
+    series: [],
+    limitations: ["No observations in the requested period."],
+  },
+  locations: {
+    items: [
+      {
+        id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        name: "Demo location A",
+        city: "São Paulo",
+        latitude: -23.56,
+        longitude: -46.65,
+        isDemo: true,
+      },
+    ],
+    page: 1,
+    pageSize: 20,
+    total: 1,
+  },
+};
