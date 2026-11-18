@@ -30,7 +30,7 @@
     "evidence": []
   },
   "deployment": {
-    "target": "expo-prebuild-android-debug-apk",
+    "target": "expo-prebuild-android-demo-apk",
     "status": "not-deployed"
   }
 }
