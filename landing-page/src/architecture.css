@@ -7,20 +7,19 @@
 .arch-header,
 .arch-header nav,
 .arch-intro,
-.console-tools,
-.readout,
-.transport,
-.source-picker {
+.map-toolbar,
+.map-controls,
+.map-footer {
   display: flex;
   align-items: center;
 }
 .arch-header {
-  height: 84px;
+  height: 76px;
   justify-content: space-between;
   border-bottom: 1px solid var(--line);
 }
 .arch-header nav {
-  gap: clamp(14px, 3vw, 42px);
+  gap: clamp(12px, 3vw, 40px);
   font-size: 14px;
 }
 .arch-header [aria-current] {
@@ -29,277 +28,353 @@
   text-underline-offset: 7px;
 }
 .arch-intro {
+  align-items: end;
   justify-content: space-between;
   gap: 24px;
-  margin: 52px 0 32px;
+  margin: 36px 0 22px;
 }
 .arch-intro h1 {
-  font-size: clamp(44px, 6vw, 88px);
+  font-size: clamp(40px, 4.7vw, 72px);
+  line-height: 1.05;
   margin: 0;
-  line-height: 1.02;
 }
 .arch-intro p {
-  max-width: 350px;
-  color: #414955;
+  max-width: 320px;
+  color: #45526a;
 }
-.console {
-  background: #101e37;
-  color: #f4f7ff;
-  border-radius: 22px;
+.atlas {
+  border: 1px solid #c5ccd8;
+  border-radius: 18px;
   overflow: hidden;
+  background: #fcfcfa;
 }
-.console-tools,
-.readout {
+.map-toolbar {
   justify-content: space-between;
-  gap: 20px;
-  padding: 24px clamp(18px, 3vw, 48px);
+  gap: 8px;
+  padding: 12px 18px;
+  border-bottom: 1px solid #d5dbe5;
+  background: #fff;
 }
-.source-picker {
-  padding: 4px;
-  border-radius: 24px;
-  background: #213350;
-  gap: 2px;
+.map-controls {
+  gap: 3px;
+  padding: 3px;
+  background: #eff1f5;
+  border-radius: 12px;
 }
-.source-picker button,
-.transport button {
+.map-controls button,
+#play {
   border: 0;
-  border-radius: 20px;
+  border-radius: 9px;
+  padding: 9px 15px;
   background: transparent;
-  color: #e2ebff;
-  padding: 10px 18px;
+  color: #34405a;
   font-size: 14px;
 }
-.source-picker [aria-pressed="true"] {
-  background: #eaf1ff;
-  color: #132748;
+.map-controls [aria-pressed="true"] {
+  background: #fff;
+  color: #1536b2;
+  box-shadow: 0 1px 4px #11234225;
+  font-weight: 700;
 }
-.console-tools code {
-  color: #bbd2fe;
-  font-size: 13px;
+#play {
+  background: #1b3155;
+  color: white;
 }
-.signal-map {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  padding: 38px 3% 32px;
-  background:
-    radial-gradient(ellipse at 42% 100%, #213a66aa, transparent 67%),
-    radial-gradient(#8296b34d 1px, transparent 1px);
-  background-size:
-    auto,
-    16px 16px;
-  border-block: 1px solid #334461;
-}
-.station {
+.map-board {
   position: relative;
-  min-width: 0;
-  display: grid;
-  justify-items: center;
-  gap: 6px;
-  background: transparent;
-  border: none;
-  color: #dce9ff;
+  isolation: isolate;
+  background-image: radial-gradient(#b9c5d6 0.8px, transparent 0.8px);
+  background-size: 16px 16px;
 }
-.station-icon {
-  z-index: 1;
+.map-nodes {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-areas: "archive iot mobile panel" "capture capture api api" ". db db .";
+  justify-items: center;
+  gap: 64px 12px;
+  padding: 32px 3%;
+}
+.map-board[data-view="infra"] .map-nodes {
+  grid-template-areas: ". iot mobile ." ". proxy proxy ." "capture capture api api" ". db db .";
+}
+.map-nodes button {
+  --tone: #4d5d75;
+  --tint: #e9eef5;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  width: 100%;
+  max-width: 246px;
+  min-height: 68px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #fff;
+  color: #15233a;
+  border: 1px solid #bdc8d7;
+  box-shadow: 0 3px 8px #1426400e;
+  transition:
+    box-shadow 0.2s,
+    border-color 0.2s;
+}
+.map-nodes i {
   display: grid;
   place-items: center;
-  width: 62px;
-  height: 62px;
-  background: #162941;
-  border: 1px solid #7a91b2;
-  border-radius: 20px;
-  font-size: 30px;
-  margin-bottom: 7px;
+  flex: none;
+  width: 35px;
+  height: 35px;
+  background: var(--tint);
+  color: var(--tone);
+  border-radius: 9px;
+  font-size: 22px;
 }
-.station strong {
-  font-size: clamp(13px, 1.4vw, 20px);
+.map-nodes strong,
+.map-nodes small {
+  display: block;
+  line-height: 1.25;
 }
-.station small {
-  color: #bdcde3;
+.map-nodes strong {
+  font-size: clamp(13px, 1.2vw, 18px);
+}
+.map-nodes small {
+  margin-top: 3px;
+  color: #4b5770;
   font-size: 12px;
 }
-.station:not(:first-child)::before,
-.station:not(:first-child)::after {
-  content: "";
+.map-nodes [data-node="capture"],
+.map-nodes [data-node="api"],
+.map-nodes [data-node="db"],
+.map-nodes [data-node="proxy"] {
+  max-width: 292px;
+  background: var(--tint);
+  border-color: color-mix(in srgb, var(--tone) 52%, white);
+}
+.map-nodes [data-node="capture"] {
+  --tone: #1c55b7;
+  --tint: #e6efff;
+}
+.map-nodes [data-node="api"] {
+  --tone: #6741a6;
+  --tint: #f0eafb;
+}
+.map-nodes [data-node="db"] {
+  --tone: #096659;
+  --tint: #dcf3e9;
+}
+.map-nodes [data-node="proxy"] {
+  --tone: #9a4c0e;
+  --tint: #fff0dc;
+}
+.map-nodes button:hover,
+.map-nodes button[aria-pressed="true"] {
+  border-color: var(--tone);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--tone) 16%, transparent);
+}
+.map-lines {
   position: absolute;
-  left: calc(-50% + 31px);
-  width: calc(100% - 62px);
-  top: 31px;
-  height: 2px;
-  background: #68809e;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
-.station:not(:first-child)::after {
-  background: #81beff;
-  transform: scaleX(0);
-  transform-origin: left;
+.map-lines g path {
+  fill: none;
+  stroke: #72829a;
+  stroke-width: 1.7;
+  stroke-linejoin: round;
 }
-.station.visited::after,
-.station[aria-pressed="true"]::after {
-  transform: scaleX(1);
-  transition: transform 0.7s ease;
+.map-lines g.lit path {
+  stroke: #2549d9;
+  stroke-width: 2.5;
+  stroke-dasharray: 7 3;
+  animation: travel 1.4s linear 2;
 }
-.station[aria-pressed="true"] .station-icon {
-  background: #2748e9;
-  border-color: #a1cfff;
-  box-shadow:
-    0 0 0 5px #447bf52e,
-    0 0 30px #507ffd66;
+.map-lines text {
+  text-anchor: middle;
+  fill: #374969;
+  font:
+    600 12px "DM Sans Variable",
+    sans-serif;
+  paint-order: stroke;
+  stroke: #fcfcfa;
+  stroke-width: 5px;
+  stroke-linejoin: round;
 }
-.station.visited .station-icon {
-  border-color: #83b5ff;
+@keyframes travel {
+  to {
+    stroke-dashoffset: -30;
+  }
 }
-.readout {
-  align-items: flex-start;
-  min-height: 222px;
-  padding-block: 30px;
+.map-footer {
+  background: #14233c;
+  color: white;
+  padding: 20px 3%;
+  align-items: start;
+  gap: 20px;
 }
-.readout-text {
-  max-width: 740px;
+.map-footer h2 {
+  font-size: 20px;
+  line-height: 1.3;
+  letter-spacing: -0.035em;
+  min-width: 28%;
 }
-#phase {
-  font: 600 11px monospace;
-  letter-spacing: 0.13em;
-  color: #a9ccff;
-}
-.readout h2 {
-  font-size: clamp(22px, 2.5vw, 36px);
-  margin: 7px 0 10px;
-}
-.readout p {
-  color: #d2ddef;
-  max-width: 68ch;
-  font-size: 15px;
-}
-.transport {
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 12px;
-}
-.transport button {
-  border: 1px solid #697e9b;
-  white-space: nowrap;
-}
-.transport #play {
-  background: #eaf1ff;
-  color: #132748;
-  font-weight: 650;
-}
-.transport button:disabled {
-  opacity: 0.45;
-}
-.console button:focus-visible {
-  outline-color: #9bcaff;
-  outline-offset: 2px;
+.map-footer p {
+  font-size: 14px;
+  color: #d9e4f8;
 }
 .support {
-  padding: 48px 0 70px;
+  padding: 32px 0 54px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.support h2,
+.support > a {
+  grid-column: 1/-1;
 }
 .support h2 {
-  font-size: clamp(26px, 3vw, 40px);
-  margin-bottom: 25px;
+  font-size: 27px;
+  margin-bottom: 5px;
 }
 .support details {
-  border-top: 1px solid var(--line);
-  padding: 19px 0;
+  background: #fff;
+  border: 1px solid #d5dae3;
+  border-radius: 10px;
+  padding: 14px 18px;
+  align-self: start;
 }
 .support summary {
   cursor: pointer;
-  font-size: 15px;
-  color: #4e5969;
+  font-size: 13px;
+  color: #49566a;
 }
 .support summary span {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
-  margin: 0 12px;
-  color: var(--ink);
+  margin: 0 10px;
+  color: #19263b;
 }
 .support details p {
-  max-width: 76ch;
-  margin-top: 12px;
+  margin-top: 10px;
+  font-size: 14px;
 }
 .support .text-link {
-  margin-top: 22px;
+  justify-self: start;
 }
-@media (max-width: 720px) {
+@media (max-width: 680px) {
   .arch-header {
-    height: 68px;
+    height: 64px;
   }
   .arch-header .wordmark {
-    font-size: 23px;
+    font-size: 22px;
   }
   .arch-header .brand-mark {
     width: 28px;
     height: 28px;
   }
   .arch-header nav {
+    gap: 10px;
     font-size: 12px;
-    gap: 12px;
   }
   .arch-intro {
     display: block;
-    margin: 30px 0 20px;
+    margin: 24px 0 16px;
   }
   .arch-intro p {
-    margin-top: 10px;
+    font-size: 14px;
+    margin-top: 7px;
   }
-  .console-tools {
-    align-items: flex-start;
-    gap: 10px;
+  .map-toolbar {
+    padding: 8px;
     flex-wrap: wrap;
-    padding-block: 14px;
   }
-  .source-picker button {
-    font-size: 13px;
-    padding: 7px 13px;
+  .map-controls button,
+  #play {
+    font-size: 12px;
+    padding: 8px;
   }
-  .signal-map {
+  .map-nodes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-areas: "archive iot" "capture capture" "db db" "api api" "mobile panel";
+    gap: 44px 10px;
+    padding: 20px 10px;
+  }
+  .map-board[data-view="infra"] .map-nodes {
+    grid-template-areas: "iot mobile" "proxy proxy" "capture api" "db db";
+  }
+  .map-nodes button {
+    min-height: 55px;
+    padding: 8px;
+    gap: 6px;
+  }
+  .map-nodes i {
+    width: 25px;
+    height: 29px;
+    font-size: 18px;
+  }
+  .map-nodes [data-node="db"],
+  .map-nodes [data-node="capture"],
+  .map-nodes [data-node="api"],
+  .map-nodes [data-node="proxy"] {
+    max-width: 205px;
+  }
+  .map-nodes strong {
+    font-size: 12px;
+  }
+  .map-nodes small {
+    font-size: 10px;
+  }
+  .map-lines text {
+    font-size: 10px;
+  }
+  .map-footer {
+    display: block;
+    padding: 16px;
+  }
+  .map-footer h2 {
+    font-size: 18px;
+    margin-bottom: 5px;
+  }
+  .support {
     grid-template-columns: 1fr;
-    padding: 14px 22px;
-  }
-  .station {
-    grid-template-columns: 42px 1fr auto;
-    align-items: center;
-    justify-items: start;
-    text-align: left;
-    gap: 12px;
-    min-height: 52px;
-    padding: 0;
-  }
-  .station-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    font-size: 22px;
-    margin: 0;
-  }
-  .station:not(:first-child)::before,
-  .station:not(:first-child)::after {
-    left: 18px;
-    top: -7px;
-    width: 2px;
-    height: 14px;
-  }
-  .station:not(:first-child)::after {
-    transform: scaleY(0);
-    transform-origin: top;
-  }
-  .station.visited::after,
-  .station[aria-pressed="true"]::after {
-    transform: scaleY(1);
-  }
-  .readout {
-    flex-direction: column;
-    min-height: 0;
-    padding-block: 20px;
-  }
-  .transport {
-    align-self: stretch;
-    flex-direction: row;
-    justify-content: space-between;
   }
 }
 @media (prefers-reduced-motion: reduce) {
-  .station::after {
-    transition: none !important;
+  .map-lines g.lit path {
+    animation: none;
+  }
+  .map-nodes button {
+    transition: none;
+  }
+}
+
+.map-board[data-view="infra"]::before {
+  content: "";
+  position: absolute;
+  inset: var(--host-top) 1% 9px;
+  border: 1px dashed #8a9fbb;
+  border-radius: 14px;
+  background: #ebf1fa66;
+  pointer-events: none;
+}
+.map-board[data-view="infra"]::after {
+  content: "VM Linux · Azure";
+  position: absolute;
+  bottom: 19px;
+  left: 4%;
+  color: #425575;
+  font-size: 12px;
+  font-weight: 650;
+}
+.map-board[data-view="infra"] .map-nodes {
+  padding-bottom: 50px;
+}
+@media (max-width: 680px) {
+  .map-board[data-view="infra"]::after {
+    bottom: 16px;
+  }
+  .map-board[data-view="infra"] .map-nodes {
+    padding-bottom: 43px;
   }
 }

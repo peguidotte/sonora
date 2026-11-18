@@ -15,7 +15,9 @@
     <header class="arch-header">
       <a href="./index.html" class="wordmark" aria-label="Sonora, início"
         ><img
-          class="brand-mark" width="36" height="36"
+          class="brand-mark"
+          width="36"
+          height="36"
           src="./images/sonora-logo.png"
           alt=""
         /><span>sonora<span class="brand-dot">.</span></span></a
@@ -28,44 +30,54 @@
     </header>
     <main id="percurso" class="arch-main">
       <div class="arch-intro">
-        <h1>Da borda <span>à tela.</span></h1>
+        <h1>Mapa do <span>Sonora.</span></h1>
         <p>
-          Escolha a origem de uma observação acústica e acompanhe seu caminho
-          até o aplicativo Sonora.
+          Explore as conexões entre as fontes, os serviços e quem consulta o
+          perfil acústico.
         </p>
       </div>
-      <section class="console" aria-label="Percurso interativo da observação">
-        <div class="console-tools">
-          <div
-            role="group"
-            aria-label="Origem do percurso"
-            class="source-picker"
-          >
-            <button data-source="iot" aria-pressed="true">ESP32 / Wokwi</button
-            ><button data-source="archive" aria-pressed="false">
-              NoiseCapture
-            </button>
+      <section class="atlas" aria-label="Diagrama de arquitetura">
+        <div class="map-toolbar">
+          <div class="map-controls" role="group" aria-label="Visão do diagrama">
+            <button data-map="flow">Fluxo de dados</button
+            ><button data-map="infra">Infraestrutura</button>
           </div>
-          <code id="origin"></code>
+          <button id="play">Guiar pelo mapa</button>
         </div>
-        <div
-          class="signal-map"
-          role="group"
-          aria-label="Etapas do percurso"
-        ></div>
-        <div class="readout">
-          <div class="readout-text" aria-live="polite" aria-atomic="true">
-            <span id="phase"></span>
-            <h2 id="stage-title"></h2>
-            <p id="narration"></p>
-          </div>
-          <div class="transport">
-            <button id="play"></button>
-            <div>
-              <button id="prev" aria-label="Etapa anterior">←</button
-              ><button id="next" aria-label="Próxima etapa">→</button>
-            </div>
-          </div>
+        <div class="map-board">
+          <svg class="map-lines" aria-hidden="true">
+            <defs>
+              <marker
+                id="arrow"
+                markerWidth="6"
+                markerHeight="6"
+                refX="5"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L6,3 L0,6 Z" fill="#72829a" />
+              </marker>
+              <marker
+                id="arrow-on"
+                markerWidth="6"
+                markerHeight="6"
+                refX="5"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L6,3 L0,6 Z" fill="#2549d9" />
+              </marker>
+            </defs>
+          </svg>
+          <div
+            class="map-nodes"
+            role="group"
+            aria-label="Blocos do diagrama"
+          ></div>
+        </div>
+        <div class="map-footer" aria-live="polite">
+          <h2 id="stage-title"></h2>
+          <p id="narration"></p>
         </div>
       </section>
       <section class="support">
