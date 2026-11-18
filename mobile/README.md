@@ -35,9 +35,11 @@ O app abre em modo de demonstração com dados sintéticos. Na tela **Settings**
 2. Marque um local consultado como favorito. Se abrir esse favorito após reiniciar o app, o último perfil salvo da API aparece identificado com a data da consulta.
 3. Na tela **Compare**, selecione dois locais. A comparação verifica período, origem e método de coleta.
 
-## Demonstração em Android
+## Prévia técnica em Android
 
-[Vídeo do app em execução](https://github.com/peguidotte/sonora/releases/download/mobile-demo-v0.1.0/sonora-mobile-demo.mp4) · [Versão de demonstração](https://github.com/peguidotte/sonora/releases/tag/mobile-demo-v0.1.0)
+[Vídeo do app em execução](https://github.com/peguidotte/sonora/releases/download/mobile-demo-v0.1.0/sonora-mobile-demo.mp4) · [APK da prévia técnica](https://github.com/peguidotte/sonora/releases/tag/mobile-demo-v0.1.0)
+
+A aprovação visual da versão de entrega está pendente. Esta versão usa a última hora para a consulta e limita a comparação à origem simulada. O histórico de 2018 está disponível no [painel web](../linux/README.md#consultar-uma-medição-pública-no-painel).
 
 Registro feito no emulador Android 37 com dados sintéticos. O vídeo mostra a consulta, a comparação e a reabertura de um favorito salvo em SQLite com a rede desligada.
 

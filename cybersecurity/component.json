@@ -28,7 +28,11 @@
     "commands": [
       "cd cybersecurity && npm test"
     ],
-    "evidence": []
+    "evidence": [
+      "cybersecurity/docs-entrega/cybersecurity-entrega.pdf",
+      "cybersecurity/docs-entrega/painel-em-execucao.png",
+      "cybersecurity/video-demostrativo.mp4"
+    ]
   },
   "deployment": {
     "target": "local-audit",
