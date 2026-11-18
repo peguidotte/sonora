@@ -1,0 +1,26 @@
+{
+  "expo": {
+    "name": "Sonora",
+    "slug": "sonora-mobile",
+    "scheme": "sonora",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "plugins": [
+      "expo-router",
+      "expo-sqlite"
+    ],
+    "android": {
+      "package": "br.com.sonora.mobile"
+    },
+    "ios": {
+      "bundleIdentifier": "br.com.sonora.mobile"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      }
+    }
+  }
+}
