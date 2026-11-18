@@ -20,12 +20,20 @@ export default function CompareScreen() {
   const origin: Origin = "simulated";
 
   const [locations, setLocations] = useState<Location[] | null>(null);
+  const [listError, setListError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
   const [left, setLeft] = useState<Slot>({ location: null, profile: null, error: null });
   const [right, setRight] = useState<Slot>({ location: null, profile: null, error: null });
 
   useEffect(() => {
-    client.listLocations().then((page) => setLocations(page.items));
-  }, [client]);
+    let active = true;
+    setListError(false);
+    setLocations(null);
+    client.listLocations()
+      .then((page) => { if (active) setLocations(page.items); })
+      .catch(() => { if (active) setListError(true); });
+    return () => { active = false; };
+  }, [client, attempt]);
 
   async function pick(side: "left" | "right", location: Location) {
     const setSlot = side === "left" ? setLeft : setRight;
@@ -38,6 +46,7 @@ export default function CompareScreen() {
     }
   }
 
+  if (listError) return <ErrorState message="Could not load locations." onRetry={() => setAttempt((previous) => previous + 1)} />;
   if (!locations) return <LoadingState label="Loading locations…" />;
 
   const mismatches =

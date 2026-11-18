@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../session/SessionContext";
 import { SonoraApiError, SonoraNetworkError, type GetProfileParams, type Profile } from "../api/types";
-import { loadProfileCache, saveProfileCache } from "../storage/cache";
+import { loadLatestProfile, saveProfileCache } from "../storage/cache";
 
 export type ProfileResult =
   | { status: "loading" }
@@ -18,18 +18,18 @@ export function authErrorMessage(statusCode: number): string {
 }
 
 export function useProfile(params: GetProfileParams) {
-  const { client } = useSession();
+  const { client, mode } = useSession();
   const [result, setResult] = useState<ProfileResult>({ status: "loading" });
 
   const load = useCallback(async () => {
     setResult({ status: "loading" });
     try {
       const profile = await client.getProfile(params);
-      saveProfileCache(params, profile);
+      if (mode === "integrated") saveProfileCache(params, profile);
       setResult({ status: "ready", profile });
     } catch (error) {
       if (error instanceof SonoraNetworkError) {
-        const cached = loadProfileCache(params);
+        const cached = mode === "integrated" ? loadLatestProfile(params.locationId, params.origin) : null;
         if (cached) {
           setResult({ status: "offline-cache", profile: cached.profile, fetchedAt: cached.fetchedAt });
           return;
@@ -46,7 +46,7 @@ export function useProfile(params: GetProfileParams) {
     // params is a plain object rebuilt by the caller on every relevant change;
     // intentionally depending on its serialized form, not identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, JSON.stringify(params)]);
+  }, [client, mode, JSON.stringify(params)]);
 
   useEffect(() => {
     load();

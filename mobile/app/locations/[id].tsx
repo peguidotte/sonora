@@ -9,13 +9,14 @@ import { useSession } from "../../src/session/SessionContext";
 import { useProfile } from "../../src/hooks/useProfile";
 import { describeCoverage } from "../../src/domain/compare";
 import { lastHourWindow } from "../../src/domain/period";
+import { loadLatestProfile } from "../../src/storage/cache";
 import { addFavorite, isFavorite, removeFavorite } from "../../src/storage/favorites";
 import { highContrastTheme, MIN_TOUCH_TARGET, normalTheme } from "../../src/theme";
 import type { Location, Origin } from "../../src/api/types";
 
 export default function LocationDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { client } = useSession();
+  const { client, mode } = useSession();
   const { highContrast } = useAccessibility();
   const theme = highContrast ? highContrastTheme : normalTheme;
 
@@ -30,6 +31,8 @@ export default function LocationDetailScreen() {
   }, [client, id]);
 
   const { result, reload } = useProfile({ locationId: id, origin, ...window });
+
+  const saved = favorite && mode === "mock" ? loadLatestProfile(id, origin) : null;
 
   function toggleFavorite() {
     if (!location) return;
@@ -73,7 +76,7 @@ export default function LocationDetailScreen() {
 
       {result.status === "loading" ? <LoadingState label="Loading noise profile…" /> : null}
 
-      {result.status === "ready" ? (
+      {result.status === "ready" && !saved ? (
         <ProfileCard laeq={result.profile.laeqDbA} coverage={describeCoverage(result.profile)} origin={result.profile.origin} theme={theme} />
       ) : null}
 
@@ -84,6 +87,13 @@ export default function LocationDetailScreen() {
         </>
       ) : null}
 
+      {saved && result.status !== "offline-cache" ? (
+        <>
+          <ThemedText variant="title">Saved API profile</ThemedText>
+          <ThemedText variant="muted">{new Date(saved.fetchedAt).toLocaleString()}</ThemedText>
+          <ProfileCard laeq={saved.profile.laeqDbA} coverage={describeCoverage(saved.profile)} origin={saved.profile.origin} theme={theme} />
+        </>
+      ) : null}
       {result.status === "auth-error" ? <ErrorState message={result.message} /> : null}
       {result.status === "error" ? <ErrorState message={result.message} onRetry={reload} /> : null}
     </ScreenContainer>
