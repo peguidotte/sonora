@@ -89,3 +89,9 @@ O primeiro comando cadastra o local identificado como demonstração e usa a cre
 O cadastro usa a identidade de dispositivo da instalação padrão. Se já estiver vinculada a outro local, o script interrompe a transação. As credenciais ficam na VM.
 
 O [smoke integrado manual](https://github.com/peguidotte/sonora/actions/workflows/integration-smoke.yml) usa o modo `azure` para conferir serviços e consultar a janela de demonstração com `demo.sh --check`. Esse modo lê o perfil existente e mantém as chaves na VM.
+
+### Consultar uma medição pública no painel
+
+No [painel da Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard), use a chave de leitura da sua equipe e escolha **Paulista B — amostra real NoiseCapture**. Selecione a origem de dados públicos, preencha as duas datas com **22/08/2018** e agrupe por hora. A faixa das **23h de São Paulo** mostra **73,1 dB(A)**, calculados a partir de 24 segundos de medição entre 23h50min26s e 23h50min49s. A cobertura daquele dia se limita a esses 24 segundos.
+
+Essa amostra veio do [arquivo histórico NoiseCapture](../ml/dados/README.md), sob licença ODbL 1.0. O serviço Java importou 24 observações e o C# consultou o resultado no banco. A simulação de 63,4 dB(A) está em outro local e período.
