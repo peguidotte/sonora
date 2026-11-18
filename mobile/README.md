@@ -35,6 +35,24 @@ O app abre em modo de demonstração com dados sintéticos. Na tela **Settings**
 2. Marque um local consultado como favorito. Se abrir esse favorito após reiniciar o app, o último perfil salvo da API aparece identificado com a data da consulta.
 3. Na tela **Compare**, selecione dois locais. A comparação verifica período, origem e método de coleta.
 
+## Demonstração em Android
+
+[Vídeo do app em execução](https://github.com/peguidotte/sonora/releases/download/mobile-demo-v0.1.0/sonora-mobile-demo.mp4) · [Versão de demonstração](https://github.com/peguidotte/sonora/releases/tag/mobile-demo-v0.1.0)
+
+Registro feito no emulador Android 37 com dados sintéticos. O vídeo mostra a consulta, a comparação e a reabertura de um favorito salvo em SQLite com a rede desligada.
+
+| Consulta | Perfil | Favoritos | Comparação |
+| --- | --- | --- | --- |
+| ![Locais de demonstração](evidencias/01-locais.png) | ![Perfil e cobertura](evidencias/02-perfil.png) | ![Favorito salvo](evidencias/03-favoritos.png) | ![Comparação dos perfis](evidencias/04-comparacao.png) |
+
+### Consulta à API real e reabertura offline
+
+No mesmo emulador, conectamos o aplicativo ao C# com PostgreSQL descartável e consultamos uma observação de 63,4 dB(A). Depois de fechar o processo e remover a conexão, reabrimos o favorito. O app recuperou o mesmo perfil do SQLite com a data da consulta.
+
+| Perfil recebido do C# | Perfil salvo reaberto sem conexão |
+| --- | --- |
+| ![API real com perfil de 63,4 dB(A)](evidencias/05-api-real.png) | ![Perfil de 63,4 dB(A) salvo com data](evidencias/06-perfil-salvo-offline.png) |
+
 ## Validação
 
 ```bash
@@ -44,5 +62,3 @@ npx expo export --platform android
 ```
 
 Para montar o APK no Android, execute `npx expo prebuild --platform android` e `./gradlew assembleRelease` a partir de `android/` (no Windows, `gradlew.bat assembleRelease`). A variante release inclui o bundle JavaScript e usa a chave de teste padrão do Expo para a demonstração. Esse também é o fluxo do [GitHub Actions](../.github/workflows/delivery.yml).
-
-As capturas de tela, o vídeo de até três minutos e o teste em aparelho com a API C# são evidências pendentes.
