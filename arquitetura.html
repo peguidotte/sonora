@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="./images/sonora-logo.png" />
+    <title>Arquitetura interativa · Sonora</title>
+    <meta
+      name="description"
+      content="Acompanhe uma observação acústica da origem até o aplicativo Sonora."
+    />
+    <script type="module" crossorigin src="./assets/architecture-D8b9T4dC.js"></script>
+    <link rel="modulepreload" crossorigin href="./assets/style-D1YkM7Vu.js">
+    <link rel="stylesheet" crossorigin href="./assets/style-DM-HaMnL.css">
+    <link rel="stylesheet" crossorigin href="./assets/architecture-DrJi9etG.css">
+  </head>
+  <body class="arch">
+    <a class="skip" href="#percurso">Pular para o percurso</a>
+    <header class="arch-header">
+      <a href="./index.html" class="wordmark" aria-label="Sonora, início"
+        ><img
+          class="brand-mark"
+          width="36"
+          height="36"
+          src="./images/sonora-logo.png"
+          alt=""
+        /><span>sonora<span class="brand-dot">.</span></span></a
+      >
+      <nav aria-label="Navegação">
+        <a href="./index.html">Produto</a
+        ><a href="./arquitetura.html" aria-current="page">Arquitetura</a
+        ><a href="./api-docs.html">API Docs ↗</a>
+      </nav>
+    </header>
+    <main id="percurso" class="arch-main">
+      <div class="arch-intro">
+        <h1>Mapa do <span>Sonora.</span></h1>
+        <p>
+          Explore as conexões entre as fontes, os serviços e quem consulta o
+          perfil acústico.
+        </p>
+      </div>
+      <section class="atlas" aria-label="Diagrama de arquitetura">
+        <div class="map-toolbar">
+          <div class="map-controls" role="group" aria-label="Visão do diagrama">
+            <button data-map="flow">Fluxo de dados</button
+            ><button data-map="infra">Infraestrutura</button>
+          </div>
+          <button id="play">Guiar pelo mapa</button>
+        </div>
+        <div class="map-board">
+          <svg class="map-lines" aria-hidden="true">
+            <defs>
+              <marker
+                id="arrow"
+                markerWidth="6"
+                markerHeight="6"
+                refX="5"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L6,3 L0,6 Z" fill="#72829a" />
+              </marker>
+              <marker
+                id="arrow-on"
+                markerWidth="6"
+                markerHeight="6"
+                refX="5"
+                refY="3"
+                orient="auto"
+              >
+                <path d="M0,0 L6,3 L0,6 Z" fill="#2549d9" />
+              </marker>
+            </defs>
+          </svg>
+          <div
+            class="map-nodes"
+            role="group"
+            aria-label="Blocos do diagrama"
+          ></div>
+        </div>
+        <div class="map-footer" aria-live="polite">
+          <h2 id="stage-title"></h2>
+          <p id="narration"></p>
+        </div>
+      </section>
+      <section class="support">
+        <h2>Quem sustenta o percurso?</h2>
+        <details>
+          <summary>
+            <i class="ph ph-terminal-window" aria-hidden="true"></i
+            ><span>Linux</span>Infraestrutura
+          </summary>
+          <p>
+            A VM Ubuntu na Azure hospeda Java, C# e PostgreSQL. O proxy
+            encaminha as requisições HTTPS, o systemd mantém os serviços ativos
+            e o monitor acompanha CPU, memória e disco. O aplicativo roda no
+            aparelho.
+          </p>
+        </details>
+        <details>
+          <summary>
+            <i class="ph ph-list-checks" aria-hidden="true"></i
+            ><span>Testing</span>Qualidade de ponta a ponta
+          </summary>
+          <p>
+            A frente de Testing organiza as jornadas, os critérios de aceite e
+            os casos de teste no Azure Boards. Um dos cenários acompanha o
+            reenvio de uma leitura pelo dispositivo e verifica se há apenas um
+            registro. Outro confere se uma consulta sem observações retorna
+            <code>no_data</code>.
+          </p>
+        </details>
+        <a
+          class="text-link"
+          href="https://github.com/peguidotte/sonora/blob/main/docs/arquitetura.md"
+          >Ler a arquitetura do projeto ↗</a
+        >
+      </section>
+    </main>
+  </body>
+</html>
