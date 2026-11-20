@@ -8,6 +8,21 @@ Repositório: [github.com/peguidotte/sonora/tree/main/mobile](https://github.com
 
 ---
 
+## Ficha CitizenTech
+
+| Item | Sonora |
+| --- | --- |
+| Território | São Paulo (SP). A demonstração usa locais selecionados e os dados públicos têm cobertura irregular. |
+| Quem se beneficia | Quem está pesquisando um imóvel em São Paulo e quer entender o contexto acústico do entorno. |
+| Problema | É difícil comparar a medição de ruído de dois locais antes de visitar ou escolher um imóvel. |
+| Como funciona | O app consulta perfis acústicos do C#, exibe período, origem e cobertura e permite guardar favoritos. A demonstração também funciona com dados sintéticos. |
+| Papel de cada parte | Wokwi simula medições. Java recebe e grava no PostgreSQL. C# consulta as views e calcula o perfil. Mobile apresenta os resultados e guarda favoritos e consultas em SQLite. |
+| Indicador a medir | Percentual de consultas que encontram observações e tempo coberto pelas medições em cada recorte. |
+| ODS | ODS 3, Saúde e Bem-estar, e ODS 11, Cidades e Comunidades Sustentáveis. |
+| Repositório e integrantes | [Sonora no GitHub](https://github.com/peguidotte/sonora) · [Equipe](../README.md#equipe) |
+
+---
+
 ## 1. Introdução e problemática
 
 ### 1.1 Introdução
@@ -170,9 +185,9 @@ Capturadas com o visual atual, rodando o app no Expo web: 01–04 em modo mock l
 | -------------------------------------------- | -------------------------------------------------------- | -------------------------------------------------- |
 | ![Lista de locais](evidencias/01-locais.png) | ![Perfil acústico de um local](evidencias/02-perfil.png) | ![Lista de favoritos](evidencias/03-favoritos.png) |
 
-| Comparação                                                 | Integrado com a API real                                        | Cache offline                                                              |
+| Comparação                                                 | Conectado a um stub HTTP local                                        | Cache offline                                                              |
 | ---------------------------------------------------------- | --------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| ![Comparação de dois locais](evidencias/04-comparacao.png) | ![Tela Settings conectada à API C#](evidencias/05-api-real.png) | ![Perfil servido do cache offline](evidencias/06-perfil-salvo-offline.png) |
+| ![Comparação de dois locais](evidencias/04-comparacao.png) | ![Tela Settings conectada a um stub HTTP local](evidencias/05-api-real.png) | ![Perfil servido do cache offline após consulta ao stub local](evidencias/06-perfil-salvo-offline.png) |
 
 ---
 
@@ -243,7 +258,7 @@ Exigência do professor e tarefa coletada (PDF CitizenTech p. 34; íntegra na [f
 | Entregável pedido                     | Onde está                                                                     |
 | ------------------------------------- | ----------------------------------------------------------------------------- |
 | Código do app organizado              | [Arquitetura e organização do código](#4-arquitetura-e-organização-do-código) |
-| Ficha CitizenTech da disciplina       | [docs/disciplinas/mobile.md](../docs/disciplinas/mobile.md)                   |
+| Ficha CitizenTech da disciplina       | [Ficha CitizenTech preenchida](#ficha-citizentech)                             |
 | Instruções para rodar o app           | [Como executar](#12-como-executar)                                            |
 | Prints das telas                      | [Capturas de tela](#10-capturas-de-tela)                                      |
 | Vídeo até 3 minutos com o app rodando | [Vídeo demonstrativo](#11-vídeo-demonstrativo)                                |
