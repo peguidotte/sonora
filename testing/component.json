@@ -1,6 +1,6 @@
 {
   "component": "testing",
-  "status": "in_progress",
+  "status": "ready",
   "owner": "Felipe Soares Xavier",
   "rm": "556931",
   "branch": "felipe/testing",
@@ -8,8 +8,10 @@
   "contract": "contracts/README.md",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
-    "dataMode": "explicit-seed-or-fixture"
+    "commands": [
+      "python testing/azure/publicar_azure.py https://dev.azure.com/sonona-gs Sonora --dry-run"
+    ],
+    "dataMode": "azure-boards-source-text"
   },
   "integrated": {
     "status": "in_progress",
@@ -20,11 +22,29 @@
     ]
   },
   "validation": {
-    "commands": [],
-    "evidence": []
+    "commands": [
+      "python testing/azure/publicar_azure.py https://dev.azure.com/sonona-gs Sonora --dry-run"
+    ],
+    "evidence": [
+      "testing/Sonora-Testing-RM556931.pdf",
+      "testing/evidencias/01-features-lista.png",
+      "testing/evidencias/02-F01.png",
+      "testing/evidencias/03-F02.png",
+      "testing/evidencias/04-F03.png",
+      "testing/evidencias/05-F04.png",
+      "testing/evidencias/06-F05.png",
+      "testing/evidencias/07-F06.png",
+      "testing/evidencias/08-F07.png",
+      "testing/evidencias/09-F08.png",
+      "testing/evidencias/10-testcases-lista.png",
+      "testing/evidencias/11-tc-positivo.png",
+      "testing/evidencias/12-tc-negativo.png",
+      "testing/evidencias/13-professor-admin.png"
+    ]
   },
   "deployment": {
     "target": "azure-boards",
-    "status": "not-deployed"
+    "status": "deployed",
+    "url": "https://dev.azure.com/sonona-gs/Sonora"
   }
 }
