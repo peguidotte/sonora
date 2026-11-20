@@ -195,7 +195,7 @@ jobs:
       - name: Instalar e validar TypeScript
         working-directory: mobile
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npx tsc --noEmit
       - name: Gerar Android com Expo e compilar APK de demonstração
         working-directory: mobile

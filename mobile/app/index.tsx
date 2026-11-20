@@ -1,12 +1,15 @@
 import { Link, useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { FlatList, Pressable, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { ScreenContainer } from "../src/components/ScreenContainer";
 import { ThemedText } from "../src/components/ThemedText";
+import { Card } from "../src/components/Card";
+import { Chip } from "../src/components/Chip";
 import { ErrorState, LoadingState } from "../src/components/QueryStates";
 import { useAccessibility } from "../src/accessibility/AccessibilityContext";
 import { useSession } from "../src/session/SessionContext";
-import { highContrastTheme, MIN_TOUCH_TARGET, normalTheme } from "../src/theme";
+import { highContrastTheme, normalTheme, spacing } from "../src/theme";
 import type { Location } from "../src/api/types";
 
 type State =
@@ -39,75 +42,64 @@ export default function LocationsScreen() {
 
   return (
     <ScreenContainer>
-      <ThemedText variant="title" accessibilityRole="header">
-        Sonora
-      </ThemedText>
-      <ThemedText variant="muted">
-        Mode: {mode === "mock" ? "Local mock data" : "Integrated with configured API"}
-      </ThemedText>
+      <View style={{ gap: spacing.xs }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+          <Feather name="radio" size={26} color={theme.accent} />
+          <ThemedText variant="title" accessibilityRole="header">
+            Sonora
+          </ThemedText>
+        </View>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.xs,
+            alignSelf: "flex-start",
+            paddingHorizontal: spacing.sm,
+            paddingVertical: spacing.xs / 2,
+            borderRadius: 999,
+            backgroundColor: theme.surfaceAlt,
+          }}
+        >
+          <Feather name={mode === "mock" ? "cpu" : "wifi"} size={14} color={theme.muted} />
+          <ThemedText variant="muted">
+            {mode === "mock" ? "Local mock data" : "Integrated with configured API"}
+          </ThemedText>
+        </View>
+      </View>
 
-      <View style={{ flexDirection: "row", gap: 12 }}>
-        <NavButton label="Favorites" onPress={() => router.push("/favorites")} theme={theme} />
-        <NavButton label="Compare" onPress={() => router.push("/compare")} theme={theme} />
-        <NavButton label="Settings" onPress={() => router.push("/settings")} theme={theme} />
+      <View style={{ flexDirection: "row", gap: spacing.sm, flexWrap: "wrap" }}>
+        <Chip label="Favorites" icon="star" onPress={() => router.push("/favorites")} />
+        <Chip label="Compare" icon="bar-chart-2" onPress={() => router.push("/compare")} />
+        <Chip label="Settings" icon="settings" onPress={() => router.push("/settings")} />
       </View>
 
       {state.status === "loading" ? <LoadingState label="Loading locations…" /> : null}
       {state.status === "error" ? <ErrorState message={state.message} /> : null}
       {state.status === "ready" ? (
-        <FlatList
-          data={state.items}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-          renderItem={({ item }) => (
-            <Link href={`/locations/${item.id}`} asChild>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Open ${item.name}, ${item.city}`}
-                style={{
-                  minHeight: MIN_TOUCH_TARGET,
-                  padding: 12,
-                  borderRadius: 8,
-                  borderWidth: 1,
-                  borderColor: theme.border,
-                  backgroundColor: theme.surface,
-                  marginBottom: 8,
-                }}
-              >
-                <ThemedText>{item.name}</ThemedText>
-                <ThemedText variant="muted">{item.city}</ThemedText>
-              </Pressable>
-            </Link>
-          )}
-        />
+        <View style={{ gap: spacing.sm }}>
+          <ThemedText variant="label">Monitored locations</ThemedText>
+          <FlatList
+            data={state.items}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+            ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
+            renderItem={({ item }) => (
+              <Link href={`/locations/${item.id}`} asChild>
+                <Pressable accessibilityRole="button" accessibilityLabel={`Open ${item.name}, ${item.city}`}>
+                  <Card style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <View style={{ gap: 2 }}>
+                      <ThemedText variant="subtitle">{item.name}</ThemedText>
+                      <ThemedText variant="muted">{item.city}</ThemedText>
+                    </View>
+                    <Feather name="chevron-right" size={20} color={theme.muted} />
+                  </Card>
+                </Pressable>
+              </Link>
+            )}
+          />
+        </View>
       ) : null}
     </ScreenContainer>
-  );
-}
-
-function NavButton({
-  label,
-  onPress,
-  theme,
-}: {
-  label: string;
-  onPress: () => void;
-  theme: typeof normalTheme;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      onPress={onPress}
-      style={{
-        minHeight: MIN_TOUCH_TARGET,
-        paddingHorizontal: 12,
-        justifyContent: "center",
-        borderRadius: 8,
-        backgroundColor: theme.accent,
-      }}
-    >
-      <ThemedText style={{ color: "#FFFFFF" }}>{label}</ThemedText>
-    </Pressable>
   );
 }

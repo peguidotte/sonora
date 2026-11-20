@@ -9,7 +9,7 @@
   "standalone": {
     "requiresCloud": false,
     "commands": [
-      "npm ci",
+      "npm ci --legacy-peer-deps",
       "npx tsc --noEmit",
       "npx jest",
       "npx expo start"
@@ -25,21 +25,12 @@
   "validation": {
     "commands": [
       "npx tsc --noEmit",
-      "npx jest",
-      "npx expo export --platform android",
-      "./gradlew assembleRelease"
+      "npx jest"
     ],
-    "evidence": [
-      "mobile/evidencias/01-locais.png",
-      "mobile/evidencias/02-perfil.png",
-      "mobile/evidencias/03-favoritos.png",
-      "mobile/evidencias/04-comparacao.png",
-      "mobile/evidencias/05-api-real.png",
-      "mobile/evidencias/06-perfil-salvo-offline.png"
-    ]
+    "evidence": []
   },
   "deployment": {
-    "target": "expo-prebuild-android-demo-apk",
-    "status": "demo-release"
+    "target": "expo-prebuild-android-debug-apk",
+    "status": "not-deployed"
   }
 }

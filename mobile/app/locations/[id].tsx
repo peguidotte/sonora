@@ -1,22 +1,24 @@
 import { useLocalSearchParams } from "expo-router";
 import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { ScreenContainer } from "../../src/components/ScreenContainer";
 import { ThemedText } from "../../src/components/ThemedText";
+import { Card } from "../../src/components/Card";
+import { Chip } from "../../src/components/Chip";
 import { EmptyState, ErrorState, LoadingState, OfflineCacheBanner } from "../../src/components/QueryStates";
 import { useAccessibility } from "../../src/accessibility/AccessibilityContext";
 import { useSession } from "../../src/session/SessionContext";
 import { useProfile } from "../../src/hooks/useProfile";
 import { describeCoverage } from "../../src/domain/compare";
 import { lastHourWindow } from "../../src/domain/period";
-import { loadLatestProfile } from "../../src/storage/cache";
 import { addFavorite, isFavorite, removeFavorite } from "../../src/storage/favorites";
-import { highContrastTheme, MIN_TOUCH_TARGET, normalTheme } from "../../src/theme";
+import { highContrastTheme, MIN_TOUCH_TARGET, normalTheme, radius, spacing } from "../../src/theme";
 import type { Location, Origin } from "../../src/api/types";
 
 export default function LocationDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { client, mode } = useSession();
+  const { client } = useSession();
   const { highContrast } = useAccessibility();
   const theme = highContrast ? highContrastTheme : normalTheme;
 
@@ -32,8 +34,6 @@ export default function LocationDetailScreen() {
 
   const { result, reload } = useProfile({ locationId: id, origin, ...window });
 
-  const saved = favorite && mode === "mock" ? loadLatestProfile(id, origin) : null;
-
   function toggleFavorite() {
     if (!location) return;
     if (favorite) {
@@ -47,10 +47,17 @@ export default function LocationDetailScreen() {
 
   return (
     <ScreenContainer>
-      <ThemedText variant="title" accessibilityRole="header">
-        {location?.name ?? "Location"}
-      </ThemedText>
-      {location ? <ThemedText variant="muted">{location.city}</ThemedText> : null}
+      <View style={{ gap: spacing.xs }}>
+        <ThemedText variant="title" accessibilityRole="header">
+          {location?.name ?? "Location"}
+        </ThemedText>
+        {location ? (
+          <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
+            <Feather name="map-pin" size={14} color={theme.muted} />
+            <ThemedText variant="muted">{location.city}</ThemedText>
+          </View>
+        ) : null}
+      </View>
 
       <Pressable
         accessibilityRole="button"
@@ -58,25 +65,45 @@ export default function LocationDetailScreen() {
         onPress={toggleFavorite}
         style={{
           minHeight: MIN_TOUCH_TARGET,
+          flexDirection: "row",
+          alignItems: "center",
+          gap: spacing.xs,
           alignSelf: "flex-start",
-          paddingHorizontal: 16,
+          paddingHorizontal: spacing.lg,
           justifyContent: "center",
-          borderRadius: 8,
+          borderRadius: radius.pill,
           borderWidth: 1,
           borderColor: theme.accent,
+          backgroundColor: favorite ? theme.accent : "transparent",
         }}
       >
-        <ThemedText>{favorite ? "★ Favorited" : "☆ Add to favorites"}</ThemedText>
+        <Feather name="star" size={16} color={favorite ? theme.accentText : theme.accent} />
+        <ThemedText style={{ color: favorite ? theme.accentText : theme.accent }}>
+          {favorite ? "Favorited" : "Add to favorites"}
+        </ThemedText>
       </Pressable>
 
-      <View style={{ flexDirection: "row", gap: 8 }}>
-        <OriginButton label="Simulated" active={origin === "simulated"} onPress={() => setOrigin("simulated")} theme={theme} />
-        <OriginButton label="Public dataset" active={origin === "public_dataset"} onPress={() => setOrigin("public_dataset")} theme={theme} />
+      <View style={{ gap: spacing.sm }}>
+        <ThemedText variant="label">Data origin</ThemedText>
+        <View style={{ flexDirection: "row", gap: spacing.sm }}>
+          <Chip
+            label="Simulated"
+            icon="cpu"
+            selected={origin === "simulated"}
+            onPress={() => setOrigin("simulated")}
+          />
+          <Chip
+            label="Public dataset"
+            icon="database"
+            selected={origin === "public_dataset"}
+            onPress={() => setOrigin("public_dataset")}
+          />
+        </View>
       </View>
 
       {result.status === "loading" ? <LoadingState label="Loading noise profile…" /> : null}
 
-      {result.status === "ready" && !saved ? (
+      {result.status === "ready" ? (
         <ProfileCard laeq={result.profile.laeqDbA} coverage={describeCoverage(result.profile)} origin={result.profile.origin} theme={theme} />
       ) : null}
 
@@ -87,48 +114,9 @@ export default function LocationDetailScreen() {
         </>
       ) : null}
 
-      {saved && result.status !== "offline-cache" ? (
-        <>
-          <ThemedText variant="title">Saved API profile</ThemedText>
-          <ThemedText variant="muted">{new Date(saved.fetchedAt).toLocaleString()}</ThemedText>
-          <ProfileCard laeq={saved.profile.laeqDbA} coverage={describeCoverage(saved.profile)} origin={saved.profile.origin} theme={theme} />
-        </>
-      ) : null}
       {result.status === "auth-error" ? <ErrorState message={result.message} /> : null}
       {result.status === "error" ? <ErrorState message={result.message} onRetry={reload} /> : null}
     </ScreenContainer>
-  );
-}
-
-function OriginButton({
-  label,
-  active,
-  onPress,
-  theme,
-}: {
-  label: string;
-  active: boolean;
-  onPress: () => void;
-  theme: typeof normalTheme;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      accessibilityState={{ selected: active }}
-      onPress={onPress}
-      style={{
-        minHeight: MIN_TOUCH_TARGET,
-        paddingHorizontal: 12,
-        justifyContent: "center",
-        borderRadius: 8,
-        borderWidth: active ? 2 : 1,
-        borderColor: theme.accent,
-        backgroundColor: active ? theme.accent : theme.surface,
-      }}
-    >
-      <ThemedText style={{ color: active ? "#FFFFFF" : undefined }}>{label}</ThemedText>
-    </Pressable>
   );
 }
 
@@ -147,14 +135,16 @@ function ProfileCard({
     return <EmptyState message="No observations in the requested period for this origin." />;
   }
   return (
-    <View
+    <Card
       accessibilityRole="text"
       accessibilityLabel={`Noise level ${laeq.toFixed(1)} decibels A, origin ${origin}, ${coverage}`}
-      style={{ padding: 16, borderRadius: 8, backgroundColor: theme.surface, borderWidth: 1, borderColor: theme.border, gap: 4 }}
     >
-      <ThemedText variant="title">{laeq.toFixed(1)} dB(A)</ThemedText>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+        <Feather name="volume-2" size={22} color={theme.accent} />
+        <ThemedText variant="title">{laeq.toFixed(1)} dB(A)</ThemedText>
+      </View>
       <ThemedText variant="muted">Origin: {origin}</ThemedText>
       <ThemedText variant="muted">{coverage}</ThemedText>
-    </View>
+    </Card>
   );
 }

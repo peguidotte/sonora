@@ -16,7 +16,7 @@ export function ensureSchema(): void {
       added_at TEXT NOT NULL
     );
 
-    CREATE TABLE IF NOT EXISTS integrated_profile_cache (
+    CREATE TABLE IF NOT EXISTS profile_cache (
       location_id TEXT NOT NULL,
       origin TEXT NOT NULL,
       from_ts TEXT NOT NULL,

@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../session/SessionContext";
-import { SonoraApiError, SonoraNetworkError, type GetProfileParams, type Profile } from "../api/types";
-import { loadLatestProfile, saveProfileCache } from "../storage/cache";
+import {
+  SonoraApiError,
+  SonoraNetworkError,
+  type GetProfileParams,
+  type Profile,
+} from "../api/types";
+import { loadProfileCache, saveProfileCache } from "../storage/cache";
 
 export type ProfileResult =
   | { status: "loading" }
@@ -18,35 +23,51 @@ export function authErrorMessage(statusCode: number): string {
 }
 
 export function useProfile(params: GetProfileParams) {
-  const { client, mode } = useSession();
+  const { client } = useSession();
   const [result, setResult] = useState<ProfileResult>({ status: "loading" });
 
   const load = useCallback(async () => {
     setResult({ status: "loading" });
     try {
       const profile = await client.getProfile(params);
-      if (mode === "integrated") saveProfileCache(params, profile);
+      saveProfileCache(params, profile);
       setResult({ status: "ready", profile });
     } catch (error) {
       if (error instanceof SonoraNetworkError) {
-        const cached = mode === "integrated" ? loadLatestProfile(params.locationId, params.origin) : null;
+        const cached = loadProfileCache(params);
         if (cached) {
-          setResult({ status: "offline-cache", profile: cached.profile, fetchedAt: cached.fetchedAt });
+          setResult({
+            status: "offline-cache",
+            profile: cached.profile,
+            fetchedAt: cached.fetchedAt,
+          });
           return;
         }
-        setResult({ status: "error", message: "Offline and no cached data for this location yet." });
+        setResult({
+          status: "error",
+          message: "Offline and no cached data for this location yet.",
+        });
         return;
       }
-      if (error instanceof SonoraApiError && (error.status === 401 || error.status === 403)) {
-        setResult({ status: "auth-error", message: authErrorMessage(error.status) });
+      if (
+        error instanceof SonoraApiError &&
+        (error.status === 401 || error.status === 403)
+      ) {
+        setResult({
+          status: "auth-error",
+          message: authErrorMessage(error.status),
+        });
         return;
       }
-      setResult({ status: "error", message: "Could not load the noise profile." });
+      setResult({
+        status: "error",
+        message: "Could not load the noise profile.",
+      });
     }
     // params is a plain object rebuilt by the caller on every relevant change;
     // intentionally depending on its serialized form, not identity.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, mode, JSON.stringify(params)]);
+  }, [client, JSON.stringify(params)]);
 
   useEffect(() => {
     load();
