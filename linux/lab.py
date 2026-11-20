@@ -208,17 +208,12 @@ table{{border-collapse:collapse;width:100%}}td,th{{padding:10px;border-bottom:1p
 aside{{background:#fff3cf;padding:16px}}code{{overflow-wrap:anywhere}}</style>
 <h1>Sonora — laboratório Linux</h1><p>Estado: <strong>{html.escape(status)}</strong>.</p>
 <p>VM local VirtualBox, Ubuntu 24.04 amd64, uma interface NAT. Não é evidência de deploy Azure/ARM64.</p>
-<aside>Entrega acadêmica incompleta: falta aplicação funcional de outra disciplina com banco de domínio e a demonstração final.</aside>
+<aside>Este ensaio verifica a infraestrutura local. A execução das aplicações na Azure e o vídeo estão documentados no README de Linux.</aside>
 <p>Commit-base: <code>{state['sourceCommit']}</code>. Os hashes dos arquivos testados estão em
 <a href="environment.json">environment.json</a>; alterações locais: {state.get('sourceWorktreeDirty', True)}.</p>
 <table><tr><th>Etapa concluída</th><th>Duração</th><th>Evidência</th></tr>{rows}</table>
 <p><a href="00-clean-boot.log">Primeiro boot</a> · <a href="terminal.cast">Gravação de terminal</a> ·
 <a href="results.json">Resultados</a> · <a href="sha256.json">Hashes</a></p>
-<h2>Seleção para vídeo de até sete minutos</h2>
-<ol><li>Contexto e estado limpo (30 s).</li><li>Provisionamento e reexecução (60 s; identificar cortes/aceleração).</li>
-<li>IP, DNS, aplicação de rede e rollback (70 s).</li><li>Monitor, carga, alerta e recuperação após crash (60 s).</li>
-<li>Reboot real, serviços e persistência (40 s).</li><li>Reservar 100 s para aplicação real/banco/falha, ainda pendentes.</li>
-<li>Logs e limites da entrega (30 s).</li></ol>
 <p>Logs e terminal.cast preservam a execução original. Abrir a gravação em um player compatível com asciicast v2.
 Não apresentar simulação, aplicação ausente ou trecho não executado como concluído.</p></html>'''
     (evidence / 'index.html').write_text(content, encoding='utf-8')

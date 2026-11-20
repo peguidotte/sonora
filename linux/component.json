@@ -1,6 +1,6 @@
 {
   "component": "linux",
-  "status": "in_progress",
+  "status": "ready",
   "owner": "Pedro Visconti Guidotte",
   "rm": "556630",
   "branch": "pedro/operating-systems",
@@ -16,7 +16,7 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "validated",
     "dependencies": [
       "postgresql",
       "api",
@@ -30,10 +30,18 @@
       "sudo bash linux/verify.sh --infrastructure-only --load-test",
       "sudo bash linux/verify.sh"
     ],
-    "evidence": []
+    "evidence": [
+      "linux/Sonora-Linux-v2.mp4",
+      "linux/evidencias/01-provisionamento.png",
+      "linux/evidencias/02-rede.png",
+      "linux/evidencias/03-monitoramento.png",
+      "linux/evidencias/04-recuperacao.png",
+      "linux/evidencias/05-aplicacao-azure.png",
+      "linux/evidencias/painel-azure.png"
+    ]
   },
   "deployment": {
     "target": "azure-vm-and-local-vm",
-    "status": "infrastructure-provisioned-applications-pending"
+    "status": "deployed"
   }
 }

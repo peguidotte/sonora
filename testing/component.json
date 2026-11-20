@@ -14,7 +14,7 @@
     "dataMode": "azure-boards-source-text"
   },
   "integrated": {
-    "status": "planned",
+    "status": "in_progress",
     "dependencies": [
       "api",
       "soa",

@@ -17,7 +17,7 @@
     "dataMode": "postgresql-and-local-inputs"
   },
   "integrated": {
-    "status": "planned",
+    "status": "validated",
     "dependencies": [
       "postgresql"
     ]
@@ -40,6 +40,6 @@
   },
   "deployment": {
     "target": "azure-vm",
-    "status": "not-deployed"
+    "status": "deployed"
   }
 }

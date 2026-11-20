@@ -97,7 +97,8 @@ jobs:
             SONORA_DB_USER=sonora_ingest SONORA_DB_PASSWORD=ci-ingest-only python deploy/pipeline.py package soa
           fi
           if [[ "$DO_API" == 'true' ]]; then
-            SONORA_DB_USER=sonora_query SONORA_DB_PASSWORD=ci-query-only python deploy/pipeline.py package api
+            SONORA_ALLOW_DEV_SEED=1 bash database/migrate.sh seed
+            SONORA_DB_INTEGRATION=1 SONORA_DB_USER=sonora_query SONORA_DB_PASSWORD=ci-query-only python deploy/pipeline.py package api
           fi
       - name: Conferir contratos contra PostgreSQL real e versão anterior
         env:
@@ -194,7 +195,7 @@ jobs:
       - name: Instalar e validar TypeScript
         working-directory: mobile
         run: |
-          npm ci
+          npm ci --legacy-peer-deps
           npx tsc --noEmit
       - name: Gerar Android com Expo e compilar APK de demonstração
         working-directory: mobile
@@ -202,12 +203,12 @@ jobs:
           npx expo prebuild --platform android --clean --no-install
           cd android
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          ./gradlew assembleRelease --no-daemon
       - uses: actions/upload-artifact@v4
         if: github.ref == 'refs/heads/main'
         with:
           name: sonora-android-demo
-          path: mobile/android/app/build/outputs/apk/debug/*.apk
+          path: mobile/android/app/build/outputs/apk/release/*.apk
           if-no-files-found: error
           retention-days: 1
       - name: Explicar distribuição

@@ -1,18 +1,28 @@
-# Azure Boards, PDF e pitch
+# Testing, Compliance & Quality Assurance
 
-Responsável: **Felipe Soares Xavier, RM556931**. [Equipe completa](../README.md#equipe).
+**Felipe Soares Xavier · RM 556931** · [Equipe](../README.md#equipe) · [Rubrica](../docs/disciplinas/testing.md)
 
-[Especificação da matéria](../docs/disciplinas/testing.md) · [Arquitetura](../docs/arquitetura.md) · [Contratos](../contracts/README.md).
+A jornada principal começa quando o dispositivo envia uma observação. O Java a grava uma vez, mesmo com reenvio, e o C# permite consultá-la por local e horário. Esses comportamentos orientam as Features e os Test Cases no Azure Boards.
+
+| Jornada | Caso positivo | Caso negativo |
+| --- | --- | --- |
+| Ingestão | A primeira leitura retorna 201. Um reenvio idêntico retorna o mesmo registro. | A mesma identificação com dados divergentes retorna 409. |
+| Consulta | Duas janelas de mesma duração a 60 e 70 dB resultam em aproximadamente 67,4 dB. | Sem observações no período, a API devolve `no_data` e nível nulo. |
+| Operação | Após o retorno do banco, as APIs voltam a responder e a observação continua disponível. | Com o banco indisponível, a prontidão retorna 503. |
+
+Os cenários completos estão na [especificação da disciplina](../docs/disciplinas/testing.md). A [demonstração integrada](../linux/README.md) permite reproduzir a jornada de ingestão e consulta.
 
 ## Entrega
 
 | Item da rubrica | Onde está |
 | --- | --- |
-| Features com descrição e critérios de aceite (50%) | Azure Boards: <https://dev.azure.com/sonona-gs/Sonora> (8 Features, F01 a F08) |
+| Features com descrição e critérios de aceite (50%) | Projeto acadêmico no Azure Boards (acesso sujeito a permissão): <https://dev.azure.com/sonona-gs/Sonora> (8 Features, F01 a F08) |
 | Test Cases funcionais de caixa-preta, positivos e negativos (50%) | Azure Boards: 53 Test Cases (18 positivos, 35 negativos), vinculados às Features por *Tested By* |
 | Professor como administrador | Project settings → Permissions → Project Administrators |
 | PDF com link e prints | [Sonora-Testing-RM556931.pdf](Sonora-Testing-RM556931.pdf) (prints em [evidencias/](evidencias/)) |
-| VIDEO PITCH GS | Link do YouTube na capa do PDF |
+| VIDEO PITCH GS | O PDF remete à descrição da entrega no Teams para o link do pitch |
+
+A cópia pública da captura de administradores e a figura correspondente no PDF ocultam os e-mails institucionais. Os casos foram cadastrados no Boards. As evidências documentam o cadastro.
 
 ## Features
 

@@ -58,15 +58,14 @@
             }
           },
           "503": {
-            "description": "Request failed. Sanitized English error response.",
+            "description": "Database or published views unavailable.",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/Health"
                 },
                 "example": {
-                  "code": "invalid_request",
-                  "message": "Invalid request."
+                  "status": "unavailable"
                 }
               }
             }

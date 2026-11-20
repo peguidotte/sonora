@@ -1,6 +1,6 @@
 {
   "component": "iot",
-  "status": "planned",
+  "status": "ready",
   "owner": "Leonardo Correa de Mello",
   "rm": "555573",
   "branch": "leo/iot",
@@ -8,18 +8,28 @@
   "contract": "contracts/openapi/soa.openapi.json",
   "standalone": {
     "requiresCloud": false,
-    "commands": [],
+    "commands": [
+      "cd iot && pio run",
+      "python tools/mock_server.py --service soa --port 4011"
+    ],
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "validated",
     "dependencies": [
-      "soa"
+      "soa",
+      "postgresql"
     ]
   },
   "validation": {
-    "commands": [],
-    "evidence": []
+    "commands": [
+      "c++ -std=c++17 -Wall -Wextra -I iot/include iot/test/host/test_acoustic.cpp -o output/iot-host-tests && output/iot-host-tests",
+      "cd iot && pio run"
+    ],
+    "evidence": [
+      "iot/README.md",
+      "iot/INTEGRANTES.txt"
+    ]
   },
   "deployment": {
     "target": "wokwi",
