@@ -9,7 +9,7 @@
   "standalone": {
     "requiresCloud": false,
     "commands": [
-      "npm ci",
+      "npm ci --legacy-peer-deps",
       "npx tsc --noEmit",
       "npx jest",
       "npx expo start"
@@ -17,7 +17,7 @@
     "dataMode": "explicit-seed-or-fixture"
   },
   "integrated": {
-    "status": "planned",
+    "status": "verified-local-emulator",
     "dependencies": [
       "api"
     ]

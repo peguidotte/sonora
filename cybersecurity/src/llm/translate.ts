@@ -29,7 +29,6 @@ function buildPrompt(event: DiagnosticEvent): string {
     `Código: ${event.code}`,
     `Sink: ${event.sink}`,
     `Categoria de dado envolvida: ${CATEGORY_LABEL[event.category]}`,
-    `Fonte da contaminação: ${event.source}`,
     `Não cite valores, nomes de variáveis internas ou termos técnicos como "taint" ou "sink".`,
   ].join("\n");
 }

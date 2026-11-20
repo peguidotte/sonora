@@ -32,3 +32,10 @@ test("ponta a ponta: payload com saúde e credencial produz farol vermelho expli
   assert.equal(report.level, "vermelho");
   assert.match(report.explanation, /score=6/);
 });
+
+test("fonte fora do catálogo recebe rótulo público mesmo com formato válido", async () => {
+  const log = new SecurityEventLog();
+  const { events } = await interceptRequest({ password: "amostra" }, "identificador-particular", log);
+  assert.equal(events.length, 2);
+  assert.ok(events.every(event => event.source === "manual"));
+});

@@ -26,6 +26,10 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 
 | 14/11/2026 | Implementar o app Mobile (Expo Router/TypeScript) após a entrega de Cybersecurity | Navegação completa (locais, perfil acústico, comparação, favoritos, settings), adaptador mock/HTTP único, SQLite para favoritos/cache offline com data, chave de API só em memória e acessibilidade (fonte/contraste/alvos de toque). `npm ci`, `tsc --noEmit`, `jest` (7/7) e `expo prebuild` android executados nesta máquina; execução integrada contra a API C# real, prints, vídeo e ficha CitizenTech continuam pendentes |
 
+| 13–16/11/2026 | Implementar a entrega de IA/ML (Gabriel) | Script e notebook KMeans + PCA sobre o dump NoiseCapture de São Paulo (hash conferido), limpeza registrada, divisão espacial, 16 combinações com GroupKFold só no treino, métricas treino/teste, figuras, relatório e summary.json validado no schema. Resultados executados localmente; vídeo e revisão do responsável pendentes |
+
+| 17/11/2026 | Aplicar a revisão técnica do PR de ML (Gabriel) | Download com criação da pasta, filtros explícitos de coordenadas/datas (0 pontos removidos no snapshot), texto do summary.json descrito como medianas entre sessões e conclusão sobre estabilidade espacial moderada. Pipeline e notebook reexecutados localmente com métricas inalteradas |
+
 | 13/11/2026 | Esclarecer e implementar a base de Cybersecurity (Herbert) | Identificada divergência: docs presumiam uma "base de aula" a localizar; doc do professor (Teams) confirma implementação do zero. Corrigidas as fichas afetadas e implementado middleware Node/TypeScript standalone (parsing de PII com regras/checksum, taint analysis com sinks guardados, tradução via LLM com fallback declarado, cálculo e render do dashboard Risco Cidadão), com fixtures sintéticas e 23 testes locais passando. Vídeo, print do painel e integração real com API/SOA continuam pendentes com o responsável. |
 
 | 14/11/2026 | Implementar a API C# de consulta (Leonardo) | Domínio acústico, EF Core sobre as views do contrato, rotas, segurança por escopo, painel e Scalar; testes de domínio/HTTP/segurança/EF e integração em PostgreSQL de laboratório com views equivalentes ao contrato. Em 16/11, após revisão do PR: correções do painel (sessão/abort ao desconectar, fuso America/Sao_Paulo histórico) com regressão em Node, e validação local com as migrations/seed oficiais e o fluxo ingestão Java → consulta C#. CI e deploy ainda pendentes |
@@ -35,3 +39,9 @@ Registro resumido para acompanhar a entrega acadêmica, sem publicar conversas p
 | 16/11/2026 | Implementar a entrega de SOA (Felipe) com assistente de IA | Migrations V2/V3, seed de laboratório e serviço Java (domínio, ingestão IoT, importação NoiseCapture, comando ML, OpenAPI gerado). Executados localmente em PostgreSQL 16 descartável: 30 testes Maven, testes de `tools/` e checker API/banco sem erros; importação do dump real conferida contra o banco. Revisão humana, PR, CI no GitHub e deploy ainda pendentes |
 
 Cada integrante deve acrescentar seus usos relevantes de IA, revisar e compreender o código produzido e registrar validação real. Não usar este registro como prova de testes ou execução não realizados.
+
+| 17/11/2026 | Implementar landing Sonora a partir de direção visual aprovada | Landing isolada com assets conceituais gerados por IA, demo acústica local, dispositivo e arquitetura interativos. Build e 5 testes de domínio passaram. QA visual/E2E bloqueado pelo navegador do ambiente; não houve deploy, merge ou execução de Actions. |
+
+Em 17/11, o grupo utilizou ImageGen para criar o símbolo acústico do Sonora. A marca aparece no site e no README. O assistente também apoiou a organização das entregas, os testes de integração e a preparação de evidências a partir de execuções reais.
+
+Em 18/11, o assistente apoiou a animação de abertura da landing, a adaptação ao celular e a integração do playground com o OpenAPI C#. A validação do site usa exemplos locais e dados sintéticos.

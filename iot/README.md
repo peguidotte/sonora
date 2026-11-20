@@ -1,4 +1,8 @@
-# Sonora — nó acústico simulado (ESP32/Wokwi)
+# Nó acústico · ESP32 e Wokwi
+
+[Abrir o circuito no Wokwi](https://wokwi.com/projects/480800721533486081) · [Assistir ao vídeo do Léo](https://www.youtube.com/watch?v=YdfbrvcihVM) · [Integrantes](INTEGRANTES.txt)
+
+Gire o potenciômetro no simulador para variar o sinal. O display mostra o nível da janela de cinco segundos e o estado de envio. O vídeo apresentado utiliza o mock de ingestão. A [PR de integração](https://github.com/peguidotte/sonora/pull/15) registra o ensaio com o Java e o banco.
 
 Responsável: **Leonardo Correa de Mello, RM555573** (Physical Computing: IoT & IoB). [Equipe completa](../README.md#equipe) · [integrantes (TXT da entrega)](INTEGRANTES.txt).
 
@@ -97,9 +101,3 @@ python iot/test/slow_ingest.py --port 4012 --delay 8
 cada POST fica preso até o timeout de 5 s e entra em reenvio, enquanto o serial continua mostrando uma janela a cada 5 s com `amostras=50 em 4900 ms`.
 
 Build do firmware: `pio run` em `iot/`. Comportamento elétrico, Wi-Fi e envio precisam ser demonstrados no simulador.
-
-## Entrega da matéria
-
-- Projeto Wokwi: https://wokwi.com/projects/480800721533486081 (circuito e firmware desta pasta; no wokwi.com o gateway público não alcança a ingestão local, então o envio fica em reenvio).
-- Vídeo (até 4 minutos): https://youtu.be/YdfbrvcihVM — circuito, potenciômetro alterando LCD/LEDs e envio ao **mock** da ingestão Java (resposta estática, sem persistência), executado no Wokwi for VS Code.
-- [INTEGRANTES.txt](INTEGRANTES.txt).

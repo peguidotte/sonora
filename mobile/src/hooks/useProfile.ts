@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { useSession } from "../session/SessionContext";
-import { SonoraApiError, SonoraNetworkError, type GetProfileParams, type Profile } from "../api/types";
+import {
+  SonoraApiError,
+  SonoraNetworkError,
+  type GetProfileParams,
+  type Profile,
+} from "../api/types";
 import { loadProfileCache, saveProfileCache } from "../storage/cache";
 
 export type ProfileResult =
@@ -31,17 +36,33 @@ export function useProfile(params: GetProfileParams) {
       if (error instanceof SonoraNetworkError) {
         const cached = loadProfileCache(params);
         if (cached) {
-          setResult({ status: "offline-cache", profile: cached.profile, fetchedAt: cached.fetchedAt });
+          setResult({
+            status: "offline-cache",
+            profile: cached.profile,
+            fetchedAt: cached.fetchedAt,
+          });
           return;
         }
-        setResult({ status: "error", message: "Offline and no cached data for this location yet." });
+        setResult({
+          status: "error",
+          message: "Offline and no cached data for this location yet.",
+        });
         return;
       }
-      if (error instanceof SonoraApiError && (error.status === 401 || error.status === 403)) {
-        setResult({ status: "auth-error", message: authErrorMessage(error.status) });
+      if (
+        error instanceof SonoraApiError &&
+        (error.status === 401 || error.status === 403)
+      ) {
+        setResult({
+          status: "auth-error",
+          message: authErrorMessage(error.status),
+        });
         return;
       }
-      setResult({ status: "error", message: "Could not load the noise profile." });
+      setResult({
+        status: "error",
+        message: "Could not load the noise profile.",
+      });
     }
     // params is a plain object rebuilt by the caller on every relevant change;
     // intentionally depending on its serialized form, not identity.

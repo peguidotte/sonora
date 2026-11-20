@@ -1,6 +1,6 @@
 {
   "component": "api",
-  "status": "in_progress",
+  "status": "ready",
   "owner": "Leonardo Correa de Mello",
   "rm": "555573",
   "branch": "leo/csharp",
@@ -14,7 +14,7 @@
     "dataMode": "postgresql-with-shared-schema-and-seed"
   },
   "integrated": {
-    "status": "in_progress",
+    "status": "validated",
     "dependencies": [
       "postgresql",
       "soa"
@@ -41,6 +41,6 @@
   },
   "deployment": {
     "target": "azure-vm",
-    "status": "not-deployed"
+    "status": "deployed"
   }
 }

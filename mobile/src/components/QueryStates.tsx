@@ -1,24 +1,39 @@
 import React from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { ThemedText } from "./ThemedText";
+import { Card } from "./Card";
 import { useAccessibility } from "../accessibility/AccessibilityContext";
-import { highContrastTheme, MIN_TOUCH_TARGET, normalTheme } from "../theme";
+import { highContrastTheme, MIN_TOUCH_TARGET, normalTheme, radius, spacing } from "../theme";
 
 export function LoadingState({ label = "Loading…" }: { label?: string }) {
+  const { highContrast } = useAccessibility();
+  const theme = highContrast ? highContrastTheme : normalTheme;
+
   return (
-    <View accessibilityRole="progressbar" accessibilityLabel={label} style={{ gap: 8, padding: 16 }}>
-      <ActivityIndicator accessibilityLabel={label} />
+    <View
+      accessibilityRole="progressbar"
+      accessibilityLabel={label}
+      style={{ alignItems: "center", gap: spacing.sm, padding: spacing.xl }}
+    >
+      <ActivityIndicator accessibilityLabel={label} color={theme.accent} size="large" />
       <ThemedText variant="muted">{label}</ThemedText>
     </View>
   );
 }
 
 export function EmptyState({ message }: { message: string }) {
+  const { highContrast } = useAccessibility();
+  const theme = highContrast ? highContrastTheme : normalTheme;
+
   return (
-    <View accessibilityRole="text" style={{ padding: 16, gap: 4 }}>
-      <ThemedText variant="title">No data</ThemedText>
-      <ThemedText variant="muted">{message}</ThemedText>
-    </View>
+    <Card accessibilityRole="text" style={{ alignItems: "center" }}>
+      <Feather name="volume-x" size={28} color={theme.muted} />
+      <ThemedText variant="subtitle">No data</ThemedText>
+      <ThemedText variant="muted" style={{ textAlign: "center" }}>
+        {message}
+      </ThemedText>
+    </Card>
   );
 }
 
@@ -35,9 +50,19 @@ export function ErrorState({
   return (
     <View
       accessibilityRole="alert"
-      style={{ padding: 16, gap: 8, borderWidth: 1, borderColor: theme.danger, borderRadius: 8 }}
+      style={{
+        padding: spacing.lg,
+        gap: spacing.sm,
+        borderWidth: 1,
+        borderColor: theme.danger,
+        borderRadius: radius.lg,
+        backgroundColor: theme.surface,
+      }}
     >
-      <ThemedText variant="title">Something went wrong</ThemedText>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+        <Feather name="alert-triangle" size={20} color={theme.danger} />
+        <ThemedText variant="subtitle">Something went wrong</ThemedText>
+      </View>
       <ThemedText>{message}</ThemedText>
       {onRetry ? (
         <Pressable
@@ -46,14 +71,18 @@ export function ErrorState({
           onPress={onRetry}
           style={{
             minHeight: MIN_TOUCH_TARGET,
+            flexDirection: "row",
+            gap: spacing.xs,
+            alignSelf: "flex-start",
             justifyContent: "center",
             alignItems: "center",
             backgroundColor: theme.accent,
-            borderRadius: 8,
-            paddingHorizontal: 16,
+            borderRadius: radius.md,
+            paddingHorizontal: spacing.lg,
           }}
         >
-          <ThemedText style={{ color: "#FFFFFF" }}>Try again</ThemedText>
+          <Feather name="refresh-cw" size={16} color={theme.accentText} />
+          <ThemedText style={{ color: theme.accentText }}>Try again</ThemedText>
         </Pressable>
       ) : null}
     </View>
@@ -70,13 +99,17 @@ export function OfflineCacheBanner({ fetchedAt }: { fetchedAt: string }) {
       accessibilityRole="text"
       accessibilityLabel={`Offline: showing data cached on ${formatted}`}
       style={{
-        padding: 12,
-        borderRadius: 8,
-        backgroundColor: theme.surface,
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.sm,
+        padding: spacing.md,
+        borderRadius: radius.md,
+        backgroundColor: theme.surfaceAlt,
         borderWidth: 1,
         borderColor: theme.border,
       }}
     >
+      <Feather name="wifi-off" size={16} color={theme.muted} />
       <ThemedText variant="muted">Offline — showing cached data from {formatted}.</ThemedText>
     </View>
   );

@@ -7,21 +7,40 @@ export interface CachedProfile {
 }
 
 function key(params: GetProfileParams) {
-  return [params.locationId, params.origin, params.from, params.to, params.aggregation ?? "hour"] as const;
+  return [
+    params.locationId,
+    params.origin,
+    params.from,
+    params.to,
+    params.aggregation ?? "hour",
+  ] as const;
 }
 
-export function saveProfileCache(params: GetProfileParams, profile: Profile): void {
+export function saveProfileCache(
+  params: GetProfileParams,
+  profile: Profile,
+): void {
   const db = getDatabase();
   const [locationId, origin, from, to, aggregation] = key(params);
   db.runSync(
     `INSERT OR REPLACE INTO profile_cache
       (location_id, origin, from_ts, to_ts, aggregation, payload, fetched_at)
       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-    [locationId, origin, from, to, aggregation, JSON.stringify(profile), new Date().toISOString()],
+    [
+      locationId,
+      origin,
+      from,
+      to,
+      aggregation,
+      JSON.stringify(profile),
+      new Date().toISOString(),
+    ],
   );
 }
 
-export function loadProfileCache(params: GetProfileParams): CachedProfile | null {
+export function loadProfileCache(
+  params: GetProfileParams,
+): CachedProfile | null {
   const db = getDatabase();
   const [locationId, origin, from, to, aggregation] = key(params);
   const row = db.getFirstSync<{ payload: string; fetched_at: string }>(
@@ -30,5 +49,8 @@ export function loadProfileCache(params: GetProfileParams): CachedProfile | null
     [locationId, origin, from, to, aggregation],
   );
   if (!row) return null;
-  return { profile: JSON.parse(row.payload) as Profile, fetchedAt: row.fetched_at };
+  return {
+    profile: JSON.parse(row.payload) as Profile,
+    fetchedAt: row.fetched_at,
+  };
 }

@@ -1,13 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Pressable, View } from "react-native";
+import { View } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { ScreenContainer } from "../src/components/ScreenContainer";
 import { ThemedText } from "../src/components/ThemedText";
+import { Card } from "../src/components/Card";
+import { Chip } from "../src/components/Chip";
 import { EmptyState, ErrorState, LoadingState } from "../src/components/QueryStates";
 import { useAccessibility } from "../src/accessibility/AccessibilityContext";
 import { useSession } from "../src/session/SessionContext";
 import { describeCoverage, findComparisonMismatches } from "../src/domain/compare";
 import { lastHourWindow } from "../src/domain/period";
-import { highContrastTheme, MIN_TOUCH_TARGET, normalTheme } from "../src/theme";
+import { highContrastTheme, normalTheme, spacing } from "../src/theme";
 import type { Location, Origin, Profile } from "../src/api/types";
 
 type Slot = { location: Location | null; profile: Profile | null; error: string | null };
@@ -45,16 +48,21 @@ export default function CompareScreen() {
 
   return (
     <ScreenContainer>
-      <ThemedText variant="title" accessibilityRole="header">
-        Compare two locations
-      </ThemedText>
-      <ThemedText variant="muted">
-        Same period, origin and method; this never ranks overall comfort.
-      </ThemedText>
+      <View style={{ gap: spacing.xs }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.sm }}>
+          <Feather name="bar-chart-2" size={24} color={theme.accent} />
+          <ThemedText variant="title" accessibilityRole="header">
+            Compare two locations
+          </ThemedText>
+        </View>
+        <ThemedText variant="muted">
+          Same period, origin and method; this never ranks overall comfort.
+        </ThemedText>
+      </View>
 
-      <View style={{ flexDirection: "row", gap: 16 }}>
-        <Picker label="Location A" locations={locations} selected={left.location} onPick={(l) => pick("left", l)} theme={theme} />
-        <Picker label="Location B" locations={locations} selected={right.location} onPick={(l) => pick("right", l)} theme={theme} />
+      <View style={{ flexDirection: "row", gap: spacing.lg }}>
+        <Picker label="Location A" locations={locations} selected={left.location} onPick={(l) => pick("left", l)} />
+        <Picker label="Location B" locations={locations} selected={right.location} onPick={(l) => pick("right", l)} />
       </View>
 
       {left.error ? <ErrorState message={left.error} /> : null}
@@ -66,7 +74,7 @@ export default function CompareScreen() {
             message={`Not directly comparable: ${mismatches.map((m) => m.message).join(" ")}`}
           />
         ) : (
-          <View style={{ flexDirection: "row", gap: 16 }}>
+          <View style={{ flexDirection: "row", gap: spacing.lg }}>
             <SideCard title={left.location!.name} profile={left.profile} theme={theme} />
             <SideCard title={right.location!.name} profile={right.profile} theme={theme} />
           </View>
@@ -81,53 +89,43 @@ function Picker({
   locations,
   selected,
   onPick,
-  theme,
 }: {
   label: string;
   locations: Location[];
   selected: Location | null;
   onPick: (location: Location) => void;
-  theme: typeof normalTheme;
 }) {
   return (
-    <View style={{ flex: 1, gap: 4 }}>
-      <ThemedText variant="muted">{label}</ThemedText>
-      {locations.map((location) => (
-        <Pressable
-          key={location.id}
-          accessibilityRole="button"
-          accessibilityLabel={`Select ${location.name} as ${label}`}
-          accessibilityState={{ selected: selected?.id === location.id }}
-          onPress={() => onPick(location)}
-          style={{
-            minHeight: MIN_TOUCH_TARGET,
-            justifyContent: "center",
-            paddingHorizontal: 8,
-            borderRadius: 6,
-            borderWidth: selected?.id === location.id ? 2 : 1,
-            borderColor: theme.accent,
-            backgroundColor: selected?.id === location.id ? theme.accent : theme.surface,
-          }}
-        >
-          <ThemedText style={{ color: selected?.id === location.id ? "#FFFFFF" : undefined }}>
-            {location.name}
-          </ThemedText>
-        </Pressable>
-      ))}
+    <View style={{ flex: 1, gap: spacing.xs }}>
+      <ThemedText variant="label">{label}</ThemedText>
+      <View style={{ gap: spacing.xs }}>
+        {locations.map((location) => (
+          <Chip
+            key={location.id}
+            label={location.name}
+            selected={selected?.id === location.id}
+            accessibilityLabel={`Select ${location.name} as ${label}`}
+            onPress={() => onPick(location)}
+          />
+        ))}
+      </View>
     </View>
   );
 }
 
 function SideCard({ title, profile, theme }: { title: string; profile: Profile; theme: typeof normalTheme }) {
   return (
-    <View style={{ flex: 1, padding: 12, borderRadius: 8, borderWidth: 1, borderColor: theme.border, backgroundColor: theme.surface }}>
-      <ThemedText variant="title">{title}</ThemedText>
+    <Card style={{ flex: 1 }}>
+      <ThemedText variant="subtitle">{title}</ThemedText>
       {profile.laeqDbA === null ? (
         <ThemedText variant="muted">No data</ThemedText>
       ) : (
-        <ThemedText>{profile.laeqDbA.toFixed(1)} dB(A)</ThemedText>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.xs }}>
+          <Feather name="volume-2" size={18} color={theme.accent} />
+          <ThemedText variant="subtitle">{profile.laeqDbA.toFixed(1)} dB(A)</ThemedText>
+        </View>
       )}
       <ThemedText variant="muted">{describeCoverage(profile)}</ThemedText>
-    </View>
+    </Card>
   );
 }

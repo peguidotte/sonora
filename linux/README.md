@@ -1,4 +1,10 @@
-# Provisionamento e monitoramento
+# Operating Systems · Linux
+
+[Capturas da execução](evidencias/) · [Painel na Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard)
+
+O servidor hospeda a ingestão Java, o PostgreSQL e a API C#. O monitor acompanha CPU, RAM e disco. O laboratório demonstra provisionamento do zero, mudança de rede com rollback e recuperação do serviço após falha.
+
+**Vídeo para a entrega:** Pedro vai gravar a demonstração de até sete minutos. As [capturas do laboratório](evidencias/) mostram o provisionamento, a configuração de rede, o monitor e sua recuperação. Para mostrar a aplicação de outra disciplina, siga a [consulta no painel da Azure](#consultar-uma-medição-pública-no-painel).
 
 Responsável: **Pedro Visconti Guidotte, RM556630**. [Equipe completa](../README.md#equipe).
 
@@ -7,6 +13,17 @@ Responsável: **Pedro Visconti Guidotte, RM556630**. [Equipe completa](../README
 Reprodução esperada: VM/WSL, PostgreSQL e C# real com setup/seed; sem conta Azure obrigatória.
 
 `provision.sh` prepara Ubuntu 24.04/PostgreSQL/Java/Caddy/systemd e retenção de logs; `network.sh` verifica/configura rede; `monitor.sh` acompanha CPU/RAM/disco com alerta e recuperação por recurso; `verify.sh` verifica a VM e executa testes limitados de falha/carga; `deploy-release.py` instala releases privados e verifica saúde. [Infraestrutura e CI/CD](../deploy/azure/README.md) define execução Azure e contrato de publicação. Schema/views/seed continuam sendo entrega do SOA no [módulo database/](../database/README.md), com artefato independente das aplicações.
+
+## Roteiro para a gravação de Pedro
+
+| Na gravação | O que mostrar |
+| --- | --- |
+| 0–2 min · Servidor e rede | Abra o índice do ensaio indicado abaixo. Use o log de boot limpo e o de provisionamento para mostrar a VM inicial, as dependências e a reexecução. Mostre IP estático, retorno a DHCP e o teste de rollback. |
+| 2–4 min · Aplicação da equipe | Abra o painel e reproduza a [consulta NoiseCapture](#consultar-uma-medição-pública-no-painel). Mostre a origem e os 24 segundos de cobertura. Explique onde Java grava e de onde o C# lê. |
+| 4–6 min · Monitor, falha e recuperação | No registro do laboratório, mostre CPU, RAM e disco, o alerta de carga e sua recuperação. Compare o PID do monitor antes e depois do crash e mostre o retorno após reboot. |
+| Último minuto · Auditoria | Mostre os timestamps e os códigos de saída no log, o resultado do verificador e a equipe. Mantenha chaves de acesso fora da gravação. |
+
+Os nomes do laboratório e dos logs refletem resultados já obtidos. Na reprodução, abra o `index.html` do ensaio gerado em `output/evidence/linux/`.
 
 ## Reprodução local
 
@@ -18,7 +35,7 @@ sudo install -m 0700 linux/*.sh linux/deploy-release.py /opt/sonora/bootstrap/
 sudo bash /opt/sonora/bootstrap/provision.sh sonora.localhost --local
 ```
 
-Modo local usa HTTP; no Azure o cloud-init passa FQDN real e HTTPS. `SONORA_HOSTNAME` permite escolher o hostname, padrão `sonora`. Backends/migrations precisam ser fornecidos pelos responsáveis. Não executar provisionamento no host pessoal ou em servidor com dados/serviços de outros projetos.
+Modo local usa HTTP; no Azure o cloud-init passa FQDN real e HTTPS. `SONORA_HOSTNAME` permite escolher o hostname, padrão `sonora`. Para instalar as releases compiladas, siga o [procedimento de publicação](../deploy/azure/README.md). Não executar provisionamento no host pessoal ou em servidor com dados/serviços de outros projetos.
 
 ### Laboratório isolado no Windows
 
@@ -36,7 +53,7 @@ A VM usa um vCPU e uma única interface NAT, sem encaminhar portas; o proxy DNS 
 
 `lab.sh` comprova a ausência inicial do Sonora/PostgreSQL, executa o provisionamento real e seus testes, confere reexecução preservando credenciais/OID do banco/arquivo, aplica IP estático, deixa uma tentativa expirar para conferir rollback em disco e runtime, retorna a DHCP e verifica reboot real. IPs `10.0.2.15/24`, `10.0.2.20/24`, gateway `10.0.2.2` e DNS `10.0.2.3` são exclusivos do NAT padrão desse laboratório VirtualBox.
 
-Cada execução gera um diretório próprio em `output/evidence/linux/lab-<id>/`: abrir `index.html` para localizar ambiente, hashes dos fontes/imagem, logs por etapa, gravação `terminal.cast`, resultados e seleção sugerida para o vídeo. O ZIP ao lado desse diretório contém somente as evidências, sem discos/ISO/segredos. `sourceCommit` é a base Git; `sourceWorktreeDirty`, hashes dos arquivos copiados e `execution.json` identificam o código efetivamente ensaiado. O controlador solicita desligamento ao terminar e registra se a VM desligou; mantém VM/disco para consulta posterior. Uma execução incompleta não comprova as etapas restantes. Resultado `infrastructure-only-passed` continua sendo validação parcial: aplicações/migrations de domínio e a demonstração final permanecem pendentes.
+Cada execução gera um diretório próprio em `output/evidence/linux/lab-<id>/`: abrir `index.html` para localizar ambiente, hashes dos fontes/imagem, logs por etapa, gravação `terminal.cast`, resultados e seleção sugerida para o vídeo. O ZIP ao lado desse diretório contém somente as evidências, sem discos/ISO/segredos. `sourceCommit` é a base Git; `sourceWorktreeDirty`, hashes dos arquivos copiados e `execution.json` identificam o código efetivamente ensaiado. O controlador solicita desligamento ao terminar e registra se a VM desligou; mantém VM/disco para consulta posterior. Uma execução incompleta não comprova as etapas restantes. O resultado `infrastructure-only-passed` cobre rede, sistema e monitor. A [demonstração na Azure](#reproduzir-a-demonstração-na-vm) cobre as aplicações e o banco com as migrations aplicadas.
 
 ## Rede
 
@@ -71,4 +88,23 @@ Monitor: `INTERVAL_SECONDS` de 1 a 3600; `CPU_THRESHOLD`, `MEMORY_THRESHOLD`, `D
 
 Comprovar novo PID/reinício e logs após crash e reboot. Aplicações só ficam ativas após deploy real. Scripts registram etapas/timestamp/resultado em `/var/log/sonora-*.log`, com rotação; serviços usam journald persistente limitado a 100 MB/14 dias. Reexecução deve preservar banco, chaves e dados. Para evidências, salvar saída real e metadados de ambiente/commit em `output/` local ou anexar ao PR, sem segredos. Um reboot precisa ser executado e verificado de fato; `is-enabled` sozinho não comprova recuperação pós-boot.
 
-Para fechar a entrega: demonstrar aplicação de outra disciplina com banco/migrations reais, persistência e falhas da aplicação/banco; configuração de rede e rollback em laboratório; reprodução completa e vídeo até 7 minutos. Usar a [rubrica](../docs/disciplinas/linux.md) para organizar essas evidências. Infraestrutura disponível não conclui a matéria; `component.json` permanece em desenvolvimento até comprovar tudo.
+## Reproduzir a demonstração na VM
+
+Com as migrations e as releases instaladas, execute na raiz do clone:
+
+```bash
+sudo bash linux/demo.sh
+sudo bash linux/verify.sh
+```
+
+O primeiro comando cadastra o local identificado como demonstração e usa a credencial de dispositivo da VM para enviar uma janela sintética ao Java. O reenvio retorna o registro anterior. O C# lê o perfil pelo PostgreSQL. No painel, selecione **Laboratório Sonora (simulado)**, origem simulada e um intervalo que inclua **17/11/2026 às 12h de São Paulo**. A janela registrada tem cinco segundos e 63,4 dB(A).
+
+O cadastro usa a identidade de dispositivo da instalação padrão. Se já estiver vinculada a outro local, o script interrompe a transação. As credenciais ficam na VM.
+
+O [smoke integrado manual](https://github.com/peguidotte/sonora/actions/workflows/integration-smoke.yml) usa o modo `azure` para conferir serviços e consultar a janela de demonstração com `demo.sh --check`. Esse modo lê o perfil existente e mantém as chaves na VM.
+
+### Consultar uma medição pública no painel
+
+No [painel da Azure](https://sonora-gs-58403f1647.centralus.cloudapp.azure.com/dashboard), use a chave de leitura da sua equipe e escolha **Paulista B — amostra real NoiseCapture**. Selecione a origem de dados públicos, preencha as duas datas com **22/08/2018** e agrupe por hora. A faixa das **23h de São Paulo** mostra **73,1 dB(A)**, calculados a partir de 24 segundos de medição entre 23h50min26s e 23h50min49s. A cobertura daquele dia se limita a esses 24 segundos.
+
+Essa amostra veio do [arquivo histórico NoiseCapture](../ml/dados/README.md), sob licença ODbL 1.0. O serviço Java importou 24 observações e o C# consultou o resultado no banco. A simulação de 63,4 dB(A) está em outro local e período.

@@ -15,8 +15,10 @@ test("mensagem nunca inclui o valor sensível original, só a categoria", async 
 });
 
 test("com apiKey e fetch simulado, usa o caminho de LLM real e marca usedLlm=true", async () => {
-  const fakeFetch = (async () =>
-    new Response(JSON.stringify({ content: [{ text: "Mensagem traduzida pela IA simulada." }] }), { status: 200 })) as unknown as typeof fetch;
+  const fakeFetch = (async (_url: unknown, init: RequestInit) => {
+    assert.doesNotMatch(String(init.body), /csharp-config|apiKey/);
+    return new Response(JSON.stringify({ content: [{ text: "Mensagem traduzida pela IA simulada." }] }), { status: 200 });
+  }) as unknown as typeof fetch;
   const result = await translateDiagnostic(
     { code: "TAINT_SINK_BLOCKED", sink: "log", category: "credential", source: "csharp-config:apiKey" },
     { apiKey: "test-key", fetchImpl: fakeFetch },
