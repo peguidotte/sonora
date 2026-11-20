@@ -14,7 +14,7 @@ describe("normalizeBaseUrl", () => {
 });
 
 describe("createHttpClient (fetch stubbed)", () => {
-  const originalFetch = global.fetch;
+  const originalFetch = globalThis.fetch;
   let fetchMock: jest.Mock;
 
   function respond(status: number, body: unknown) {
@@ -27,11 +27,11 @@ describe("createHttpClient (fetch stubbed)", () => {
 
   beforeEach(() => {
     fetchMock = jest.fn();
-    global.fetch = fetchMock as unknown as typeof fetch;
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
   });
 
   afterAll(() => {
-    global.fetch = originalFetch;
+    globalThis.fetch = originalFetch;
   });
 
   const client = createHttpClient({ baseUrl: "http://host:4010/", apiKey: "k" });
